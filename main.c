@@ -18,7 +18,7 @@ int main(int argc, char** argv){
 
     SDL_Renderer *renderer = SDL_CreateRenderer(window,-1,0);
     SDL_Surface *image = SDL_LoadPNG("./ressources/fond1.png");
-    SDL_Texture *
+    //SDL_Texture *
 
     while (play){
         
