@@ -8,8 +8,7 @@ int main(int argc, char** argv){
     bool play = true;
     
     if (SDL_Init(SDL_INIT_VIDEO) != 0){
-        fprintf(stdout,"Erreur du lancement de SDL %s\n",SDL_GetError());
-        return play=false;
+        fprintf(stdouurn play=false;
     }
 
     //initialisation de la fenêtre
