@@ -1,0 +1,3 @@
+/home/alexis/Documents/projet2/Prog_Avance_Fight_game/CMakeFiles/main.dir
+/home/alexis/Documents/projet2/Prog_Avance_Fight_game/CMakeFiles/edit_cache.dir
+/home/alexis/Documents/projet2/Prog_Avance_Fight_game/CMakeFiles/rebuild_cache.dir
