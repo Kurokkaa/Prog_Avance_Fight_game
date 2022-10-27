@@ -11,6 +11,8 @@ list(APPEND CMAKE_MODULE_PATH ${SRC_DIR}/cmake/sdl2)
 file(GLOB SOURCES
 "${SRC_DIR}/*.h"
 "${SRC_DIR}/*.c"
+"${SRC_DIR}/*/*.h"
+"${SRC_DIR}/*/*.c"
 )
 #Add the executable
 add_executable(${PROJECT_NAME} ${SOURCES})

@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_image.h>
+
 int main(int argc, char *argv[])
 {
 SDL_Window* fenetre; // Déclaration de la fenêtre

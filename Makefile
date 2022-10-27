@@ -57,10 +57,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/alexis/Documents/projet2/Prog_Avance_Fight_game/build
+CMAKE_SOURCE_DIR = /home/john/Documents/L2/Progra_avancée/Prog_Avance_Fight_game/build
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/alexis/Documents/projet2/Prog_Avance_Fight_game
+CMAKE_BINARY_DIR = /home/john/Documents/L2/Progra_avancée/Prog_Avance_Fight_game
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -87,9 +87,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/alexis/Documents/projet2/Prog_Avance_Fight_game/CMakeFiles /home/alexis/Documents/projet2/Prog_Avance_Fight_game//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/john/Documents/L2/Progra_avancée/Prog_Avance_Fight_game/CMakeFiles /home/john/Documents/L2/Progra_avancée/Prog_Avance_Fight_game//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/alexis/Documents/projet2/Prog_Avance_Fight_game/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/john/Documents/L2/Progra_avancée/Prog_Avance_Fight_game/CMakeFiles 0
 .PHONY : all
 
 # The main clean target

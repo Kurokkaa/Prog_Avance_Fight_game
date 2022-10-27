@@ -1,4 +1,4 @@
-# Install script for directory: /home/alexis/Documents/projet2/Prog_Avance_Fight_game/build
+# Install script for directory: /home/john/Documents/L2/Progra_avancée/Prog_Avance_Fight_game/build
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -50,5 +50,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/alexis/Documents/projet2/Prog_Avance_Fight_game/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/john/Documents/L2/Progra_avancée/Prog_Avance_Fight_game/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

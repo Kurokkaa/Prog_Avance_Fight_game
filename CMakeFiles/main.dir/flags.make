@@ -4,7 +4,7 @@
 # compile C with /usr/bin/cc
 C_DEFINES = 
 
-C_INCLUDES = -I/home/alexis/Documents/projet2/Prog_Avance_Fight_game/build/include -isystem /usr/include/SDL2
+C_INCLUDES = -I/home/john/Documents/L2/Progra_avancée/Prog_Avance_Fight_game/build/include -isystem /usr/include/SDL2
 
 C_FLAGS = 
 
