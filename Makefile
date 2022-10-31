@@ -129,6 +129,30 @@ main/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/build
 .PHONY : main/fast
 
+graphics.o: graphics.c.o
+.PHONY : graphics.o
+
+# target to build an object file
+graphics.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/graphics.c.o
+.PHONY : graphics.c.o
+
+graphics.i: graphics.c.i
+.PHONY : graphics.i
+
+# target to preprocess a source file
+graphics.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/graphics.c.i
+.PHONY : graphics.c.i
+
+graphics.s: graphics.c.s
+.PHONY : graphics.s
+
+# target to generate assembly for a file
+graphics.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/graphics.c.s
+.PHONY : graphics.c.s
+
 main.o: main.c.o
 .PHONY : main.o
 
@@ -162,6 +186,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... main"
+	@echo "... graphics.o"
+	@echo "... graphics.i"
+	@echo "... graphics.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"

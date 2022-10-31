@@ -8,6 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "/home/john/Documents/L2/Progra_avancée/Prog_Avance_Fight_game/build/graphics.c" "CMakeFiles/main.dir/graphics.c.o" "gcc" "CMakeFiles/main.dir/graphics.c.o.d"
   "/home/john/Documents/L2/Progra_avancée/Prog_Avance_Fight_game/build/main.c" "CMakeFiles/main.dir/main.c.o" "gcc" "CMakeFiles/main.dir/main.c.o.d"
   )
 
