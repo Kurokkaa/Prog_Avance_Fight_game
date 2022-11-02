@@ -2,9 +2,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
+//#include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_image.h>
-#include <SDL2/SDL_events.h>
 #include "structure/structure.h"
 #include "graphics.h"
 
@@ -21,19 +20,19 @@ void init_perso(SDL_Renderer* renderer, jeu* world, int x, int y, int w, int h, 
     init_texture(renderer, &world->p1);
 }
 
-void init(SDL_Window* window, SDL_Renderer* renderer, jeu* world){
+void init(SDL_Window** window, SDL_Renderer** renderer, jeu* world){
     if(SDL_Init(SDL_INIT_EVERYTHING) < 0){ // Initialisation de la SDL
         printf("Erreur d'initialisation de la SDL: %s",SDL_GetError());
         SDL_Quit();
     }
 
-    window = SDL_CreateWindow("Fenetre SDL", SDL_WINDOWPOS_CENTERED,
-    SDL_WINDOWPOS_CENTERED, 600, 600, SDL_WINDOW_RESIZABLE);
+    *window = SDL_CreateWindow("Fenetre SDL", SDL_WINDOWPOS_CENTERED,
+    SDL_WINDOWPOS_CENTERED, 1000, 1000, SDL_WINDOW_RESIZABLE);
     if( window == NULL){ // En cas d’erreur
         printf("Erreur de la creation d'une fenetre: %s",SDL_GetError());
         SDL_Quit();
     }
-    renderer = SDL_CreateRenderer(window,-1,SDL_RENDERER_ACCELERATED);
+    *renderer = SDL_CreateRenderer(*window,-1,SDL_RENDERER_ACCELERATED);
     
     int imgFlags = IMG_INIT_PNG;
     if( !( IMG_Init( imgFlags ) & imgFlags ) ){
@@ -41,7 +40,7 @@ void init(SDL_Window* window, SDL_Renderer* renderer, jeu* world){
         SDL_Quit();
     }
     init_jeu(world);
-    init_perso(renderer,world,10,10,25,100,10);
+    init_perso(*renderer,world,10,400,25,100,20);
 }
 
 void gameplay_events(SDL_Event *event, jeu *world){
@@ -72,16 +71,26 @@ void gameplay_events(SDL_Event *event, jeu *world){
     }
 }
 
+void apply_texture(SDL_Renderer *renderer, SDL_Texture *texture, int x, int y){
+    SDL_Rect dst = {0, 0, 0, 0};
+    
+    SDL_QueryTexture(texture, NULL, NULL, &dst.w, &dst.h);
+    dst.x = x; dst.y = y;
+    
+    SDL_RenderCopy(renderer, texture, NULL, &dst);
+}
+
 int main(int argc, char *argv[]){
     SDL_Window* fenetre; // Déclaration de la fenêtre
-    SDL_Event events; // Événements liés à la fenêtre
+
     SDL_Renderer* renderer;
+    SDL_Event events;
     
     jeu world;
     
-    init(fenetre,renderer,&world);
+    init(&fenetre,&renderer,&world);
 
-
+    refresh_graphics(renderer,&world);
     // Boucle principale
     while(!world.terminer){
         gameplay_events(&events, &world);

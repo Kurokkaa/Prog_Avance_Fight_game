@@ -12,7 +12,7 @@ enum perso{p1,p2};
 */
 
 struct sprite_p{
-    SDL_Texture * text_perso;
+    SDL_Texture * texture_perso;
     int x;
     int y;
     int w; /*!<largeur du sprite */
