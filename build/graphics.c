@@ -5,11 +5,7 @@
 #include "structure/structure.h"
 
 SDL_Texture* load_image( char path[],SDL_Renderer *renderer){
-    int imgFlags = IMG_INIT_PNG;
-    if( !( IMG_Init( imgFlags ) & imgFlags ) ){
-        printf( "Erreur initialisation de SDL_Image: %s\n", IMG_GetError() );
-        SDL_Quit();
-    }
+    
     SDL_Surface* surfaceCharge = IMG_Load(path);
     return SDL_CreateTextureFromSurface(renderer, surfaceCharge);
 }

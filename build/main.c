@@ -10,7 +10,7 @@
 #include "graphics.h"
 
 
-void init(SDL_Window* window, SDL_Renderer* render){
+void init(SDL_Window* window, SDL_Renderer* render, jeu* world){
     if(SDL_Init(SDL_INIT_EVERYTHING) < 0){ // Initialisation de la SDL
     printf("Erreur d'initialisation de la SDL: %s",SDL_GetError());
     SDL_Quit();
@@ -23,6 +23,13 @@ void init(SDL_Window* window, SDL_Renderer* render){
         SDL_Quit();
     }
     render = SDL_CreateRenderer(window,-1,SDL_RENDERER_ACCELERATED);
+    
+    int imgFlags = IMG_INIT_PNG;
+    if( !( IMG_Init( imgFlags ) & imgFlags ) ){
+        printf( "Erreur initialisation de SDL_Image: %s\n", IMG_GetError() );
+        SDL_Quit();
+    }
+    init_jeu(&world);
 }
 
 void gameplay_events(SDL_Event *event, jeu *world){
@@ -66,8 +73,8 @@ int main(int argc, char *argv[]){
     SDL_Renderer* renderer;
     
     jeu world;
-    init_jeu(&world);
-    init(fenetre,renderer);
+    
+    init(fenetre,renderer,&world);
 
 
     // Boucle principale

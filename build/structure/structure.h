@@ -30,7 +30,7 @@ enum state{combat, menu, pause, options};
 struct world_s{
     enum state etat;
     bool terminer; /*!< Champ indiquant si l'on est à la fin du jeu */
-    sprite_perso pers1;
+    
 };
 
 typedef struct world_s jeu;
