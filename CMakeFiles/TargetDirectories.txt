@@ -1,3 +1,0 @@
-/home/john/Documents/L2/Progra_avancée/Prog_Avance_Fight_game/CMakeFiles/main.dir
-/home/john/Documents/L2/Progra_avancée/Prog_Avance_Fight_game/CMakeFiles/edit_cache.dir
-/home/john/Documents/L2/Progra_avancée/Prog_Avance_Fight_game/CMakeFiles/rebuild_cache.dir

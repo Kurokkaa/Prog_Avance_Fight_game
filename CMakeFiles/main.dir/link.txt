@@ -1,1 +1,0 @@
-/usr/bin/cc CMakeFiles/main.dir/graphics.c.o CMakeFiles/main.dir/main.c.o -o main  /usr/lib/x86_64-linux-gnu/libSDL2_ttf.so /usr/lib/x86_64-linux-gnu/libSDL2_image.so /usr/lib/x86_64-linux-gnu/libSDL2main.a /usr/lib/x86_64-linux-gnu/libSDL2.so 
