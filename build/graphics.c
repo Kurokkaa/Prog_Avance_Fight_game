@@ -2,6 +2,7 @@
 #include <SDL2/SDL_image.h>
 #include <stdio.h>
 #include <string.h>
+#include "graphics.h"
 #include "structure/structure.h"
 
 SDL_Texture* load_image( char path[],SDL_Renderer *renderer){
@@ -12,6 +13,7 @@ SDL_Texture* load_image( char path[],SDL_Renderer *renderer){
 
 void init_texture(SDL_Renderer *renderer, sprite_perso *perso){
     perso->text_perso = load_image( "ressources/stickman.png",renderer);
+
 }
 
 void apply_sprite(SDL_Renderer *renderer, SDL_Texture *texture, sprite_perso* sprite){
@@ -25,8 +27,16 @@ void apply_sprite(SDL_Renderer *renderer, SDL_Texture *texture, sprite_perso* sp
 
 void refresh_graphics(SDL_Renderer *renderer, jeu *world){
         SDL_RenderClear(renderer);
-        apply_sprite(renderer, world->pers1.text_perso, &(world->pers1));
-        //apply_texture(world->pers1.text_perso, renderer, world->pers1.x , world->pers1.y);
+        //apply_sprite(renderer, world->p1.text_perso, &(world->p1));
+        
+        SDL_Rect srcrect;
+        srcrect.x = 0;
+        srcrect.y = 0;
+        srcrect.w = 300;
+        srcrect.h = 300;
+        SDL_SetRenderDrawColor(renderer,255,0,0,1);
+        SDL_RenderDrawRect(renderer, &srcrect);
+        //apply_texture(world->p1.text_perso, renderer, world->p1.x , world->p1.y);
         SDL_RenderPresent(renderer);
 }
 
