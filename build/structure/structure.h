@@ -4,6 +4,8 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <stdbool.h>
+#include "../constante.h"
+#include "../map/russia/map_russia.h"
 
 /*struct personnage{
 };
@@ -23,12 +25,19 @@ struct sprite_p{
 
 typedef struct sprite_p sprite_perso ;
 
-enum state{combat, menu, pause, options};
+struct maps{
+    Russia map_r;
+    
+};
+
+typedef struct maps map;
 
 struct world_s{
-    enum state etat;
+    enum game_state state;
     bool terminer; /*!< Champ indiquant si l'on est à la fin du jeu */
     sprite_perso p1;
+    enum map_choice choice;
+    map maps;
 };
 
 typedef struct world_s jeu;
