@@ -18,7 +18,7 @@ void init_jeu(jeu *world){
 void init_map(jeu* world,SDL_Renderer* renderer){
     switch(world->choice){
         case russia:
-            world->maps.map_r.image_fond = load_image("./ressources/dojo.png",renderer);
+            world->maps.map_r.image_fond = load_image("build/map/russia/RussiaMap.png",renderer);
             break;        
     }
 }

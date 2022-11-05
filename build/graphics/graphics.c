@@ -25,7 +25,7 @@ void apply_sprite(SDL_Renderer *renderer, SDL_Texture *texture, sprite_perso* sp
 
 void refresh_graphics(SDL_Renderer *renderer, jeu *world){
         SDL_RenderClear(renderer);
-       
+      
         if(world->state==combat){
             display_map(renderer,world);
         }
