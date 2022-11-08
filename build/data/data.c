@@ -37,11 +37,14 @@ SDL_Texture* load_image( char path[],SDL_Renderer *renderer){
     return texture;
 }
 
-void limit_movements(sprite_perso* perso){
-    if(perso->x >= SCREEN_WIDTH - perso->w){
-        perso->x = SCREEN_WIDTH - perso->w;
-    }
-    if(perso->x <= 0){
-        perso->x = 0;
-    }
+
+void is_empty(int x, int y, char** struct){
+    return struct[y][x] == ' ';
+}
+
+
+void limit_movements(sprite_perso* perso, jeu* world){
+    int x = perso->x / CELL_WIDTH;
+    int y = perso->y / CELL_HEIGHT;
+    if(!is_empty(x,y, world->map.map_structure))
 }

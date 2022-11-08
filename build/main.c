@@ -58,33 +58,35 @@ void init(SDL_Window** window, SDL_Renderer** renderer, jeu* world){
 }
 
 void gameplay_inputs(SDL_Event *event, jeu *world){
-    Uint8 *keystates;
+    const Uint8 *keystates = SDL_GetKeyboardState(NULL);;
     while(SDL_PollEvent(event)){
-
-        switch(event->type){
-            case SDL_QUIT:
-            world->terminer = true;
-            break;
-
-            case SDL_KEYDOWN:
-            switch(event->key.keysym.sym){
-                case SDLK_ESCAPE:
-                case SDLK_q:
-                world->terminer = true;
-                break;
-
-                case SDLK_RIGHT:
-                world->p1.x += world->p1.speed ;
-                limit_movements(&world->p1);
-                break;
-
-                case SDLK_LEFT:
-                world->p1.x -= world->p1.speed;
-                limit_movements(&world->p1);
-                break;
-            }
-        }
+        if(event->type == SDL_QUIT){
+            world->terminer == true;
+        }     
     }
+            //deplacement gauche
+        if(keystates[SDL_SCANCODE_A] && !keystates[SDL_SCANCODE_D]){
+            world->p1.x -= 10;
+        }
+        //deplacement droite
+        if(!keystates[SDL_SCANCODE_A] && keystates[SDL_SCANCODE_D]){
+            world->p1.x += 10;
+        }
+        //sauts
+        if(keystates[SDL_SCANCODE_W]){
+            
+        }
+        //coups
+        if(keystates[SDL_SCANCODE_G] && !keystates[SDL_SCANCODE_U] && !keystates[SDL_SCANCODE_Y]){
+        }
+        //kicks
+        if(!keystates[SDLK_g] && keystates[SDLK_u] && !keystates[SDLK_y]){
+        }
+        //coup spéciaux si la jauge est pleine
+        if(keystates[SDLK_y] && keystates[SDLK_g] && keystates[SDLK_u]){
+
+        }
+        
 }
 
 int main(int argc, char *argv[]){

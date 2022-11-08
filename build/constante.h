@@ -8,7 +8,7 @@
     #define CELL_WIDTH SCREEN_WIDTH/COLUMNS
 
 enum game_state{combat, menu, pause, options};
-enum character_state{rest};
+enum character_state{rest, walking, jump, falling};
 enum map_choice{dojo,russia};
 
 #endif

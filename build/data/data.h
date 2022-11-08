@@ -14,5 +14,6 @@ SDL_Texture* load_image( char path[],SDL_Renderer *renderer);
 char** read_file_map(char* nom);
 void init_map(jeu* world,SDL_Renderer* renderer);
 void limit_movements(sprite_perso* perso);
+void is_empty(int x, int y, char** struct);
 
 #endif
