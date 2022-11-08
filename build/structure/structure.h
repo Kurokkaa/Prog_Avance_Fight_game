@@ -26,18 +26,18 @@ struct sprite_p{
 typedef struct sprite_p sprite_perso ;
 
 struct maps{
-    Russia map_r;
+    Russia map_russia;
     
 };
 
-typedef struct maps map;
+typedef struct maps map_set;
 
 struct world_s{
     enum game_state state;
     bool terminer; /*!< Champ indiquant si l'on est à la fin du jeu */
     sprite_perso p1;
     enum map_choice choice;
-    map maps;
+    map_set map;
 };
 
 typedef struct world_s jeu;

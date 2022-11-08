@@ -18,7 +18,9 @@ void init_jeu(jeu *world){
 void init_map(jeu* world,SDL_Renderer* renderer){
     switch(world->choice){
         case russia:
-            world->maps.map_r.image_fond = load_image("build/map/russia/RussiaMap.png",renderer);
+            world->map.map_russia.image_fond = load_image("build/map/russia/RussiaMap.png",renderer);
+            world->map.map_russia.map_structure = read_file_map("build/map/russia/russia_structure");
+            world->map.map_russia.plateformes = load_image("build/map/russia/plateforme.png",renderer);
             break;        
     }
 }
@@ -51,7 +53,7 @@ void init(SDL_Window** window, SDL_Renderer** renderer, jeu* world){
         SDL_Quit();
     }
     init_jeu(world);
-    init_perso(*renderer,world,10,400,25,100,20);
+    init_perso(*renderer,world,10,400,125,100,20);
     init_map(world,*renderer);
 }
 
@@ -73,23 +75,16 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
 
                 case SDLK_RIGHT:
                 world->p1.x += world->p1.speed ;
+                limit_movements(&world->p1);
                 break;
 
                 case SDLK_LEFT:
                 world->p1.x -= world->p1.speed;
+                limit_movements(&world->p1);
                 break;
             }
         }
     }
-}
-
-void apply_texture(SDL_Renderer *renderer, SDL_Texture *texture, int x, int y){
-    SDL_Rect dst = {0, 0, 0, 0};
-    
-    SDL_QueryTexture(texture, NULL, NULL, &dst.w, &dst.h);
-    dst.x = x; dst.y = y;
-    
-    SDL_RenderCopy(renderer, texture, NULL, &dst);
 }
 
 int main(int argc, char *argv[]){

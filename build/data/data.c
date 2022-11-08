@@ -8,8 +8,11 @@ char** read_file_map(char* nom){
     char** map_struct = malloc(sizeof(char*)*40);
     for(int i =0 ;i<40;i++){
         map_struct[i]=malloc(sizeof(char)*20);
+        fread(map_struct[i],20,1,file);
     }
-    fread(map_struct,20,40,file);
+    if(map_struct == NULL){
+        printf("Erreur de chargement de structure");
+    }
     return map_struct;
 }
 
@@ -32,4 +35,13 @@ SDL_Texture* load_image( char path[],SDL_Renderer *renderer){
         return NULL;
     }
     return texture;
+}
+
+void limit_movements(sprite_perso* perso){
+    if(perso->x >= SCREEN_WIDTH - perso->w){
+        perso->x = SCREEN_WIDTH - perso->w;
+    }
+    if(perso->x <= 0){
+        perso->x = 0;
+    }
 }
