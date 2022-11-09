@@ -11,16 +11,16 @@
 
 void init_jeu(jeu *world){
     world->state = combat;
-    world->choice = russia;
+    world->choosed_map = russia;
     world->terminer = false;
     
 }
 void init_map(jeu* world,SDL_Renderer* renderer){
-    switch(world->choice){
+    switch(world->choosed_map){
         case russia:
-            world->map.map_russia.image_fond = load_image("build/map/russia/RussiaMap.png",renderer);
-            world->map.map_russia.map_structure = read_file_map("build/map/russia/russia_structure");
-            world->map.map_russia.plateformes = load_image("build/map/russia/plateforme.png",renderer);
+            world->map.image_fond = load_image("build/map/russia/RussiaMap.png",renderer);
+            world->map.map_structure = read_file_map("build/map/russia/russia_structure");
+            world->map.plateformes = load_image("build/map/russia/plateforme.png",renderer);
             break;        
     }
 }
@@ -29,7 +29,7 @@ void init_perso(SDL_Renderer* renderer, jeu* world, int x, int y, int w, int h, 
     world->p1.y = y;
     world->p1.w = w;
     world->p1.h = h;
-    world->p1.speed = speed;
+    world->p1.speed = CHARA_SPEED;
     init_texture(renderer, &world->p1,world);
 }
 
@@ -61,16 +61,16 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
     const Uint8 *keystates = SDL_GetKeyboardState(NULL);;
     while(SDL_PollEvent(event)){
         if(event->type == SDL_QUIT){
-            world->terminer == true;
+            world->terminer = true;
         }     
     }
             //deplacement gauche
         if(keystates[SDL_SCANCODE_A] && !keystates[SDL_SCANCODE_D]){
-            world->p1.x -= 10;
+            limit_movements(&world->p1, world, world->p1.x - world->p1.speed, world->p1.y);
         }
         //deplacement droite
         if(!keystates[SDL_SCANCODE_A] && keystates[SDL_SCANCODE_D]){
-            world->p1.x += 10;
+            world->p1.x += world->p1.speed;
         }
         //sauts
         if(keystates[SDL_SCANCODE_W]){

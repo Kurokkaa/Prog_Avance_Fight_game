@@ -3,7 +3,6 @@
 
 
 char** read_file_map(char* nom){
-    
     FILE* file = fopen(nom,"r");
     char** map_struct = malloc(sizeof(char*)*40);
     for(int i =0 ;i<40;i++){
@@ -37,14 +36,16 @@ SDL_Texture* load_image( char path[],SDL_Renderer *renderer){
     return texture;
 }
 
-
-void is_empty(int x, int y, char** struct){
-    return struct[y][x] == ' ';
+void limit_movements(sprite_perso* perso, jeu* world, int x , int y){
+    if(is_empty(x,y, world->map.map_structure)){
+       perso->x = x;
+       perso->y = y;
+    }
 }
 
 
-void limit_movements(sprite_perso* perso, jeu* world){
-    int x = perso->x / CELL_WIDTH;
-    int y = perso->y / CELL_HEIGHT;
-    if(!is_empty(x,y, world->map.map_structure))
+bool is_empty(int x, int y, char** map_point){
+    return (map_point[y][x] == ' ');
 }
+
+

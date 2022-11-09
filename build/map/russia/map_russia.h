@@ -1,14 +1,12 @@
 #ifndef dojo_h
 #define dojo_h
 
+/*A voir si structure nécessaire*/
 
+#include "../map_global.h"
 
 struct map_russia{
-    char** map_structure;
-    int taille_cellule_H;
-    int taille_cellule_W;
-    SDL_Texture* image_fond;
-    SDL_Texture* plateformes;
+    set_map russia;
 };
 
 typedef struct map_russia Russia;
