@@ -21,6 +21,10 @@ struct sprite_p{
     int h; /*!<hauteur du sprite */
     int speed;
     int perso;
+    enum character_state chara_state;
+    bool backwards;
+    int jump_height;
+    int jump_origin;
 };
 
 typedef struct sprite_p sprite_perso ;

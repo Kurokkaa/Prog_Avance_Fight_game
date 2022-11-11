@@ -7,14 +7,14 @@
 #include "../constante.h"
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_image.h"
-#include "../map/russia/map_russia.h"
 #include <stdbool.h>
+#include <math.h>
 
 
 SDL_Texture* load_image( char path[],SDL_Renderer *renderer);
 char** read_file_map(char* nom);
 void init_map(jeu* world,SDL_Renderer* renderer);
-bool is_empty(int x, int y, char** map_point);
-void limit_movements(sprite_perso* perso, jeu* world, int x , int y);
+void movements(jeu* world, sprite_perso* perso);
+bool equals(int x, int y, char** map_point, char test);
 
 #endif

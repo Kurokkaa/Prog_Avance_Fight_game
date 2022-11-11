@@ -4,7 +4,7 @@
 #include "SDL2/SDL.h"
 
 struct map_settings{
-    enum game_map choose_map;
+    enum game_map choosed_map;
     char** map_structure;
     int taille_cellule_H;
     int taille_cellule_W;

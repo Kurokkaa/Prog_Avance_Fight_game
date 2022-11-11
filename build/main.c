@@ -21,6 +21,8 @@ void init_map(jeu* world,SDL_Renderer* renderer){
             world->map.image_fond = load_image("build/map/russia/RussiaMap.png",renderer);
             world->map.map_structure = read_file_map("build/map/russia/russia_structure");
             world->map.plateformes = load_image("build/map/russia/plateforme.png",renderer);
+            world->map.taille_cellule_H = sizeof(world->map.map_structure);
+            world->map.taille_cellule_W = sizeof(world->map.map_structure[0]);
             break;        
     }
 }
@@ -30,6 +32,9 @@ void init_perso(SDL_Renderer* renderer, jeu* world, int x, int y, int w, int h, 
     world->p1.w = w;
     world->p1.h = h;
     world->p1.speed = CHARA_SPEED;
+    world->p1.jump_height = 300;
+    world->p1.chara_state = idle;
+    world->p1.jump_origin = y;
     init_texture(renderer, &world->p1,world);
 }
 
@@ -53,7 +58,7 @@ void init(SDL_Window** window, SDL_Renderer** renderer, jeu* world){
         SDL_Quit();
     }
     init_jeu(world);
-    init_perso(*renderer,world,10,400,125,100,20);
+    init_perso(*renderer,world,64, 450 ,125,232,CHARA_SPEED);
     init_map(world,*renderer);
 }
 
@@ -62,20 +67,33 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
     while(SDL_PollEvent(event)){
         if(event->type == SDL_QUIT){
             world->terminer = true;
-        }     
-    }
+        }
+    }   
+        if(!keystates[SDL_SCANCODE_A] && !keystates[SDL_SCANCODE_D]){
+            world->p1.speed = 0;
+        }
+
             //deplacement gauche
         if(keystates[SDL_SCANCODE_A] && !keystates[SDL_SCANCODE_D]){
-            limit_movements(&world->p1, world, world->p1.x - world->p1.speed, world->p1.y);
+            world->p1.speed = -CHARA_SPEED;
+            if(world->p1.chara_state == idle){
+                world->p1.chara_state = walk;
+            }
         }
+
         //deplacement droite
         if(!keystates[SDL_SCANCODE_A] && keystates[SDL_SCANCODE_D]){
-            world->p1.x += world->p1.speed;
+            world->p1.speed = CHARA_SPEED;
+            if(world->p1.chara_state == idle){
+                world->p1.chara_state = walk;
+            }
         }
+
         //sauts
-        if(keystates[SDL_SCANCODE_W]){
-            
+        if(keystates[SDL_SCANCODE_W] && (world->p1.chara_state == idle || world->p1.chara_state == walk)){
+            world->p1.chara_state = jump;
         }
+
         //coups
         if(keystates[SDL_SCANCODE_G] && !keystates[SDL_SCANCODE_U] && !keystates[SDL_SCANCODE_Y]){
         }
@@ -86,7 +104,7 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
         if(keystates[SDLK_y] && keystates[SDLK_g] && keystates[SDLK_u]){
 
         }
-        
+        movements(world, &world->p1);
 }
 
 int main(int argc, char *argv[]){

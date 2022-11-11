@@ -9,8 +9,9 @@
     #define CELL_WIDTH SCREEN_WIDTH/COLUMNS
     #define CHARA_SPEED CELL_WIDTH * 0.2
 
+
     enum game_state{combat, menu, pause, options};
-    enum character_state{rest, walking, jump, falling};
+    enum character_state{idle, walk, jump, fall, backwards, flight};
     enum game_map{russia, other_map};
 
 #endif
