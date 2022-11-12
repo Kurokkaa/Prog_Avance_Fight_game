@@ -37,23 +37,72 @@ SDL_Texture* load_image( char path[],SDL_Renderer *renderer){
 }
 
 void movements(jeu* world, sprite_perso* perso){
+    printf("X: %d\n", perso->x);
+    printf("Y: %d\n", perso->y);
+    printf("State: %d\n", perso->chara_state);
+    printf("Bckwd: %d\n", backwards);
     int x, y;
-    x = perso->x + perso->speed;
+    x = perso->x;
     y = perso->y;
-    if(equals(x, y + perso->h, world->map.map_structure, ' ') && perso->chara_state != flight){
-        perso->x = x;
+
+    //Contrôle en marche
+    if(perso->chara_state == walk){
+            if(perso->backwards){
+                if(!equals(x - perso->speed, y + perso->h, world->map.map_structure, '0')){
+                    perso->x -= perso->speed;
+                }
+            }
+            else{
+                if(!equals(x + perso->speed, y + perso->h, world->map.map_structure, '0')){
+                    perso->x += perso->speed;
+                }
+            }
     }
 
+    //Contrôle en vol
+    if(perso->chara_state == flight_control){
+        if(perso->backwards){
+                if(equals(x - perso->speed, y + perso->h, world->map.map_structure, ' ')){
+                    perso->x -= perso->speed * 0.2;
+                }
+            }
+            else{
+                if(equals(x + perso->speed, y + perso->h, world->map.map_structure, ' ')){
+                    perso->x += perso->speed * 0.2;
+                }
+        }
+        perso->chara_state = flight;
+    }
+
+    //Contrôle en chute
+    if(perso->chara_state == fall_control){
+        if(perso->backwards){
+                if(equals(x - perso->speed, y + perso->h, world->map.map_structure, ' ')){
+                    perso->x -= perso->speed * 0.2;
+                }
+            }
+            else{
+                if(equals(x + perso->speed, y + perso->h, world->map.map_structure, ' ')){
+                    perso->x += perso->speed * 0.2;
+                }
+        }
+        perso->chara_state = fall;
+    }
+
+    //Initialisation du saut
     if(perso->chara_state == jump){
         perso->jump_origin = perso->y;
         perso->chara_state = flight;
     }
 
+    //Contrôle de la hauteur du saut
     if(perso->chara_state == flight){
         if(perso->y > perso->jump_origin - perso->jump_height){
-            printf("Y: %d\n", perso->y);
-            if(!equals(x, y + perso->h, world->map.map_structure, '0')){
-                perso->y -= perso->jump_height*0.005;
+            if(!equals(x, y, world->map.map_structure, '0')){
+                perso->y -= perso->jump_height*0.025;
+            }
+            else{
+                perso->chara_state = fall;
             }
         }
         else{
@@ -61,14 +110,38 @@ void movements(jeu* world, sprite_perso* perso){
         }
     }
 
+    //Automatisaion de la chute
     if((perso->chara_state == fall)){
-        x = perso->x + perso->speed;
+        x = perso->x;
         y = perso->y;
-        if(equals(x, y + perso->h, world->map.map_structure, ' ')){
-            perso->y += perso->jump_height*0.005;
+        if(y + perso->jump_height *0.025 > 720){
+            perso->y = 465;
+            perso->chara_state = landing;
         }
         else{
+            if(equals(x, y + perso->h + perso->jump_height*0.025, world->map.map_structure, ' ')){
+                perso->y += perso->jump_height*0.025;
+            }
+            else{
+                printf("COLLISION\n");
+                perso->chara_state = landing;
+            }
+        }
+    }
+
+    //Cas où le personnage chute s'il n'y a pas de plateformes
+    x = perso->x;
+    y = perso->y;
+    if(perso->chara_state !=flight && equals(x, y + perso->h + perso->jump_height *0.025 , world->map.map_structure, ' ') && equals(x + perso->x, y + perso->h + perso->jump_height *0.025 , world->map.map_structure, ' ')){
+        perso->chara_state = fall;
+    }
+
+    if(perso->chara_state == landing){
+        printf("idle: %d\n", perso->animation);
+        perso->animation++;
+        if(perso->animation >= 20){
             perso->chara_state = idle;
+            perso->animation = 0;
         }
     }
 }

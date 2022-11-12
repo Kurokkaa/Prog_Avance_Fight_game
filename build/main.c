@@ -34,7 +34,9 @@ void init_perso(SDL_Renderer* renderer, jeu* world, int x, int y, int w, int h, 
     world->p1.speed = CHARA_SPEED;
     world->p1.jump_height = 300;
     world->p1.chara_state = idle;
+    world->p1.backwards = false;
     world->p1.jump_origin = y;
+    world->p1.animation = 0;
     init_texture(renderer, &world->p1,world);
 }
 
@@ -58,7 +60,7 @@ void init(SDL_Window** window, SDL_Renderer** renderer, jeu* world){
         SDL_Quit();
     }
     init_jeu(world);
-    init_perso(*renderer,world,64, 450 ,125,232,CHARA_SPEED);
+    init_perso(*renderer,world,65, 465 ,125,232,CHARA_SPEED);
     init_map(world,*renderer);
 }
 
@@ -69,23 +71,40 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
             world->terminer = true;
         }
     }   
-        if(!keystates[SDL_SCANCODE_A] && !keystates[SDL_SCANCODE_D]){
-            world->p1.speed = 0;
+        if(!keystates[SDL_SCANCODE_A] && !keystates[SDL_SCANCODE_D] && world->p1.chara_state == walk){
+            world->p1.chara_state = idle;
         }
-
             //deplacement gauche
         if(keystates[SDL_SCANCODE_A] && !keystates[SDL_SCANCODE_D]){
-            world->p1.speed = -CHARA_SPEED;
+            //world->p1.speed = -CHARA_SPEED;
             if(world->p1.chara_state == idle){
                 world->p1.chara_state = walk;
+                world->p1.backwards = true;
+            }
+            if(world->p1.chara_state == flight){
+                world->p1.chara_state = flight_control;
+                world->p1.backwards = true;
+            }
+            if(world->p1.chara_state == fall){
+                world->p1.chara_state = fall_control;
+                world->p1.backwards = true;
             }
         }
 
         //deplacement droite
         if(!keystates[SDL_SCANCODE_A] && keystates[SDL_SCANCODE_D]){
-            world->p1.speed = CHARA_SPEED;
+            //world->p1.speed = CHARA_SPEED;
             if(world->p1.chara_state == idle){
                 world->p1.chara_state = walk;
+                world->p1.backwards = false;
+            }
+            if(world->p1.chara_state == flight){
+                world->p1.chara_state = flight_control;
+                world->p1.backwards = false;
+            }
+            if(world->p1.chara_state == fall){
+                world->p1.chara_state = fall_control;
+                world->p1.backwards = false;
             }
         }
 

@@ -11,7 +11,7 @@
 
 
     enum game_state{combat, menu, pause, options};
-    enum character_state{idle, walk, jump, fall, backwards, flight};
+    enum character_state{idle, walk, jump, fall, backwards, flight, flight_control, fall_control, landing};
     enum game_map{russia, other_map};
 
 #endif

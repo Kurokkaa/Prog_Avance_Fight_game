@@ -25,6 +25,7 @@ struct sprite_p{
     bool backwards;
     int jump_height;
     int jump_origin;
+    int animation;
 };
 
 typedef struct sprite_p sprite_perso ;
