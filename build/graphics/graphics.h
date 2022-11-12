@@ -8,7 +8,7 @@
 #include "../data/data.h"
 
 
-void init_texture(SDL_Renderer *renderer, sprite_perso *perso,jeu* world);
+void init_texture(SDL_Renderer *renderer, sprite_perso *perso);
 void apply_sprite(SDL_Renderer *renderer, SDL_Texture *texture, sprite_perso* sprite);
 void refresh_graphics(SDL_Renderer *renderer, jeu *world);
 void apply_textures(SDL_Texture * texture, SDL_Renderer *renderer, int x , int y);

@@ -9,7 +9,7 @@
 
 
 
-void init_texture(SDL_Renderer *renderer, sprite_perso *perso,jeu* world){
+void init_texture(SDL_Renderer *renderer, sprite_perso *perso){
     perso->texture_perso = load_image( "build/ressources/stickman.png",renderer);
     
 }
@@ -31,6 +31,7 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
             display_dynamic_texture(renderer, world->map.map_structure, world->map.plateformes);
         }
         apply_sprite(renderer, world->p1.texture_perso, &(world->p1));
+        apply_sprite(renderer, world->p2.texture_perso, &(world->p2));
         //apply_texture(world->p1.texture_perso, renderer, world->p1.x , world->p1.y);
         SDL_RenderPresent(renderer);
 }

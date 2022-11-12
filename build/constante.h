@@ -7,7 +7,7 @@
     #define COLUMNS 20
     #define CELL_HEIGHT SCREEN_HEIGHT/LINES
     #define CELL_WIDTH SCREEN_WIDTH/COLUMNS
-    #define CHARA_SPEED CELL_WIDTH * 0.2
+    #define CHARA_SPEED CELL_WIDTH * 0.1
 
 
     enum game_state{combat, menu, pause, options};

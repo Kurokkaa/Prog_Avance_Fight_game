@@ -8,6 +8,25 @@
 #include "graphics/graphics.h"
 #include "data/data.h"
 #include "constante.h"
+void quit_game(jeu* world,SDL_Window** fenetre,SDL_Renderer** renderer){
+    SDL_DestroyWindow(*fenetre);
+    SDL_DestroyRenderer(*renderer);
+    destroy_textures(world);
+    free_map_structure(world->map.map_structure);
+    IMG_Quit;
+    SDL_Quit();
+}
+void free_map_structure(char** map_structure){
+    for(int i; i<20;i++){
+        free(map_structure[i]);
+    }
+    free(map_structure);
+}
+void destroy_textures(jeu* world){
+    SDL_DestroyTexture(world->p1.texture_perso);
+    SDL_DestroyTexture(world->map.image_fond);
+    SDL_DestroyTexture(world->map.plateformes);
+}
 
 void init_jeu(jeu *world){
     world->state = combat;
@@ -26,18 +45,19 @@ void init_map(jeu* world,SDL_Renderer* renderer){
             break;        
     }
 }
-void init_perso(SDL_Renderer* renderer, jeu* world, int x, int y, int w, int h, int speed){ //voir moyen pour charger texture spécifique
-    world->p1.x = x;
-    world->p1.y = y;
-    world->p1.w = w;
-    world->p1.h = h;
-    world->p1.speed = CHARA_SPEED;
-    world->p1.jump_height = 300;
-    world->p1.chara_state = idle;
-    world->p1.backwards = false;
-    world->p1.jump_origin = y;
-    world->p1.animation = 0;
-    init_texture(renderer, &world->p1,world);
+void init_perso(SDL_Renderer* renderer, sprite_perso* perso, int x, int y, int w, int h, int speed){ //voir moyen pour charger texture spécifique
+    
+    perso->x = x;
+    perso->y = y;
+    perso->w = w;
+    perso->h = h;
+    perso->speed = CHARA_SPEED;
+    perso->jump_height = 300;
+    perso->chara_state = idle;
+    perso->backwards = false;
+    perso->jump_origin = y;
+    perso->animation = 0;
+    init_texture(renderer, perso);
 }
 
 void init(SDL_Window** window, SDL_Renderer** renderer, jeu* world){
@@ -60,7 +80,8 @@ void init(SDL_Window** window, SDL_Renderer** renderer, jeu* world){
         SDL_Quit();
     }
     init_jeu(world);
-    init_perso(*renderer,world,65, 465 ,125,232,CHARA_SPEED);
+    init_perso(*renderer,&world->p1,65, 465 ,125,232,CHARA_SPEED);
+    init_perso(*renderer,&world->p2,1000, 465 ,125,232,CHARA_SPEED);
     init_map(world,*renderer);
 }
 
@@ -71,8 +92,11 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
             world->terminer = true;
         }
     }   
-        if(!keystates[SDL_SCANCODE_A] && !keystates[SDL_SCANCODE_D] && world->p1.chara_state == walk){
+        if((!keystates[SDL_SCANCODE_A] && !keystates[SDL_SCANCODE_D]||keystates[SDL_SCANCODE_A] && keystates[SDL_SCANCODE_D]) && world->p1.chara_state == walk){
             world->p1.chara_state = idle;
+        }
+        if((!keystates[SDL_SCANCODE_LEFT] && !keystates[SDL_SCANCODE_RIGHT] || keystates[SDL_SCANCODE_LEFT] && keystates[SDL_SCANCODE_RIGHT]) && world->p2.chara_state == walk){
+            world->p2.chara_state = idle;
         }
             //deplacement gauche
         if(keystates[SDL_SCANCODE_A] && !keystates[SDL_SCANCODE_D]){
@@ -88,6 +112,37 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
             if(world->p1.chara_state == fall){
                 world->p1.chara_state = fall_control;
                 world->p1.backwards = true;
+            }
+        }
+        if(keystates[SDL_SCANCODE_LEFT] && !keystates[SDL_SCANCODE_RIGHT]){
+            //world->p1.speed = -CHARA_SPEED;
+            if(world->p2.chara_state == idle){
+                world->p2.chara_state = walk;
+                world->p2.backwards = true;
+            }
+            if(world->p2.chara_state == flight){
+                world->p2.chara_state = flight_control;
+                world->p2.backwards = true;
+            }
+            if(world->p2.chara_state == fall){
+                world->p2.chara_state = fall_control;
+                world->p2.backwards = true;
+            }
+        }
+
+        if(!keystates[SDL_SCANCODE_LEFT] && keystates[SDL_SCANCODE_RIGHT]){
+            //world->p1.speed = CHARA_SPEED;
+            if(world->p2.chara_state == idle){
+                world->p2.chara_state = walk;
+                world->p2.backwards = false;
+            }
+            if(world->p2.chara_state == flight){
+                world->p2.chara_state = flight_control;
+                world->p2.backwards = false;
+            }
+            if(world->p2.chara_state == fall){
+                world->p2.chara_state = fall_control;
+                world->p2.backwards = false;
             }
         }
 
@@ -112,7 +167,9 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
         if(keystates[SDL_SCANCODE_W] && (world->p1.chara_state == idle || world->p1.chara_state == walk)){
             world->p1.chara_state = jump;
         }
-
+        if(keystates[SDL_SCANCODE_UP] && (world->p2.chara_state == idle || world->p2.chara_state == walk)){
+            world->p2.chara_state = jump;
+        }
         //coups
         if(keystates[SDL_SCANCODE_G] && !keystates[SDL_SCANCODE_U] && !keystates[SDL_SCANCODE_Y]){
         }
@@ -124,6 +181,7 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
 
         }
         movements(world, &world->p1);
+        movements(world,&world->p2);
 }
 
 int main(int argc, char *argv[]){
@@ -144,8 +202,6 @@ int main(int argc, char *argv[]){
     }
 
     // Quitter SDL
-    SDL_DestroyWindow(fenetre);
-    IMG_Quit;
-    SDL_Quit();
+    quit_game(&world,&fenetre,&renderer);
     return 0;
 }

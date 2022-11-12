@@ -36,6 +36,7 @@ struct world_s{
     enum game_map choosed_map;
     bool terminer; /*!< Champ indiquant si l'on est à la fin du jeu */
     sprite_perso p1;
+    sprite_perso p2;
     set_map map;
 };
 
