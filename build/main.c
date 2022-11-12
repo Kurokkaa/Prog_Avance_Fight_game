@@ -45,7 +45,7 @@ void init_map(jeu* world,SDL_Renderer* renderer){
             break;        
     }
 }
-void init_perso(SDL_Renderer* renderer, sprite_perso* perso, int x, int y, int w, int h, int speed){ //voir moyen pour charger texture spécifique
+void init_perso(SDL_Renderer* renderer, sprite_perso* perso, int x, int y, int w, int h, int speed,bool mirror){ //voir moyen pour charger texture spécifique
     
     perso->x = x;
     perso->y = y;
@@ -57,6 +57,7 @@ void init_perso(SDL_Renderer* renderer, sprite_perso* perso, int x, int y, int w
     perso->backwards = false;
     perso->jump_origin = y;
     perso->animation = 0;
+    perso->mirror = mirror;
     init_texture(renderer, perso);
 }
 
@@ -80,8 +81,8 @@ void init(SDL_Window** window, SDL_Renderer** renderer, jeu* world){
         SDL_Quit();
     }
     init_jeu(world);
-    init_perso(*renderer,&world->p1,65, 465 ,125,232,CHARA_SPEED);
-    init_perso(*renderer,&world->p2,1000, 465 ,125,232,CHARA_SPEED);
+    init_perso(*renderer,&world->p1,65, 465 ,125,232,CHARA_SPEED,false);
+    init_perso(*renderer,&world->p2,1000, 465 ,125,232,CHARA_SPEED,true);
     init_map(world,*renderer);
 }
 
@@ -182,8 +183,18 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
         }
         movements(world, &world->p1);
         movements(world,&world->p2);
+        change_directions(world);
 }
-
+void change_directions(jeu* world){
+    if(world->p1.x>world->p2.x){
+        world->p1.mirror = true;
+        world->p2.mirror = false;
+    }
+    else{
+        world->p1.mirror = false;
+        world->p2.mirror = true;
+    }
+}
 int main(int argc, char *argv[]){
     SDL_Window* fenetre; // Déclaration de la fenêtre
     SDL_Renderer* renderer;// Déclaration du renderer

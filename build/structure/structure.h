@@ -26,6 +26,7 @@ struct sprite_p{
     int jump_height;
     int jump_origin;
     int animation;
+    bool mirror;
 };
 
 typedef struct sprite_p sprite_perso ;

@@ -19,8 +19,15 @@ void apply_sprite(SDL_Renderer *renderer, SDL_Texture *texture, sprite_perso* sp
     
     SDL_QueryTexture(texture, NULL, NULL, &dst.w, &dst.h);
     dst.x = sprite->x; dst.y = sprite->y;
+    if(sprite->mirror){
+        SDL_RenderCopy(renderer, texture, NULL, &dst);
+        }
+    else{
+        SDL_RendererFlip flip = SDL_FLIP_VERTICAL;
+        SDL_Point center = {sprite->w/2,sprite->h/2};
+        SDL_RenderCopyEx(renderer, texture, NULL, &dst,180, &center, flip);
+    }
     
-    SDL_RenderCopy(renderer, texture, NULL, &dst);
 }
 
 void refresh_graphics(SDL_Renderer *renderer, jeu *world){
