@@ -37,10 +37,10 @@ SDL_Texture* load_image( char path[],SDL_Renderer *renderer){
 }
 
 void movements(jeu* world, sprite_perso* perso){
-    printf("X: %d\n", perso->x);
-    printf("Y: %d\n", perso->y);
-    printf("State: %d\n", perso->chara_state);
-    printf("Bckwd: %d\n", backwards);
+    //printf("X: %d\n", perso->x);
+    //printf("Y: %d\n", perso->y);
+    //printf("State: %d\n", perso->chara_state);
+    //printf("Bckwd: %d\n", backwards);
     int x, y;
     x = perso->x;
     y = perso->y;
@@ -78,12 +78,12 @@ void movements(jeu* world, sprite_perso* perso){
     if(perso->chara_state == fall_control){
         if(perso->backwards){
                 if(equals(x - perso->speed, y + perso->h, world->map.map_structure, ' ')){
-                    perso->x -= perso->speed * 0.2;
+                    perso->x -= perso->speed * 0.4;
                 }
             }
             else{
                 if(equals(x + perso->speed, y + perso->h, world->map.map_structure, ' ')){
-                    perso->x += perso->speed * 0.2;
+                    perso->x += perso->speed * 0.4;
                 }
         }
         perso->chara_state = fall;
@@ -123,7 +123,7 @@ void movements(jeu* world, sprite_perso* perso){
                 perso->y += perso->jump_height*0.025;
             }
             else{
-                printf("COLLISION\n");
+                //printf("COLLISION\n");
                 perso->chara_state = landing;
             }
         }
@@ -137,7 +137,7 @@ void movements(jeu* world, sprite_perso* perso){
     }
 
     if(perso->chara_state == landing){
-        printf("idle: %d\n", perso->animation);
+       // printf("idle: %d\n", perso->animation);
         perso->animation++;
         if(perso->animation >= 20){
             perso->chara_state = idle;

@@ -13,11 +13,23 @@ void quit_game(jeu* world,SDL_Window** fenetre,SDL_Renderer** renderer){
     SDL_DestroyRenderer(*renderer);
     destroy_textures(world);
     free_map_structure(world->map.map_structure);
-    IMG_Quit;
+    close_Joystick(world->joysticks);
+    IMG_Quit();
     SDL_Quit();
 }
+void close_Joystick(jeu* world){
+    int nbJoystick = SDL_NumJoysticks();
+    if(nbJoystick>0){
+        printf("%i",nbJoystick);
+        for(int i = 0; i<nbJoystick;i++){
+        SDL_GameControllerClose(world->joysticks[i]);
+        }
+        free(world->joysticks);
+    }
+    
+}
 void free_map_structure(char** map_structure){
-    for(int i; i<20;i++){
+    for(int i = 0; i<40;i++){
         free(map_structure[i]);
     }
     free(map_structure);
@@ -62,10 +74,11 @@ void init_perso(SDL_Renderer* renderer, sprite_perso* perso, int x, int y, int w
 }
 
 void init(SDL_Window** window, SDL_Renderer** renderer, jeu* world){
-    if(SDL_Init(SDL_INIT_EVERYTHING) < 0){ // Initialisation de la SDL
+    if(SDL_Init(SDL_INIT_EVERYTHING) == -1){ // Initialisation de la SDL
         printf("Erreur d'initialisation de la SDL: %s",SDL_GetError());
         SDL_Quit();
     }
+    
 
     *window = SDL_CreateWindow("Fenetre SDL", SDL_WINDOWPOS_CENTERED,
     SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_RESIZABLE);
@@ -84,10 +97,38 @@ void init(SDL_Window** window, SDL_Renderer** renderer, jeu* world){
     init_perso(*renderer,&world->p1,65, 465 ,125,232,CHARA_SPEED,false);
     init_perso(*renderer,&world->p2,1000, 465 ,125,232,CHARA_SPEED,true);
     init_map(world,*renderer);
+    init_controller(world);
+}
+init_controller(jeu* world){
+    int nbJoystick = SDL_NumJoysticks();
+    printf("il y a %d controller",nbJoystick);
+    if(nbJoystick>0){
+        world->joysticks = malloc(sizeof(SDL_GameController*)*nbJoystick);
+        for(int i = 0 ; i<nbJoystick; i++){
+        world->joysticks[i]=SDL_GameControllerOpen(i);
+    }
+    }
+   
+}
+void checkJoystick(SDL_Joystick** joysticks){
+    SDL_GameControllerUpdate(); // Mise à jour de l'état des controller
+    int i;
+    for(int j =0; j<SDL_NumJoysticks();j++){
+        for(i = 0 ;i<20;i++){
+            if(SDL_GameControllerGetButton(joysticks[j],i)){
+                printf("bouton %d presse",i);
+            }
+        }
+    }
+    printf("joystick X :%d \n" ,SDL_GameControllerGetAxis(joysticks[0],0));
+    printf("joystick Y : %d \n",SDL_GameControllerGetAxis(joysticks[0],1));
 }
 
+
 void gameplay_inputs(SDL_Event *event, jeu *world){
-    const Uint8 *keystates = SDL_GetKeyboardState(NULL);;
+    const Uint8 *keystates = SDL_GetKeyboardState(NULL);
+    SDL_JoystickUpdate();
+    checkJoystick(world->joysticks);
     while(SDL_PollEvent(event)){
         if(event->type == SDL_QUIT){
             world->terminer = true;
@@ -100,8 +141,9 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
             world->p2.chara_state = idle;
         }
             //deplacement gauche
-        if(keystates[SDL_SCANCODE_A] && !keystates[SDL_SCANCODE_D]){
+        if((keystates[SDL_SCANCODE_A] && !keystates[SDL_SCANCODE_D]) || SDL_GameControllerGetAxis(world->joysticks[0],0)<-(10000)){
             //world->p1.speed = -CHARA_SPEED;
+            
             if(world->p1.chara_state == idle){
                 world->p1.chara_state = walk;
                 world->p1.backwards = true;
@@ -148,7 +190,7 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
         }
 
         //deplacement droite
-        if(!keystates[SDL_SCANCODE_A] && keystates[SDL_SCANCODE_D]){
+        if(!keystates[SDL_SCANCODE_A] && keystates[SDL_SCANCODE_D]|| SDL_GameControllerGetAxis(world->joysticks[0],0)>10000){
             //world->p1.speed = CHARA_SPEED;
             if(world->p1.chara_state == idle){
                 world->p1.chara_state = walk;
@@ -165,7 +207,7 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
         }
 
         //sauts
-        if(keystates[SDL_SCANCODE_W] && (world->p1.chara_state == idle || world->p1.chara_state == walk)){
+        if((keystates[SDL_SCANCODE_W] || SDL_GameControllerGetAxis(world->joysticks[0],1)< (-10000)) && (world->p1.chara_state == idle || world->p1.chara_state == walk)){
             world->p1.chara_state = jump;
         }
         if(keystates[SDL_SCANCODE_UP] && (world->p2.chara_state == idle || world->p2.chara_state == walk)){
@@ -189,20 +231,28 @@ void change_directions(jeu* world){
     if(world->p1.x>world->p2.x){
         world->p1.mirror = true;
         world->p2.mirror = false;
+        if(world->p1.x == world->p2.x+world->p2.w && world->p2.y == world->p1.y){
+            world->p1.x+=CHARA_SPEED;
+            world->p2.x-=CHARA_SPEED;
+        }
     }
     else{
         world->p1.mirror = false;
         world->p2.mirror = true;
+        if(world->p1.x+world->p1.w == world->p2.x && world->p2.y == world->p1.y){
+            world->p1.x-=CHARA_SPEED;
+            world->p2.x+=CHARA_SPEED;
+        }
     }
+    
 }
 int main(int argc, char *argv[]){
     SDL_Window* fenetre; // Déclaration de la fenêtre
     SDL_Renderer* renderer;// Déclaration du renderer
     SDL_Event events; //évenement du jeu
-    jeu world; //structure principal
-    
+    jeu world; //structure principal    
     init(&fenetre,&renderer,&world);
-
+    
     refresh_graphics(renderer,&world);
     // Boucle principale
     while(!world.terminer){
@@ -213,6 +263,6 @@ int main(int argc, char *argv[]){
     }
 
     // Quitter SDL
-    quit_game(&world,&fenetre,&renderer);
+    //quit_game(&world,&fenetre,&renderer);
     return 0;
 }

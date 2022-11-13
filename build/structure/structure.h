@@ -39,6 +39,7 @@ struct world_s{
     sprite_perso p1;
     sprite_perso p2;
     set_map map;
+    SDL_GameController** joysticks;
 };
 
 typedef struct world_s jeu;
