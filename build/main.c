@@ -76,25 +76,28 @@ void init_perso(SDL_Renderer* renderer, sprite_perso* perso, int x, int y, int w
 }
 
 void init_hits(sprite_perso* perso){
-    perso->hits.punch.dmg = 2;
-    perso->hits.punch.speed = 0;
-    perso->hits.punch.range_x = 250;
-    perso->hits.punch.range_y = 0;
-    perso->hits.punch.frame = 0;
-    perso->hits.punch.animation = 0;
-    perso->hits.punch.launch = false;
-    perso->hits.punch.timer = 0;
+    perso->hits.punch = malloc(sizeof(hit));
+    perso->hits.kick = malloc(sizeof(hit));
+    perso->hits.special_attack = malloc(sizeof(hit));
+    perso->hits.punch->dmg = 2;
+    perso->hits.punch->speed = 0;
+    perso->hits.punch->range_x = 250;
+    perso->hits.punch->range_y = 0;
+    perso->hits.punch->frame = 0;
+    perso->hits.punch->animation = 0;
+    perso->hits.punch->launch = false;
+    perso->hits.punch->timer = 0;
 
-    perso->hits.kick.dmg = 1;
-    perso->hits.kick.speed = 0;
-    perso->hits.kick.range_x = 400;
-    perso->hits.kick.range_y = 0;
-    perso->hits.kick.frame = 0;
-    perso->hits.kick.animation = 0;
-    perso->hits.kick.launch = false;
-    perso->hits.kick.timer = 0;
+    perso->hits.kick->dmg = 1;
+    perso->hits.kick->speed = 0;
+    perso->hits.kick->range_x = 400;
+    perso->hits.kick->range_y = 0;
+    perso->hits.kick->frame = 0;
+    perso->hits.kick->animation = 0;
+    perso->hits.kick->launch = false;
+    perso->hits.kick->timer = 0;
 }
-
+  
 void init(SDL_Window** window, SDL_Renderer** renderer, jeu* world){
     if(SDL_Init(SDL_INIT_EVERYTHING) == -1){ // Initialisation de la SDL
         printf("Erreur d'initialisation de la SDL: %s",SDL_GetError());
@@ -121,17 +124,7 @@ void init(SDL_Window** window, SDL_Renderer** renderer, jeu* world){
     init_map(world,*renderer);
     init_controller(world);
 }
-init_controller(jeu* world){
-    int nbJoystick = SDL_NumJoysticks();
-    printf("il y a %d controller",nbJoystick);
-    if(nbJoystick>0){
-        world->joysticks = malloc(sizeof(SDL_GameController*)*nbJoystick);
-        for(int i = 0 ; i<nbJoystick; i++){
-        world->joysticks[i]=SDL_GameControllerOpen(i);
-    }
-    }
-   
-}
+
 void checkJoystick(SDL_Joystick** joysticks){
     SDL_GameControllerUpdate(); // Mise à jour de l'état des controller
     int i;
@@ -153,6 +146,7 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
    // checkJoystick(world->joysticks);
     reset_hit(&world->p1);
     reset_hit(&world->p2);
+    printf("%d",world->p1.hits.punch->timer);
     while(SDL_PollEvent(event)){
         if(event->type == SDL_QUIT){
             world->terminer = true;
@@ -264,28 +258,12 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
         }
         movements(world, &world->p1);
         movements(world,&world->p2);
-        change_directions(world);
+        change_directions(&world);
 }
 
-void change_directions(jeu* world){
-    if(world->p1.x>world->p2.x){
-        world->p1.mirror = true;
-        world->p2.mirror = false;
-        if(world->p1.x == world->p2.x+world->p2.w && world->p2.y == world->p1.y){
-            world->p1.x+=CHARA_SPEED;
-            world->p2.x-=CHARA_SPEED;
-        }
-    }
-    else{
-        world->p1.mirror = false;
-        world->p2.mirror = true;
-        if(world->p1.x+world->p1.w == world->p2.x && world->p2.y == world->p1.y){
-            world->p1.x-=CHARA_SPEED;
-            world->p2.x+=CHARA_SPEED;
-        }
-    }
-    
-}
+
+
+
 int main(int argc, char *argv[]){
     SDL_Window* fenetre; // Déclaration de la fenêtre
     SDL_Renderer* renderer;// Déclaration du renderer

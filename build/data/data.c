@@ -154,16 +154,17 @@ bool equals(int x, int y, char** map_point, char test){
 }
 
 void punch(sprite_perso* attacker, sprite_perso* receiver){
-    if(!attacker->hits.punch.launch){
-        attacker->hits.punch.launch == true;
+    printf("%d",!(attacker->hits.punch->launch));
+    if((!attacker->hits.punch->launch)){
+        attacker->hits.punch->launch = true;
         if(!attacker->mirror){
-            if((attacker->x + attacker->w + attacker->hits.punch.range_x >= receiver->x) && (attacker->y + attacker->jump_height/2 >= receiver->y && attacker->y + attacker->jump_height/2 <= receiver->y + receiver->h)){
-                receiver->life -= attacker->hits.punch.dmg ;        
+            if((attacker->x + attacker->w + attacker->hits.punch->range_x >= receiver->x) && (attacker->y + attacker->jump_height/2 >= receiver->y && attacker->y + attacker->jump_height/2 <= receiver->y + receiver->h)){
+                receiver->life -= attacker->hits.punch->dmg ;        
             }
         }
         else{
-            if((attacker->x - attacker->hits.punch.range_x <= receiver->x + receiver->w) && (attacker->y + attacker->jump_height/2 >= receiver->y && attacker->y + attacker->jump_height/2 <= receiver->y + receiver->h)){
-                receiver->life -= attacker->hits.punch.dmg ;
+            if((attacker->x - attacker->hits.punch->range_x <= receiver->x + receiver->w) && (attacker->y + attacker->jump_height/2 >= receiver->y && attacker->y + attacker->jump_height/2 <= receiver->y + receiver->h)){
+                receiver->life -= attacker->hits.punch->dmg ;
             }
         }
     }
@@ -171,13 +172,44 @@ void punch(sprite_perso* attacker, sprite_perso* receiver){
 }
 
 void reset_hit(sprite_perso* perso){
-    if(perso->hits.punch.launch){
-        perso->hits.punch.timer++;
-        printf("%d", perso->hits.punch.timer);
-        if(perso->hits.punch.timer > 555555555550){
-            perso->hits.punch.launch == false;
+    if(perso->hits.punch->launch){
+        perso->hits.punch->timer++;
+        printf("%d", perso->hits.punch->timer);
+        if(perso->hits.punch->timer >= 50){
+            perso->hits.punch->launch = false;
+            perso->hits.punch->timer = 0;
         }
     }
 }
 
 
+void change_directions(jeu* world){
+    if(world->p1.x>world->p2.x){
+        world->p1.mirror = true;
+        world->p2.mirror = false;
+        if(world->p1.x == world->p2.x+world->p2.w && world->p2.y == world->p1.y){
+            world->p1.x+=CHARA_SPEED;
+            world->p2.x-=CHARA_SPEED;
+        }
+    }
+    else{
+        world->p1.mirror = false;
+        world->p2.mirror = true;
+        if(world->p1.x+world->p1.w == world->p2.x && world->p2.y == world->p1.y){
+            world->p1.x-=CHARA_SPEED;
+            world->p2.x+=CHARA_SPEED;
+        }
+    }   
+}
+
+void init_controller(jeu* world){
+    int nbJoystick = SDL_NumJoysticks();
+    printf("il y a %d controller",nbJoystick);
+    if(nbJoystick>0){
+        world->joysticks = malloc(sizeof(SDL_GameController*)*nbJoystick);
+        for(int i = 0 ; i<nbJoystick; i++){
+        world->joysticks[i]=SDL_GameControllerOpen(i);
+        }
+    }
+   
+}

@@ -20,9 +20,9 @@ struct hit_chara_s{
 
 typedef struct hit_chara_s hit;
 struct hit_set_s{
-    hit punch;
-    hit kick;
-    hit special_attack;
+    hit* punch;
+    hit* kick;
+    hit* special_attack;
 };
 
 typedef struct hit_set_s hit_set;
