@@ -70,7 +70,29 @@ void init_perso(SDL_Renderer* renderer, sprite_perso* perso, int x, int y, int w
     perso->jump_origin = y;
     perso->animation = 0;
     perso->mirror = mirror;
+    perso->life = 20;
+    init_hits(perso);
     init_texture(renderer, perso);
+}
+
+void init_hits(sprite_perso* perso){
+    perso->hits.punch.dmg = 2;
+    perso->hits.punch.speed = 0;
+    perso->hits.punch.range_x = 250;
+    perso->hits.punch.range_y = 0;
+    perso->hits.punch.frame = 0;
+    perso->hits.punch.animation = 0;
+    perso->hits.punch.launch = false;
+    perso->hits.punch.timer = 0;
+
+    perso->hits.kick.dmg = 1;
+    perso->hits.kick.speed = 0;
+    perso->hits.kick.range_x = 400;
+    perso->hits.kick.range_y = 0;
+    perso->hits.kick.frame = 0;
+    perso->hits.kick.animation = 0;
+    perso->hits.kick.launch = false;
+    perso->hits.kick.timer = 0;
 }
 
 void init(SDL_Window** window, SDL_Renderer** renderer, jeu* world){
@@ -128,7 +150,9 @@ void checkJoystick(SDL_Joystick** joysticks){
 void gameplay_inputs(SDL_Event *event, jeu *world){
     const Uint8 *keystates = SDL_GetKeyboardState(NULL);
     SDL_JoystickUpdate();
-    checkJoystick(world->joysticks);
+   // checkJoystick(world->joysticks);
+    reset_hit(&world->p1);
+    reset_hit(&world->p2);
     while(SDL_PollEvent(event)){
         if(event->type == SDL_QUIT){
             world->terminer = true;
@@ -141,7 +165,7 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
             world->p2.chara_state = idle;
         }
             //deplacement gauche
-        if((keystates[SDL_SCANCODE_A] && !keystates[SDL_SCANCODE_D]) || SDL_GameControllerGetAxis(world->joysticks[0],0)<-(10000)){
+        if((keystates[SDL_SCANCODE_A] && !keystates[SDL_SCANCODE_D]) /*|| SDL_GameControllerGetAxis(world->joysticks[0],0)<-(10000)*/){
             //world->p1.speed = -CHARA_SPEED;
             
             if(world->p1.chara_state == idle){
@@ -190,7 +214,7 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
         }
 
         //deplacement droite
-        if(!keystates[SDL_SCANCODE_A] && keystates[SDL_SCANCODE_D]|| SDL_GameControllerGetAxis(world->joysticks[0],0)>10000){
+        if(!keystates[SDL_SCANCODE_A] && keystates[SDL_SCANCODE_D]/*|| SDL_GameControllerGetAxis(world->joysticks[0],0)>10000*/){
             //world->p1.speed = CHARA_SPEED;
             if(world->p1.chara_state == idle){
                 world->p1.chara_state = walk;
@@ -207,7 +231,7 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
         }
 
         //sauts
-        if((keystates[SDL_SCANCODE_W] || SDL_GameControllerGetAxis(world->joysticks[0],1)< (-10000)) && (world->p1.chara_state == idle || world->p1.chara_state == walk)){
+        if((keystates[SDL_SCANCODE_W] /*|| SDL_GameControllerGetAxis(world->joysticks[0],1)< (-10000)*/) && (world->p1.chara_state == idle || world->p1.chara_state == walk)){
             world->p1.chara_state = jump;
         }
         if(keystates[SDL_SCANCODE_UP] && (world->p2.chara_state == idle || world->p2.chara_state == walk)){
@@ -215,18 +239,34 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
         }
         //coups
         if(keystates[SDL_SCANCODE_G] && !keystates[SDL_SCANCODE_U] && !keystates[SDL_SCANCODE_Y]){
+            punch(&world->p1, &world->p2);
         }
         //kicks
-        if(!keystates[SDLK_g] && keystates[SDLK_u] && !keystates[SDLK_y]){
+        if(!keystates[SDL_SCANCODE_G] && keystates[SDL_SCANCODE_U] && !keystates[SDL_SCANCODE_Y]){
+            //special(world->p1, world->p2);
         }
         //coup spéciaux si la jauge est pleine
-        if(keystates[SDLK_y] && keystates[SDLK_g] && keystates[SDLK_u]){
+        if(keystates[SDL_SCANCODE_Y] && !keystates[SDL_SCANCODE_G] && !keystates[SDL_SCANCODE_U]){
+           // kick(world->p1, world->p2);
+        }
 
+         //coups
+        if(keystates[SDL_SCANCODE_KP_4] && !keystates[SDL_SCANCODE_KP_8] && !keystates[SDL_SCANCODE_KP_9]){
+            punch(&world->p2, &world->p1);
+        }
+        //kicks
+        if(!keystates[SDL_SCANCODE_KP_4] && keystates[SDL_SCANCODE_KP_8] && !keystates[SDL_SCANCODE_KP_9]){
+            //special(world->p2, world->p1);
+        }
+        //coup spéciaux si la jauge est pleine
+        if(!keystates[SDL_SCANCODE_KP_4] && !keystates[SDL_SCANCODE_KP_8] && keystates[SDL_SCANCODE_KP_9]){
+           // kick(world->p2, world->p1);
         }
         movements(world, &world->p1);
         movements(world,&world->p2);
         change_directions(world);
 }
+
 void change_directions(jeu* world){
     if(world->p1.x>world->p2.x){
         world->p1.mirror = true;

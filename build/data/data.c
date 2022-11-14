@@ -153,4 +153,31 @@ bool equals(int x, int y, char** map_point, char test){
     return (map_point[y/height_factor][x/width_factor] == test);
 }
 
+void punch(sprite_perso* attacker, sprite_perso* receiver){
+    if(!attacker->hits.punch.launch){
+        attacker->hits.punch.launch == true;
+        if(!attacker->mirror){
+            if((attacker->x + attacker->w + attacker->hits.punch.range_x >= receiver->x) && (attacker->y + attacker->jump_height/2 >= receiver->y && attacker->y + attacker->jump_height/2 <= receiver->y + receiver->h)){
+                receiver->life -= attacker->hits.punch.dmg ;        
+            }
+        }
+        else{
+            if((attacker->x - attacker->hits.punch.range_x <= receiver->x + receiver->w) && (attacker->y + attacker->jump_height/2 >= receiver->y && attacker->y + attacker->jump_height/2 <= receiver->y + receiver->h)){
+                receiver->life -= attacker->hits.punch.dmg ;
+            }
+        }
+    }
+    //check_life(receiver);
+}
+
+void reset_hit(sprite_perso* perso){
+    if(perso->hits.punch.launch){
+        perso->hits.punch.timer++;
+        printf("%d", perso->hits.punch.timer);
+        if(perso->hits.punch.timer > 555555555550){
+            perso->hits.punch.launch == false;
+        }
+    }
+}
+
 

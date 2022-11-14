@@ -7,6 +7,26 @@
 #include "../constante.h"
 #include "../map/map_global.h"
 
+struct hit_chara_s{
+    int dmg;
+    int range_x;
+    int range_y;
+    int speed;
+    bool launch;
+    int timer;
+    int frame;
+    SDL_Texture* animation;
+};
+
+typedef struct hit_chara_s hit;
+struct hit_set_s{
+    hit punch;
+    hit kick;
+    hit special_attack;
+};
+
+typedef struct hit_set_s hit_set;
+
 /*struct personnage{
 };
 
@@ -27,11 +47,12 @@ struct sprite_p{
     int jump_origin;
     int animation;
     bool mirror;
+    int life;
+    hit_set hits;
 };
 
+
 typedef struct sprite_p sprite_perso ;
-
-
 struct world_s{
     enum game_state state;
     enum game_map choosed_map;
@@ -43,8 +64,5 @@ struct world_s{
 };
 
 typedef struct world_s jeu;
-
-
-
 
 #endif

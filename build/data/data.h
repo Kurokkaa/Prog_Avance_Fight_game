@@ -16,5 +16,6 @@ char** read_file_map(char* nom);
 void init_map(jeu* world,SDL_Renderer* renderer);
 void movements(jeu* world, sprite_perso* perso);
 bool equals(int x, int y, char** map_point, char test);
+void punch(sprite_perso* attacker, sprite_perso* receiver);
 
 #endif

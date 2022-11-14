@@ -19,7 +19,7 @@ void apply_sprite(SDL_Renderer *renderer, SDL_Texture *texture, sprite_perso* sp
     
     SDL_QueryTexture(texture, NULL, NULL, &dst.w, &dst.h);
     dst.x = sprite->x; dst.y = sprite->y;
-    if(sprite->mirror){
+    if(!sprite->mirror){
         SDL_RenderCopy(renderer, texture, NULL, &dst);
         }
     else{
@@ -36,11 +36,51 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
         if(world->state==combat){
             display_map(renderer,world);
             display_dynamic_texture(renderer, world->map.map_structure, world->map.plateformes);
+            apply_sprite(renderer, world->p1.texture_perso, &(world->p1));
+            apply_sprite(renderer, world->p2.texture_perso, &(world->p2));
+            display_life(renderer, world);
         }
-        apply_sprite(renderer, world->p1.texture_perso, &(world->p1));
-        apply_sprite(renderer, world->p2.texture_perso, &(world->p2));
         //apply_texture(world->p1.texture_perso, renderer, world->p1.x , world->p1.y);
         SDL_RenderPresent(renderer);
+}
+
+void display_life(SDL_Renderer* renderer, jeu* world){
+    SDL_Rect rect;
+    SDL_Rect rect2;
+    rect.x = 400 ;
+    rect.h = 20;
+    rect.y = SCREEN_HEIGHT- rect.h;
+    if(world->p1.life >= 0){
+        rect.w = world->p1.life * -20;
+    }
+    else{
+        rect.w = 0;
+    }
+    if(world->p2.life >= 0){
+        rect2.w = world->p2.life * 20 ;
+    }
+    else{
+        rect2.w = 0;
+    } 
+    rect2.x = SCREEN_WIDTH - 400;
+    rect2.y = SCREEN_HEIGHT - rect.h;
+    rect2.h = 20;
+    SDL_Rect rect_fond;
+    SDL_Rect rect_fond2;
+    rect_fond.x = 400 ;
+    rect_fond.h = 20;
+    rect_fond.y = SCREEN_HEIGHT- rect.h;
+    rect_fond.w = -400;
+    rect_fond2.w =  400 ;
+    rect_fond2.x = SCREEN_WIDTH - 400;
+    rect_fond2.y = SCREEN_HEIGHT - rect.h;
+    rect_fond2.h = 20;
+    SDL_SetRenderDrawColor(renderer, 255, 0 , 0, 1);
+    SDL_RenderFillRect(renderer, &rect_fond);
+    SDL_RenderFillRect(renderer, &rect_fond2);
+    SDL_SetRenderDrawColor(renderer, 255, 255 , 0, 1);
+    SDL_RenderFillRect(renderer, &rect);
+    SDL_RenderFillRect(renderer, &rect2);
 }
 
 void apply_textures(SDL_Texture * texture, SDL_Renderer *renderer, int x , int y){
