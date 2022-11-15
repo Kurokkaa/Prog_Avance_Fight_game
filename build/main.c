@@ -111,6 +111,8 @@ void init(SDL_Window** window, SDL_Renderer** renderer, jeu* world){
         printf("Erreur de la creation d'une fenetre: %s",SDL_GetError());
         SDL_Quit();
     }
+    //SDL_SetWindowFullscreen(*window,SDL_WINDOW_FULLSCREEN);
+
     *renderer = SDL_CreateRenderer(*window,-1,SDL_RENDERER_ACCELERATED);
     
     int imgFlags = IMG_INIT_PNG;
@@ -141,12 +143,13 @@ void checkJoystick(SDL_Joystick** joysticks){
 
 
 void gameplay_inputs(SDL_Event *event, jeu *world){
+    int pos_init_P1x, pos_init_P2x;
     const Uint8 *keystates = SDL_GetKeyboardState(NULL);
     SDL_JoystickUpdate();
    // checkJoystick(world->joysticks);
     reset_hit(&world->p1);
     reset_hit(&world->p2);
-    printf("%d",world->p1.hits.punch->timer);
+    //printf("%d",world->p1.hits.punch->timer);
     while(SDL_PollEvent(event)){
         if(event->type == SDL_QUIT){
             world->terminer = true;
@@ -256,9 +259,12 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
         if(!keystates[SDL_SCANCODE_KP_4] && !keystates[SDL_SCANCODE_KP_8] && keystates[SDL_SCANCODE_KP_9]){
            // kick(world->p2, world->p1);
         }
-        movements(world, &world->p1);
-        movements(world,&world->p2);
-        change_directions(&world);
+        movements(world, &world->p1, &pos_init_P1x);
+        movements(world,&world->p2, &pos_init_P2x);
+        change_directions(&world->p1, &world->p2);
+        collision_perso(&world->p1, &world->p2, pos_init_P1x);
+        collision_perso(&world->p2, &world->p1, pos_init_P2x);
+
 }
 
 

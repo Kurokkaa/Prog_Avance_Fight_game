@@ -36,13 +36,14 @@ SDL_Texture* load_image( char path[],SDL_Renderer *renderer){
     return texture;
 }
 
-void movements(jeu* world, sprite_perso* perso){
+void movements(jeu* world, sprite_perso* perso, int * pos_init_x){
     //printf("X: %d\n", perso->x);
     //printf("Y: %d\n", perso->y);
     //printf("State: %d\n", perso->chara_state);
     //printf("Bckwd: %d\n", backwards);
     int x, y;
     x = perso->x;
+    *pos_init_x = perso->x;
     y = perso->y;
 
     //Contrôle en marche
@@ -183,33 +184,50 @@ void reset_hit(sprite_perso* perso){
 }
 
 
-void change_directions(jeu* world){
-    if(world->p1.x>world->p2.x){
-        world->p1.mirror = true;
-        world->p2.mirror = false;
-        if(world->p1.x == world->p2.x+world->p2.w && world->p2.y == world->p1.y){
-            world->p1.x+=CHARA_SPEED;
-            world->p2.x-=CHARA_SPEED;
-        }
+void change_directions(sprite_perso * p1, sprite_perso * p2){
+    /*printf("P1 : %d\n", world->p1.mirror);
+    printf("P1 / X : %d\n", world->p1.x);
+    printf("P2 : %d\n", world->p2.mirror);
+    printf("P2 / X : %d\n", world->p2.x);*/
+    if(p1->x > p2->x){
+        p1->mirror = true;
+        p2->mirror = false;
     }
     else{
-        world->p1.mirror = false;
-        world->p2.mirror = true;
-        if(world->p1.x+world->p1.w == world->p2.x && world->p2.y == world->p1.y){
-            world->p1.x-=CHARA_SPEED;
-            world->p2.x+=CHARA_SPEED;
-        }
+        p1->mirror = false;
+        p2->mirror = true;
     }   
 }
 
 void init_controller(jeu* world){
     int nbJoystick = SDL_NumJoysticks();
-    printf("il y a %d controller",nbJoystick);
+    printf("il y a %d controller\n",nbJoystick);
     if(nbJoystick>0){
         world->joysticks = malloc(sizeof(SDL_GameController*)*nbJoystick);
         for(int i = 0 ; i<nbJoystick; i++){
         world->joysticks[i]=SDL_GameControllerOpen(i);
         }
     }
-   
+}
+
+void collision_perso(sprite_perso * p1, sprite_perso * p2, int pos_initP1){
+    if(!p1->mirror && p2->mirror){
+        if(p1->x + p1->w >= p2->x && p1->x + p1->w <= p2->x + p2->w && (p1->y + p1->h > p2->y && p1->y < p2->y + p2->h)){
+            printf("collision perso Cas 1\n");
+            p1->x = pos_initP1;
+        }
+        if(p1->x + p1->w >= p2->x && p1->x + p1->w <= p2->x + p2->w){
+            p2->x = p1->x + p1->w;
+        }
+    }
+    else{
+        if(p1->x <= p2->x + p2->w && p1->x >= p2->x && (p1->y + p1->h > p2->y && p1->y < p2->y + p2->h)){
+            printf("collision perso Cas 2\n");
+            p1->x = pos_initP1;
+        }
+        if(p1->x <= p2->x + p2->w && p1->x >= p2->x){
+            p2->x = p1->x + p1->w;
+        }
+    }
+    
 }
