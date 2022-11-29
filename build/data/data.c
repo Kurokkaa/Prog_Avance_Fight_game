@@ -217,7 +217,7 @@ void collision_perso(sprite_perso * p1, sprite_perso * p2, int pos_initP1){
             p1->x = pos_initP1;
         }
         if(p1->x + p1->w >= p2->x && p1->x + p1->w <= p2->x + p2->w){
-            p2->x = p1->x + p1->w;
+            p1->x = pos_initP1;
         }
     }
     else{
@@ -226,7 +226,7 @@ void collision_perso(sprite_perso * p1, sprite_perso * p2, int pos_initP1){
             p1->x = pos_initP1;
         }
         if(p1->x <= p2->x + p2->w && p1->x >= p2->x){
-            p2->x = p1->x + p1->w;
+            p1->x = pos_initP1;
         }
     }
     
