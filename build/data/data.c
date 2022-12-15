@@ -232,6 +232,7 @@ void collision_perso(sprite_perso * p1, sprite_perso * p2, int pos_initP1){
     
 }
 
+//fonction pour les miniatures de maps
 void init_miniature(jeu* world,SDL_Renderer* renderer){
     world->menu_set.tab_map[0] = load_image("build/map/russia/RussiaMap_mini.png", renderer);
     world->menu_set.tab_map[1] = load_image("build/map/forest/forest_mini.png", renderer);
