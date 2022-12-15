@@ -31,14 +31,29 @@ void apply_sprite(SDL_Renderer *renderer, SDL_Texture *texture, sprite_perso* sp
 }
 
 void refresh_graphics(SDL_Renderer *renderer, jeu *world){
-        SDL_RenderClear(renderer);
-      
-        if(world->state==combat){
+    SDL_RenderClear(renderer);
+    switch(world->state){
+        case combat:
             display_map(renderer,world);
             display_dynamic_texture(renderer, world->map.map_structure, world->map.plateformes);
             apply_sprite(renderer, world->p1.texture_perso, &(world->p1));
             apply_sprite(renderer, world->p2.texture_perso, &(world->p2));
             display_life(renderer, world);
+        break;
+        case main_menu:
+            apply_textures(world->menu_set.menu_fond, renderer, 0, 0);
+            SDL_Rect rect;
+            rect.x = 400;
+            rect.y = 200 + 100 * world->menu_set.index_menu ;
+            rect.h = 100 ;
+            rect.w = 400; 
+            SDL_SetRenderDrawColor(renderer, 255, 255 , 0, 1);
+            SDL_RenderDrawRect(renderer, &rect);
+        break;
+        case selection_map:
+            apply_textures(world->menu_set.menu_fond, renderer, 0, 0);
+            apply_textures(world->menu_set.tab_map[world->menu_set.index_menu],renderer,240, 135);
+        break;
         }
         //apply_texture(world->p1.texture_perso, renderer, world->p1.x , world->p1.y);
         SDL_RenderPresent(renderer);
@@ -97,7 +112,10 @@ void display_map(SDL_Renderer* renderer,jeu* world){
         case russia:
             apply_textures(world->map.image_fond,renderer,0,0);
             //read_structure(world->map.map_russia.map_structure);
-            break;
+        break;
+        case forest:
+            apply_textures(world->map.image_fond,renderer,0,0);
+        break;
     }
 }
 

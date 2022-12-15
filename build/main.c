@@ -40,12 +40,14 @@ void destroy_textures(jeu* world){
     SDL_DestroyTexture(world->map.plateformes);
 }
 
-void init_jeu(jeu *world){
-    world->state = combat;
-    world->choosed_map = russia;
+void init_jeu(jeu *world, SDL_Renderer* renderer){
+    world->menu_set.menu_fond = load_image("build/ressources/menu/menu.png", renderer);
+    world->state = main_menu;
     world->terminer = false;
-    
+    world->menu_set.index_menu = 0;
 }
+
+
 void init_map(jeu* world,SDL_Renderer* renderer){
     switch(world->choosed_map){
         case russia:
@@ -55,10 +57,16 @@ void init_map(jeu* world,SDL_Renderer* renderer){
             world->map.taille_cellule_H = sizeof(world->map.map_structure);
             world->map.taille_cellule_W = sizeof(world->map.map_structure[0]);
             break;        
+        case forest:
+            world->map.image_fond = load_image("build/map/forest/forest.png",renderer);
+            world->map.map_structure = read_file_map("build/map/forest/forest_structure");
+            world->map.plateformes = load_image("build/map/forest/plateforme.png",renderer);
+            world->map.taille_cellule_H = sizeof(world->map.map_structure);
+            world->map.taille_cellule_W = sizeof(world->map.map_structure[0]);
+            break;        
     }
 }
-void init_perso(SDL_Renderer* renderer, sprite_perso* perso, int x, int y, int w, int h, int speed,bool mirror){ //voir moyen pour charger texture spécifique
-    
+void init_perso(SDL_Renderer* renderer, sprite_perso* perso, int x, int y, int w, int h, int speed,bool mirror){ //voir moyen pour charger texture spécifique  
     perso->x = x;
     perso->y = y;
     perso->w = w;
@@ -76,26 +84,26 @@ void init_perso(SDL_Renderer* renderer, sprite_perso* perso, int x, int y, int w
 }
 
 void init_hits(sprite_perso* perso){
-    perso->hits.punch = malloc(sizeof(hit));
-    perso->hits.kick = malloc(sizeof(hit));
+    perso->hits.light_punch = malloc(sizeof(hit));
+    perso->hits.low_kick = malloc(sizeof(hit));
     perso->hits.special_attack = malloc(sizeof(hit));
-    perso->hits.punch->dmg = 2;
-    perso->hits.punch->speed = 0;
-    perso->hits.punch->range_x = 250;
-    perso->hits.punch->range_y = 0;
-    perso->hits.punch->frame = 0;
-    perso->hits.punch->animation = 0;
-    perso->hits.punch->launch = false;
-    perso->hits.punch->timer = 0;
+    perso->hits.light_punch->dmg = 2;
+    perso->hits.light_punch->speed = 0;
+    perso->hits.light_punch->range_x = 250;
+    perso->hits.light_punch->range_y = 0;
+    perso->hits.light_punch->frame = 0;
+    perso->hits.light_punch->animation = 0;
+    perso->hits.light_punch->launch = false;
+    perso->hits.light_punch->timer = 0;
 
-    perso->hits.kick->dmg = 1;
-    perso->hits.kick->speed = 0;
-    perso->hits.kick->range_x = 400;
-    perso->hits.kick->range_y = 0;
-    perso->hits.kick->frame = 0;
-    perso->hits.kick->animation = 0;
-    perso->hits.kick->launch = false;
-    perso->hits.kick->timer = 0;
+    perso->hits.low_kick->dmg = 1;
+    perso->hits.low_kick->speed = 0;
+    perso->hits.low_kick->range_x = 400;
+    perso->hits.low_kick->range_y = 0;
+    perso->hits.low_kick->frame = 0;
+    perso->hits.low_kick->animation = 0;
+    perso->hits.low_kick->launch = false;
+    perso->hits.low_kick->timer = 0;
 }
   
 void init(SDL_Window** window, SDL_Renderer** renderer, jeu* world){
@@ -104,7 +112,6 @@ void init(SDL_Window** window, SDL_Renderer** renderer, jeu* world){
         SDL_Quit();
     }
     
-
     *window = SDL_CreateWindow("Fenetre SDL", SDL_WINDOWPOS_CENTERED,
     SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_RESIZABLE);
     if( window == NULL){ // En cas d’erreur
@@ -120,11 +127,7 @@ void init(SDL_Window** window, SDL_Renderer** renderer, jeu* world){
         printf( "Erreur initialisation de SDL_Image: %s\n", IMG_GetError() );
         SDL_Quit();
     }
-    init_jeu(world);
-    init_perso(*renderer,&world->p1,65, 465 ,125,232,CHARA_SPEED,false);
-    init_perso(*renderer,&world->p2,1000, 465 ,125,232,CHARA_SPEED,true);
-    init_map(world,*renderer);
-    init_controller(world);
+    init_jeu(world, *renderer);
 }
 
 void checkJoystick(SDL_Joystick** joysticks){
@@ -141,6 +144,92 @@ void checkJoystick(SDL_Joystick** joysticks){
     printf("joystick Y : %d \n",SDL_GameControllerGetAxis(joysticks[0],1));
 }
 
+//fonction qui va gerer le menu 
+void handle_input_menu(SDL_Event *event, jeu *world, SDL_Renderer* renderer){
+    const Uint8 *keystates = SDL_GetKeyboardState(NULL);
+    while(SDL_PollEvent(event)){
+        if(event->type == SDL_QUIT){
+            world->terminer = true;
+        }
+    }
+    if(keystates[SDL_SCANCODE_W]){
+        if(world->state != selection_map ){
+            world->menu_set.index_menu--;
+            SDL_Delay(150);
+            if(world->menu_set.index_menu < 0){
+                world->menu_set.index_menu = 2;
+            }
+        }
+
+    }
+    if(keystates[SDL_SCANCODE_S]){
+        if(world->state != selection_map){
+            world->menu_set.index_menu++;
+            SDL_Delay(150);
+            if(world->menu_set.index_menu > 2){
+            world->menu_set.index_menu = 0;
+            }
+        } 
+    }
+    if(keystates[SDL_SCANCODE_D]){
+        if(world->state == selection_map){
+            world->menu_set.index_menu++;
+            SDL_Delay(300);
+            if(world->menu_set.index_menu > NB_MAPS-1){
+                world->menu_set.index_menu = 0;
+            }
+        } 
+    }
+    if(keystates[SDL_SCANCODE_A]){
+        if(world->state == selection_map){
+            world->menu_set.index_menu--;
+            SDL_Delay(300);
+            if(world->menu_set.index_menu < 0){
+            
+                world->menu_set.index_menu = NB_MAPS-1;
+            }
+        } 
+    }
+    if(keystates[SDL_SCANCODE_RETURN]){
+        if(world->state == main_menu){
+        switch(world->menu_set.index_menu){
+            case 0:
+                world->menu_set.index_menu = 0;
+                free(world->menu_set.menu_fond);
+                world->menu_set.menu_fond = load_image("build/ressources/menu/selection_map.png", renderer);
+                world->state = selection_map;
+                init_miniature(world,renderer);
+                SDL_Delay(500);
+            break;
+            case 1:
+                world->state = options;
+            break;
+            case 2:
+                world->terminer = true;
+            break;
+        }
+        }
+        else if(world->state == selection_map){
+        switch(world->menu_set.index_menu){
+            case 0:
+                world->choosed_map = russia;
+            break;
+            case 1:
+                world->choosed_map = forest;
+            break;
+            case 2:
+                world->choosed_map = street_art;
+            break;
+            }
+            init_map(world, renderer);
+            init_perso(renderer,&world->p1,65, 465 ,125,232,CHARA_SPEED,false);
+            init_perso(renderer,&world->p2,1000, 465 ,125,232,CHARA_SPEED,true);
+            init_controller(world);
+            world->state = combat;
+        }
+
+    }
+}
 
 void gameplay_inputs(SDL_Event *event, jeu *world){
     int pos_init_P1x, pos_init_P2x;
@@ -236,7 +325,7 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
         }
         //coups
         if(keystates[SDL_SCANCODE_G] && !keystates[SDL_SCANCODE_U] && !keystates[SDL_SCANCODE_Y]){
-            punch(&world->p1, &world->p2);
+            light_punch(&world->p1, &world->p2);
         }
         //kicks
         if(!keystates[SDL_SCANCODE_G] && keystates[SDL_SCANCODE_U] && !keystates[SDL_SCANCODE_Y]){
@@ -249,7 +338,7 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
 
          //coups
         if(keystates[SDL_SCANCODE_KP_4] && !keystates[SDL_SCANCODE_KP_8] && !keystates[SDL_SCANCODE_KP_9]){
-            punch(&world->p2, &world->p1);
+            light_punch(&world->p2, &world->p1);
         }
         //kicks
         if(!keystates[SDL_SCANCODE_KP_4] && keystates[SDL_SCANCODE_KP_8] && !keystates[SDL_SCANCODE_KP_9]){
@@ -280,7 +369,12 @@ int main(int argc, char *argv[]){
     refresh_graphics(renderer,&world);
     // Boucle principale
     while(!world.terminer){
-        gameplay_inputs(&events, &world);
+        if(world.state == combat){
+            gameplay_inputs(&events, &world);
+        }
+        else{
+            handle_input_menu(&events, &world, renderer);
+        }
         //update_données
         refresh_graphics(renderer,&world);
         SDL_Delay(10);

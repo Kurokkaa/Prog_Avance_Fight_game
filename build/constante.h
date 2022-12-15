@@ -8,10 +8,11 @@
     #define CELL_HEIGHT SCREEN_HEIGHT/LINES
     #define CELL_WIDTH SCREEN_WIDTH/COLUMNS
     #define CHARA_SPEED CELL_WIDTH * 0.1
+    #define NB_MAPS 3
 
 
-    enum game_state{combat, menu, pause, options};
+    enum game_state{combat, main_menu, pause, options, selection_perso, selection_map};
     enum character_state{idle, walk, jump, fall, backwards, flight, flight_control, fall_control, landing};
-    enum game_map{russia, other_map};
+    enum game_map{russia, forest, street_art};
 
 #endif

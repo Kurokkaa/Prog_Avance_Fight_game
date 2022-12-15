@@ -20,4 +20,5 @@ void punch(sprite_perso* attacker, sprite_perso* receiver);
 void change_directions(sprite_perso * p1, sprite_perso * p2);
 void init_controller(jeu* world);
 void collision_perso(sprite_perso * p1, sprite_perso * p2, int pos_initP1);
+void init_miniature(jeu* world,SDL_Renderer* renderer);
 #endif

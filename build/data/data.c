@@ -154,18 +154,18 @@ bool equals(int x, int y, char** map_point, char test){
     return (map_point[y/height_factor][x/width_factor] == test);
 }
 
-void punch(sprite_perso* attacker, sprite_perso* receiver){
-    printf("%d",!(attacker->hits.punch->launch));
-    if((!attacker->hits.punch->launch)){
-        attacker->hits.punch->launch = true;
+void light_punch(sprite_perso* attacker, sprite_perso* receiver){
+    printf("%d",!(attacker->hits.light_punch->launch));
+    if((!attacker->hits.light_punch->launch)){
+        attacker->hits.light_punch->launch = true;
         if(!attacker->mirror){
-            if((attacker->x + attacker->w + attacker->hits.punch->range_x >= receiver->x) && (attacker->y + attacker->jump_height/2 >= receiver->y && attacker->y + attacker->jump_height/2 <= receiver->y + receiver->h)){
-                receiver->life -= attacker->hits.punch->dmg ;        
+            if((attacker->x + attacker->w + attacker->hits.light_punch->range_x >= receiver->x) && (attacker->y + attacker->jump_height/2 >= receiver->y && attacker->y + attacker->jump_height/2 <= receiver->y + receiver->h)){
+                receiver->life -= attacker->hits.light_punch->dmg ;        
             }
         }
         else{
-            if((attacker->x - attacker->hits.punch->range_x <= receiver->x + receiver->w) && (attacker->y + attacker->jump_height/2 >= receiver->y && attacker->y + attacker->jump_height/2 <= receiver->y + receiver->h)){
-                receiver->life -= attacker->hits.punch->dmg ;
+            if((attacker->x - attacker->hits.light_punch->range_x <= receiver->x + receiver->w) && (attacker->y + attacker->jump_height/2 >= receiver->y && attacker->y + attacker->jump_height/2 <= receiver->y + receiver->h)){
+                receiver->life -= attacker->hits.light_punch->dmg ;
             }
         }
     }
@@ -173,12 +173,12 @@ void punch(sprite_perso* attacker, sprite_perso* receiver){
 }
 
 void reset_hit(sprite_perso* perso){
-    if(perso->hits.punch->launch){
-        perso->hits.punch->timer++;
-        printf("%d", perso->hits.punch->timer);
-        if(perso->hits.punch->timer >= 50){
-            perso->hits.punch->launch = false;
-            perso->hits.punch->timer = 0;
+    if(perso->hits.light_punch->launch){
+        perso->hits.light_punch->timer++;
+        printf("%d", perso->hits.light_punch->timer);
+        if(perso->hits.light_punch->timer >= 50){
+            perso->hits.light_punch->launch = false;
+            perso->hits.light_punch->timer = 0;
         }
     }
 }
@@ -230,4 +230,10 @@ void collision_perso(sprite_perso * p1, sprite_perso * p2, int pos_initP1){
         }
     }
     
+}
+
+void init_miniature(jeu* world,SDL_Renderer* renderer){
+    world->menu_set.tab_map[0] = load_image("build/map/russia/RussiaMap_mini.png", renderer);
+    world->menu_set.tab_map[1] = load_image("build/map/forest/forest_mini.png", renderer);
+    world->menu_set.tab_map[2] = load_image("build/map/street_art/street_mini.png", renderer);
 }

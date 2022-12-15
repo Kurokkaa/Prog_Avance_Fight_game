@@ -20,8 +20,12 @@ struct hit_chara_s{
 
 typedef struct hit_chara_s hit;
 struct hit_set_s{
-    hit* punch;
-    hit* kick;
+    hit* light_punch;
+    hit* heavy_punch;
+    hit* flight_punch;
+    hit* low_kick;
+    hit* middle_kick;
+    hit* flight_kick;
     hit* special_attack;
 };
 
@@ -51,8 +55,15 @@ struct sprite_p{
     hit_set hits;
 };
 
-
 typedef struct sprite_p sprite_perso ;
+
+struct menu_p{
+    int index_menu;
+    SDL_Texture* menu_fond;
+    SDL_Texture* tab_map[3];
+};
+
+typedef struct menu_p menu;
 struct world_s{
     enum game_state state;
     enum game_map choosed_map;
@@ -61,8 +72,10 @@ struct world_s{
     sprite_perso p2;
     set_map map;
     SDL_GameController** joysticks;
+    menu menu_set;
 };
 
 typedef struct world_s jeu;
+
 
 #endif
