@@ -178,7 +178,6 @@ bool equals(int x, int y, char** map_point, char test){
 }
 
 void light_punch(sprite_perso* attacker, sprite_perso* receiver){
-    printf("%d",!(attacker->hits.light_punch->launch));
     if((!attacker->hits.light_punch->launch)){
         attacker->hits.light_punch->launch = true;
         if(!attacker->mirror){
@@ -198,7 +197,6 @@ void light_punch(sprite_perso* attacker, sprite_perso* receiver){
 void reset_hit(sprite_perso* perso){
     if(perso->hits.light_punch->launch){
         perso->hits.light_punch->timer++;
-        printf("%d", perso->hits.light_punch->timer);
         if(perso->hits.light_punch->timer >= 50){
             perso->hits.light_punch->launch = false;
             perso->hits.light_punch->timer = 0;
@@ -301,4 +299,45 @@ void init_miniature(jeu* world,SDL_Renderer* renderer){
     world->menu_set.tab_map[0] = load_image("build/map/russia/RussiaMap_mini.png", renderer);
     world->menu_set.tab_map[1] = load_image("build/map/forest/forest_mini.png", renderer);
     world->menu_set.tab_map[2] = load_image("build/map/street_art/street_mini.png", renderer);
+}
+
+//fonction pour les combos
+void add_input_buffer(sprite_perso* player, enum combos_inputs touche_appui, int timestamp){
+    if(player->pos_tab_combo == BUFFER_SIZE){
+        for(int i = 0; i<BUFFER_SIZE; i++){
+            player->buffer[i] = player->buffer[i+1];
+        }
+        player->pos_tab_combo = BUFFER_SIZE-1;
+    }
+    player->buffer[player->pos_tab_combo].input = touche_appui;
+    player->buffer[player->pos_tab_combo++].timestamp = timestamp;
+}
+
+void init_combo(sprite_perso* player){
+    //1er combo
+    player->tab_combo[0].nb_coups = 3;
+    player->tab_combo[0].input[0] = right;
+    player->tab_combo[0].input[1] = left;
+    player->tab_combo[0].input[2] = down;
+}
+
+bool read_combo(sprite_perso* player, int val){
+    //1er combo
+    bool found = false;
+    bool equal = true;
+    for(int i = 0 ; i<BUFFER_SIZE - player->tab_combo[val].nb_coups && !found ; i++){
+        for(int j = i; j<i+player->tab_combo[val].nb_coups && equal ; j++){
+            if(player->tab_combo[val].input[j] != player->buffer[j].input){
+                equal = false;
+            }
+        }
+        if(equal){
+            found = true;
+            for(int i = 0; i<BUFFER_SIZE ; i++){
+                player->buffer[i].input = 0;
+                player->buffer[i].timestamp = 0;
+            }
+        }
+    }
+    return found;
 }

@@ -10,10 +10,12 @@
     #define CHARA_SPEED CELL_WIDTH * 0.1
     #define NB_MAPS 3
     #define KNOCKBACK_SPEED CELL_WIDTH * 0.1
-
+    #define BUFFER_SIZE 60
+    #define NB_COMBOS 1 
 
     enum game_state{combat, main_menu, pause, options, selection_perso, selection_map};
     enum character_state{idle, walk, jump, fall, backwards, flight, flight_control, fall_control, landing, knockback};
     enum game_map{russia, forest, street_art};
+    enum combos_inputs{forward, down, left, right, kick, light_p, special};
 
 #endif

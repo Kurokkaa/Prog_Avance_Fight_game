@@ -37,6 +37,19 @@ typedef struct hit_set_s hit_set;
 enum perso{p1,p2};
 */
 
+struct inputs_s{
+    enum combos_inputs input;
+    int timestamp;
+};
+
+typedef struct inputs_s inputs;
+struct combos_s{
+    enum combos_inputs input[10];
+    int frame_between;
+    int nb_coups;
+};
+
+typedef struct combos_s combo;
 struct sprite_p{
     SDL_Texture * texture_perso;
     int x;
@@ -53,6 +66,9 @@ struct sprite_p{
     bool mirror;
     int life;
     hit_set hits;
+    inputs* buffer;
+    int pos_tab_combo;
+    combo tab_combo[2];
 };
 
 typedef struct sprite_p sprite_perso ;
@@ -73,6 +89,8 @@ struct world_s{
     set_map map;
     SDL_GameController** joysticks;
     menu menu_set;
+    int timestamp_w;
+    int keystates_pre[123];
 };
 
 typedef struct world_s jeu;

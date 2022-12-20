@@ -93,7 +93,7 @@ void display_life(SDL_Renderer* renderer, jeu* world){
     SDL_SetRenderDrawColor(renderer, 255, 0 , 0, 1);
     SDL_RenderFillRect(renderer, &rect_fond);
     SDL_RenderFillRect(renderer, &rect_fond2);
-    SDL_SetRenderDrawColor(renderer, 255, 255 , 0, 1);
+    SDL_SetRenderDrawColor(renderer, 255, 179 , 92, 1);
     SDL_RenderFillRect(renderer, &rect);
     SDL_RenderFillRect(renderer, &rect2);
 }

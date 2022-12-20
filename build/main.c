@@ -20,7 +20,6 @@ void quit_game(jeu* world,SDL_Window** fenetre,SDL_Renderer** renderer){
 void close_Joystick(jeu* world){
     int nbJoystick = SDL_NumJoysticks();
     if(nbJoystick>0){
-        printf("%i",nbJoystick);
         for(int i = 0; i<nbJoystick;i++){
         SDL_GameControllerClose(world->joysticks[i]);
         }
@@ -81,6 +80,8 @@ void init_perso(SDL_Renderer* renderer, sprite_perso* perso, int x, int y, int w
     perso->life = 20;
     init_hits(perso);
     init_texture(renderer, perso);
+    perso->pos_tab_combo = 0;
+    perso->buffer = malloc(sizeof(inputs)*60);
 }
 
 void init_hits(sprite_perso* perso){
@@ -226,13 +227,19 @@ void handle_input_menu(SDL_Event *event, jeu *world, SDL_Renderer* renderer){
             init_perso(renderer,&world->p2,1000, 465 ,125,232,CHARA_SPEED,true);
             init_controller(world);
             world->state = combat;
+            world->timestamp_w = 0;
+            for(int i = 0; i<123;i++){
+                world->keystates_pre[i]=0;
+            }
+            init_combo(&world->p1);
+        
         }
 
     }
+    
 }
 
 void gameplay_inputs(SDL_Event *event, jeu *world){
-    int pos_init_P1x, pos_init_P2x;
     const Uint8 *keystates = SDL_GetKeyboardState(NULL);
     SDL_JoystickUpdate();
    // checkJoystick(world->joysticks);
@@ -266,6 +273,9 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
                 world->p1.chara_state = fall_control;
                 world->p1.backwards = true;
             }
+            if(keystates[SDL_SCANCODE_A] != world->keystates_pre[SDL_SCANCODE_A]){
+                add_input_buffer(&world->p1,left,world->timestamp_w);
+            }
         }
         if(keystates[SDL_SCANCODE_LEFT] && !keystates[SDL_SCANCODE_RIGHT]){
             //world->p1.speed = -CHARA_SPEED;
@@ -280,6 +290,9 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
             if(world->p2.chara_state == fall){
                 world->p2.chara_state = fall_control;
                 world->p2.backwards = true;
+            }
+            if(keystates[SDL_SCANCODE_LEFT] != world->keystates_pre[SDL_SCANCODE_LEFT]){
+                add_input_buffer(&world->p2,left,world->timestamp_w);
             }
         }
 
@@ -296,6 +309,9 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
             if(world->p2.chara_state == fall){
                 world->p2.chara_state = fall_control;
                 world->p2.backwards = false;
+            }
+            if(keystates[SDL_SCANCODE_RIGHT] != world->keystates_pre[SDL_SCANCODE_RIGHT]){
+                add_input_buffer(&world->p2,right,world->timestamp_w);
             }
         }
 
@@ -314,18 +330,30 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
                 world->p1.chara_state = fall_control;
                 world->p1.backwards = false;
             }
+            if(keystates[SDL_SCANCODE_D] != world->keystates_pre[SDL_SCANCODE_D]){
+                add_input_buffer(&world->p1,right,world->timestamp_w);
+            }
         }
 
         //sauts
         if((keystates[SDL_SCANCODE_W] /*|| SDL_GameControllerGetAxis(world->joysticks[0],1)< (-10000)*/) && (world->p1.chara_state == idle || world->p1.chara_state == walk)){
             world->p1.chara_state = jump;
+            if(keystates[SDL_SCANCODE_W] != world->keystates_pre[SDL_SCANCODE_W]){
+                add_input_buffer(&world->p1,forward,world->timestamp_w);
+            }
         }
         if(keystates[SDL_SCANCODE_UP] && (world->p2.chara_state == idle || world->p2.chara_state == walk)){
             world->p2.chara_state = jump;
+            if(keystates[SDL_SCANCODE_UP] != world->keystates_pre[SDL_SCANCODE_UP]){
+                add_input_buffer(&world->p2,forward,world->timestamp_w);
+            }
         }
         //coups
         if(keystates[SDL_SCANCODE_G] && !keystates[SDL_SCANCODE_U] && !keystates[SDL_SCANCODE_Y]){
             light_punch(&world->p1, &world->p2);
+            if(keystates[SDL_SCANCODE_G] != world->keystates_pre[SDL_SCANCODE_G]){
+                add_input_buffer(&world->p1,light_p,world->timestamp_w);
+            }
         }
         //kicks
         if(!keystates[SDL_SCANCODE_G] && keystates[SDL_SCANCODE_U] && !keystates[SDL_SCANCODE_Y]){
@@ -353,9 +381,20 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
         sprites_collision(&world->p1, &world->p2, world);
         sprites_collision(&world->p2, &world->p1, world);
         change_directions(&world->p1, &world->p2);
+        world->timestamp_w++;
+        for(int i = 0; i<123; i++){
+            world->keystates_pre[i]=keystates[i];
+        }
         //collision_perso(&world->p1, &world->p2, pos_init_P1x);
         //collision_perso(&world->p2, &world->p1, pos_init_P2x);
+        bool combop1 = false;
+        bool combop2 = false;
+        for(int i = 0 ; i<= NB_COMBOS && !combop1 ; i++){
+            combop1 = read_combo(&world->p1,i);
+            combop2 = read_combo(&world->p2,i);
+        }
 
+        printf("p1 : %d, p2 : %d \n", combop1, combop2);
 }
 
 
