@@ -36,18 +36,21 @@ SDL_Texture* load_image( char path[],SDL_Renderer *renderer){
     return texture;
 }
 
-void movements(jeu* world, sprite_perso* perso, int * pos_init_x){
+void movements(jeu* world, sprite_perso* perso, sprite_perso* adversaire){
     //printf("X: %d\n", perso->x);
     //printf("Y: %d\n", perso->y);
     //printf("State: %d\n", perso->chara_state);
     //printf("Bckwd: %d\n", backwards);
     int x, y;
     x = perso->x;
-    *pos_init_x = perso->x;
+
+    //*pos_init_x = perso->x;
+
     y = perso->y;
 
     //Contrôle en marche
     if(perso->chara_state == walk){
+        if(canMove(perso, adversaire)){
             if(perso->backwards){
                 if(!equals(x - perso->speed, y + perso->h, world->map.map_structure, '0')){
                     perso->x -= perso->speed;
@@ -58,6 +61,7 @@ void movements(jeu* world, sprite_perso* perso, int * pos_init_x){
                     perso->x += perso->speed;
                 }
             }
+        }
     }
 
     //Contrôle en vol
@@ -115,7 +119,8 @@ void movements(jeu* world, sprite_perso* perso, int * pos_init_x){
     if((perso->chara_state == fall)){
         x = perso->x;
         y = perso->y;
-        if(y + perso->jump_height *0.025 > 720){
+        //if(y + perso->jump_height *0.025 > 720){ // A quoi servait ce test?
+        if(y  > 465){ //replace correctement perso sur le sol
             perso->y = 465;
             perso->chara_state = landing;
         }
@@ -139,6 +144,24 @@ void movements(jeu* world, sprite_perso* perso, int * pos_init_x){
 
     if(perso->chara_state == landing){
        // printf("idle: %d\n", perso->animation);
+        perso->animation++;
+        if(perso->animation >= 20){
+            perso->chara_state = idle;
+            perso->animation = 0;
+        }
+    }
+
+    if(perso->chara_state == knockback){
+        if(!perso->mirror){
+            if(!equals(x - perso->speed, y + perso->h, world->map.map_structure, '0')){
+                perso->x -= perso->speed;
+            }
+        }
+        else{
+            if(!equals(x + perso->speed, y + perso->h, world->map.map_structure, '0')){
+                perso->x += perso->speed;
+            }
+        }
         perso->animation++;
         if(perso->animation >= 20){
             perso->chara_state = idle;
@@ -210,26 +233,67 @@ void init_controller(jeu* world){
     }
 }
 
-void collision_perso(sprite_perso * p1, sprite_perso * p2, int pos_initP1){
-    if(!p1->mirror && p2->mirror){
-        if(p1->x + p1->w >= p2->x && p1->x + p1->w <= p2->x + p2->w && (p1->y + p1->h > p2->y && p1->y < p2->y + p2->h)){
-            printf("collision perso Cas 1\n");
-            p1->x = pos_initP1;
-        }
-        if(p1->x + p1->w >= p2->x && p1->x + p1->w <= p2->x + p2->w){
-            p1->x = pos_initP1;
+bool canMove(sprite_perso * perso, sprite_perso * adversaire){
+    bool canMove = true;
+    int * yAxis =(int*)malloc(sizeof(int)*2);
+    yAxis[0] = perso->y;
+    yAxis[1] = perso->y - perso->h;
+
+    if(!perso->mirror && adversaire->mirror){
+        if( yAxis[0] >= adversaire->y &&  yAxis[1] <= adversaire->y - adversaire->h ){ 
+            if( perso->x + perso->speed >= adversaire->x - adversaire->w && perso->backwards != 1){
+                canMove = false;
+            }
         }
     }
     else{
-        if(p1->x <= p2->x + p2->w && p1->x >= p2->x && (p1->y + p1->h > p2->y && p1->y < p2->y + p2->h)){
-            printf("collision perso Cas 2\n");
-            p1->x = pos_initP1;
-        }
-        if(p1->x <= p2->x + p2->w && p1->x >= p2->x){
-            p1->x = pos_initP1;
+        if( yAxis[0] >= adversaire->y &&  yAxis[1] <= adversaire->y - adversaire->h ){
+            if(perso->x - perso->speed <= adversaire->x + adversaire->w && perso->backwards == 1){
+                canMove = false;
+            }
         }
     }
-    
+    return canMove; 
+}
+
+void sprites_collision(sprite_perso * p1, sprite_perso * p2, jeu * world){ // Cas où les deux sprites sont superposés (suite à par ex un saut), un choc se produit et ils reculent tout les deux si possibles
+    int * yAxis =(int*)malloc(sizeof(int)*2);
+    yAxis[0] = p1->y;
+    yAxis[1] = p1->y - p1->h;
+    if(!p1->mirror && p2->mirror){
+        if( yAxis[0] >= p2->y &&  yAxis[1] <= p2->y - p2->h ){
+            if(p1->x + p1->w >= p2->x && p1 ->backwards != 1){
+                printf("COLLISION \n");
+                /*if(!equals(p1->x - p1->speed / 2, p1->y + p1->h, world->map.map_structure, '0')){
+                    p1->x = p1->x - p1->speed / 2;
+                    p2->x = p2->x + p2->speed / 2;
+                }
+                else{
+                    p2->x = p1->x + p1->w;
+                }*/
+                p1->chara_state = knockback;
+                p2->chara_state = knockback;
+            }
+        }
+    }
+    else{
+        if( yAxis[0] >= p2->y &&  yAxis[1] <= p2->y - p2->h){
+            /*if(p1->x - p1->w <= p2->x ){
+                printf("COLLISION 2 \n");
+                if(!equals(p1->x + p1->speed, p1->y + p1->h, world->map.map_structure, '0')){
+                    p1->x = p2->x + p2->w;
+                }
+                else{
+                    p2->x = p1->x - p1->w;
+                }
+            }*/
+            if(p1->x <= p2->x + p2->w && p1 ->backwards == 1){
+                p1->chara_state = knockback;
+                p2->chara_state = knockback;
+            }
+        }
+    }
+
 }
 
 //fonction pour les miniatures de maps

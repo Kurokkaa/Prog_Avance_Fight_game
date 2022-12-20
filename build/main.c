@@ -348,11 +348,13 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
         if(!keystates[SDL_SCANCODE_KP_4] && !keystates[SDL_SCANCODE_KP_8] && keystates[SDL_SCANCODE_KP_9]){
            // kick(world->p2, world->p1);
         }
-        movements(world, &world->p1, &pos_init_P1x);
-        movements(world,&world->p2, &pos_init_P2x);
+        movements(world, &world->p1, &world->p2);
+        movements(world,&world->p2, &world->p1);
+        sprites_collision(&world->p1, &world->p2, world);
+        sprites_collision(&world->p2, &world->p1, world);
         change_directions(&world->p1, &world->p2);
-        collision_perso(&world->p1, &world->p2, pos_init_P1x);
-        collision_perso(&world->p2, &world->p1, pos_init_P2x);
+        //collision_perso(&world->p1, &world->p2, pos_init_P1x);
+        //collision_perso(&world->p2, &world->p1, pos_init_P2x);
 
 }
 
