@@ -22,13 +22,21 @@ void apply_sprite(SDL_Renderer *renderer, SDL_Texture *texture, sprite_perso* sp
     
 }
 
+void play_animations(SDL_Renderer *renderer, sprite_perso* sprite){
+    if(sprite->chara_state == idle){
+        apply_sprite(renderer, sprite->anim.anim_text[idle], sprite);
+    }
+    
+}
+
 void refresh_graphics(SDL_Renderer *renderer, jeu *world){
     SDL_RenderClear(renderer);
     switch(world->state){
         case combat:
             display_map(renderer,world);
             display_dynamic_texture(renderer, world->map.map_structure, world->map.plateformes);
-            apply_sprite(renderer, world->p1.texture_perso, &(world->p1));
+            //apply_sprite(renderer, world->p1.texture_perso, &(world->p1));
+            play_animations(renderer, &(world->p1));
             apply_sprite(renderer, world->p2.texture_perso, &(world->p2));
             display_life(renderer, world);
         break;

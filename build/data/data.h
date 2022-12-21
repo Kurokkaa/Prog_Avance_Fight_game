@@ -20,6 +20,7 @@ void init_perso(SDL_Renderer* renderer, sprite_perso* perso, int x, int y, int w
 void init_hits(sprite_perso* perso);
 void init_combo(sprite_perso* player);
 void init(SDL_Window** window, SDL_Renderer** renderer, jeu* world);
+void init_state_animations(SDL_Renderer* renderer, sprite_perso* perso);
 
 /*FONCTIONS DE LECTURES*/
 char** read_file_map(char* nom);

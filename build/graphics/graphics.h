@@ -11,6 +11,7 @@
 
 void init_texture(SDL_Renderer *renderer, sprite_perso *perso);
 void apply_sprite(SDL_Renderer *renderer, SDL_Texture *texture, sprite_perso* sprite);
+void play_animations(SDL_Renderer *renderer, sprite_perso* sprite);
 void refresh_graphics(SDL_Renderer *renderer, jeu *world);
 void apply_textures(SDL_Texture * texture, SDL_Renderer *renderer, int x , int y);
 void display_map(SDL_Renderer* renderer,jeu* world);

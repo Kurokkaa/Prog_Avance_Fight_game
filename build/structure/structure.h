@@ -20,6 +20,14 @@ struct hit_chara_s{
 };
 
 typedef struct hit_chara_s hit;
+
+struct animation_s{
+    int frame;
+    SDL_Texture * anim_text[2];
+};
+
+typedef struct animation_s anim_t;
+
 struct hit_set_s{
     hit* light_punch;
     hit* heavy_punch;
@@ -44,6 +52,7 @@ struct combos_s{
 
 typedef struct combos_s combo;
 struct sprite_p{
+    int perso_choisi; 
     SDL_Texture * texture_perso;
     int x;
     int y;
@@ -55,10 +64,10 @@ struct sprite_p{
     bool backwards;
     int jump_height;
     int jump_origin;
-    int animation;
     bool mirror;
     int life;
     hit_set hits;
+    anim_t anim;
     inputs* buffer;
     int pos_tab_combo;
     combo tab_combo[2];

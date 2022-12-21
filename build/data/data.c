@@ -54,6 +54,7 @@ void init_jeu(jeu *world, SDL_Renderer* renderer){
 }
 
 void init_perso(SDL_Renderer* renderer, sprite_perso* perso, int x, int y, int w, int h, int speed,bool mirror){ //voir moyen pour charger texture spécifique  
+    perso->perso_choisi = 0;
     perso->x = x;
     perso->y = y;
     perso->w = w;
@@ -63,13 +64,14 @@ void init_perso(SDL_Renderer* renderer, sprite_perso* perso, int x, int y, int w
     perso->chara_state = idle;
     perso->backwards = false;
     perso->jump_origin = y;
-    perso->animation = 0;
+    perso->anim.frame = 0;
     perso->mirror = mirror;
     perso->life = 20;
     init_hits(perso);
     init_texture(renderer, perso);
     perso->pos_tab_combo = 0;
     perso->buffer = malloc(sizeof(inputs)*60);
+    init_state_animations(renderer, perso);
 }
 
 void init_hits(sprite_perso* perso){
@@ -150,6 +152,20 @@ void init(SDL_Window** window, SDL_Renderer** renderer, jeu* world){
         SDL_Quit();
     }
     init_jeu(world, *renderer);
+}
+
+void init_state_animations(SDL_Renderer* renderer, sprite_perso* perso){
+    switch (perso->perso_choisi)
+    {
+    case 0:
+        perso->anim.anim_text[idle] = load_image("build/ressources/Characters/Chara1/Yellow_idle_spritesheet.png", renderer);
+        perso->anim.frame = 0;
+        break;
+    
+    default:
+        perso->anim.anim_text[idle] = load_image("build/ressources/Characters/Chara1/Yellow_idle_spritesheet.png", renderer);
+        break;
+    }
 }
 
 
@@ -325,10 +341,10 @@ void movements(jeu* world, sprite_perso* perso, sprite_perso* adversaire){
     }
 
     if(perso->chara_state == landing){
-        perso->animation++;
-        if(perso->animation >= 20){
+        perso->anim.frame++;
+        if(perso->anim.frame >= 20){
             perso->chara_state = idle;
-            perso->animation = 0;
+            perso->anim.frame = 0;
         }
     }
 
@@ -343,10 +359,10 @@ void movements(jeu* world, sprite_perso* perso, sprite_perso* adversaire){
                 perso->x += perso->speed;
             }
         }
-        perso->animation++;
-        if(perso->animation >= 20){
+        perso->anim.frame++;
+        if(perso->anim.frame >= 20){
             perso->chara_state = idle;
-            perso->animation = 0;
+            perso->anim.frame = 0;
         }
     }
 }
