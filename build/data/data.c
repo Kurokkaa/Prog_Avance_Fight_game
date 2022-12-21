@@ -311,6 +311,10 @@ void add_input_buffer(sprite_perso* player, enum combos_inputs touche_appui, int
     }
     player->buffer[player->pos_tab_combo].input = touche_appui;
     player->buffer[player->pos_tab_combo++].timestamp = timestamp;
+
+    for(int i = 0 ;i<player->pos_tab_combo;i++){
+        printf("%d",player->buffer[i].input);
+    }
 }
 
 void init_combo(sprite_perso* player){
@@ -337,6 +341,7 @@ bool read_combo(sprite_perso* player, int val){
                 player->buffer[i].input = 0;
                 player->buffer[i].timestamp = 0;
             }
+            player->pos_tab_combo=0;
         }
     }
     return found;

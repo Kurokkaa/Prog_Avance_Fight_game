@@ -116,6 +116,8 @@ void display_map(SDL_Renderer* renderer,jeu* world){
         case forest:
             apply_textures(world->map.image_fond,renderer,0,0);
         break;
+        case street_art:
+            apply_textures(world->map.image_fond,renderer,0,0);
     }
 }
 

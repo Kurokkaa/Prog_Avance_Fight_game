@@ -15,6 +15,7 @@ struct hit_chara_s{
     bool launch;
     int timer;
     int frame;
+    int delay;
     SDL_Texture* animation;
 };
 

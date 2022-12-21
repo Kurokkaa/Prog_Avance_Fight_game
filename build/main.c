@@ -62,7 +62,14 @@ void init_map(jeu* world,SDL_Renderer* renderer){
             world->map.plateformes = load_image("build/map/forest/plateforme.png",renderer);
             world->map.taille_cellule_H = sizeof(world->map.map_structure);
             world->map.taille_cellule_W = sizeof(world->map.map_structure[0]);
-            break;        
+            break;  
+        case street_art:
+            world->map.image_fond = load_image("build/map/street_art/street.png",renderer);
+            world->map.map_structure = read_file_map("build/map/street_art/street_structure");
+            world->map.plateformes = load_image("build/map/street_art/plateforme.png",renderer);
+            world->map.taille_cellule_H = sizeof(world->map.map_structure);
+            world->map.taille_cellule_W = sizeof(world->map.map_structure[0]);
+            break;  
     }
 }
 void init_perso(SDL_Renderer* renderer, sprite_perso* perso, int x, int y, int w, int h, int speed,bool mirror){ //voir moyen pour charger texture spécifique  
@@ -96,6 +103,17 @@ void init_hits(sprite_perso* perso){
     perso->hits.light_punch->animation = 0;
     perso->hits.light_punch->launch = false;
     perso->hits.light_punch->timer = 0;
+    perso->hits.light_punch->delay = 50;
+
+    perso->hits.heavy_punch->dmg = 2;
+    perso->hits.heavy_punch->speed = 0;
+    perso->hits.heavy_punch->range_x = 250;
+    perso->hits.heavy_punch->range_y = 0;
+    perso->hits.heavy_punch->frame = 0;
+    perso->hits.heavy_punch->animation = 0;
+    perso->hits.heavy_punch->launch = false;
+    perso->hits.heavy_punch->timer = 0;
+    perso->hits.heavy_punch->delay = 50;
 
     perso->hits.low_kick->dmg = 1;
     perso->hits.low_kick->speed = 0;
@@ -105,6 +123,7 @@ void init_hits(sprite_perso* perso){
     perso->hits.low_kick->animation = 0;
     perso->hits.low_kick->launch = false;
     perso->hits.low_kick->timer = 0;
+    perso->hits.light_punch->delay = 20;
 }
   
 void init(SDL_Window** window, SDL_Renderer** renderer, jeu* world){
@@ -114,7 +133,7 @@ void init(SDL_Window** window, SDL_Renderer** renderer, jeu* world){
     }
     
     *window = SDL_CreateWindow("Fenetre SDL", SDL_WINDOWPOS_CENTERED,
-    SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_RESIZABLE);
+    SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_RESIZABLE);
     if( window == NULL){ // En cas d’erreur
         printf("Erreur de la creation d'une fenetre: %s",SDL_GetError());
         SDL_Quit();
@@ -153,90 +172,98 @@ void handle_input_menu(SDL_Event *event, jeu *world, SDL_Renderer* renderer){
             world->terminer = true;
         }
     }
-    if(keystates[SDL_SCANCODE_W]){
-        if(world->state != selection_map ){
-            world->menu_set.index_menu--;
-            SDL_Delay(150);
-            if(world->menu_set.index_menu < 0){
-                world->menu_set.index_menu = 2;
-            }
-        }
-
-    }
-    if(keystates[SDL_SCANCODE_S]){
-        if(world->state != selection_map){
-            world->menu_set.index_menu++;
-            SDL_Delay(150);
-            if(world->menu_set.index_menu > 2){
-            world->menu_set.index_menu = 0;
-            }
-        } 
-    }
-    if(keystates[SDL_SCANCODE_D]){
-        if(world->state == selection_map){
-            world->menu_set.index_menu++;
-            SDL_Delay(300);
-            if(world->menu_set.index_menu > NB_MAPS-1){
-                world->menu_set.index_menu = 0;
-            }
-        } 
-    }
-    if(keystates[SDL_SCANCODE_A]){
-        if(world->state == selection_map){
-            world->menu_set.index_menu--;
-            SDL_Delay(300);
-            if(world->menu_set.index_menu < 0){
-            
-                world->menu_set.index_menu = NB_MAPS-1;
-            }
-        } 
-    }
-    if(keystates[SDL_SCANCODE_RETURN]){
-        if(world->state == main_menu){
-        switch(world->menu_set.index_menu){
-            case 0:
-                world->menu_set.index_menu = 0;
-                free(world->menu_set.menu_fond);
-                world->menu_set.menu_fond = load_image("build/ressources/menu/selection_map.png", renderer);
-                world->state = selection_map;
-                init_miniature(world,renderer);
-                SDL_Delay(500);
-            break;
-            case 1:
-                world->state = options;
-            break;
-            case 2:
-                world->terminer = true;
-            break;
-        }
-        }
-        else if(world->state == selection_map){
-        switch(world->menu_set.index_menu){
-            case 0:
-                world->choosed_map = russia;
-            break;
-            case 1:
-                world->choosed_map = forest;
-            break;
-            case 2:
-                world->choosed_map = street_art;
-            break;
-            }
-            init_map(world, renderer);
-            init_perso(renderer,&world->p1,65, 465 ,125,232,CHARA_SPEED,false);
-            init_perso(renderer,&world->p2,1000, 465 ,125,232,CHARA_SPEED,true);
-            init_controller(world);
-            world->state = combat;
-            world->timestamp_w = 0;
-            for(int i = 0; i<123;i++){
-                world->keystates_pre[i]=0;
-            }
-            init_combo(&world->p1);
-        
-        }
-
-    }
+ 
     
+        if(keystates[SDL_SCANCODE_W]){
+            if(world->state != selection_map ){
+                world->menu_set.index_menu--;
+                SDL_Delay(150);
+                if(world->menu_set.index_menu < 0){
+                    world->menu_set.index_menu = 2;
+                }
+            }
+
+        }
+        if(keystates[SDL_SCANCODE_S]){
+            if(world->state != selection_map){
+                world->menu_set.index_menu++;
+                SDL_Delay(150);
+                if(world->menu_set.index_menu > 2){
+                world->menu_set.index_menu = 0;
+                }
+            } 
+        }
+        if(keystates[SDL_SCANCODE_D]){
+            if(world->state == selection_map){
+                world->menu_set.index_menu++;
+                SDL_Delay(300);
+                if(world->menu_set.index_menu > NB_MAPS-1){
+                    world->menu_set.index_menu = 0;
+                }
+            } 
+        }
+        if(keystates[SDL_SCANCODE_A]){
+            if(world->state == selection_map){
+                world->menu_set.index_menu--;
+                SDL_Delay(300);
+                if(world->menu_set.index_menu < 0){
+                
+                    world->menu_set.index_menu = NB_MAPS-1;
+                }
+            } 
+        }
+        if(keystates[SDL_SCANCODE_RETURN]){
+            if(world->state == main_menu){
+            switch(world->menu_set.index_menu){
+                case 0:
+                    world->menu_set.index_menu = 0;
+                    free(world->menu_set.menu_fond);
+                    world->menu_set.menu_fond = load_image("build/ressources/menu/selection_map.png", renderer);
+                    world->state = selection_map;
+                    init_miniature(world,renderer);
+                    SDL_Delay(500);
+                break;
+                case 1:
+                    world->state = options;
+                break;
+                case 2:
+                    world->terminer = true;
+                break;
+            }
+            }
+            else if(world->state == selection_map){
+            switch(world->menu_set.index_menu){
+                case 0:
+                    world->choosed_map = russia;
+                break;
+                case 1:
+                    world->choosed_map = forest;
+                break;
+                case 2:
+                    world->choosed_map = street_art;
+                break;
+                }
+                init_map(world, renderer);
+                init_perso(renderer,&world->p1,65, 465 ,125,232,CHARA_SPEED,false);
+                init_perso(renderer,&world->p2,1000, 465 ,125,232,CHARA_SPEED,true);
+                init_controller(world);
+                world->state = combat;
+                world->timestamp_w = 0;
+                
+                for(int i = 0; i<123;i++){
+                    world->keystates_pre[i]=0;
+                }
+                init_combo(&world->p1);
+            
+            }
+
+        }
+    
+    if(world->state!=combat){
+        for(int i = 0; i<123; i++){
+            world->keystates_pre[i]=keystates[i];
+            }
+    }
 }
 
 void gameplay_inputs(SDL_Event *event, jeu *world){
@@ -251,10 +278,15 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
             world->terminer = true;
         }
     }   
-        if((!keystates[SDL_SCANCODE_A] && !keystates[SDL_SCANCODE_D]||keystates[SDL_SCANCODE_A] && keystates[SDL_SCANCODE_D]) && world->p1.chara_state == walk){
+        if(keystates[SDL_SCANCODE_ESCAPE] && !world->keystates_pre[SDL_SCANCODE_ESCAPE] ){
+            
+            world->state = pause;
+        }
+        
+        if((!keystates[SDL_SCANCODE_A] && !keystates[SDL_SCANCODE_D] && !keystates[SDL_SCANCODE_S]||keystates[SDL_SCANCODE_A] && keystates[SDL_SCANCODE_D]) && (world->p1.chara_state == walk || world->p1.chara_state == crouch)){
             world->p1.chara_state = idle;
         }
-        if((!keystates[SDL_SCANCODE_LEFT] && !keystates[SDL_SCANCODE_RIGHT] || keystates[SDL_SCANCODE_LEFT] && keystates[SDL_SCANCODE_RIGHT]) && world->p2.chara_state == walk){
+        if((!keystates[SDL_SCANCODE_LEFT] && !keystates[SDL_SCANCODE_RIGHT] && !keystates[SDL_SCANCODE_DOWN]|| keystates[SDL_SCANCODE_LEFT] && keystates[SDL_SCANCODE_RIGHT])  && (world->p2.chara_state == walk || world->p1.chara_state == crouch)){
             world->p2.chara_state = idle;
         }
             //deplacement gauche
@@ -334,26 +366,40 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
                 add_input_buffer(&world->p1,right,world->timestamp_w);
             }
         }
-
+        if(!keystates[SDL_SCANCODE_Z] && keystates[SDL_SCANCODE_S]){
+            world->p1.chara_state = crouch;
+            if(keystates[SDL_SCANCODE_S] != world->keystates_pre[SDL_SCANCODE_S]){
+                add_input_buffer(&world->p1,down,world->timestamp_w);
+            }
+        }
+      
+        if(!keystates[SDL_SCANCODE_UP] && keystates[SDL_SCANCODE_DOWN]){
+            world->p2.chara_state = crouch;
+            if(keystates[SDL_SCANCODE_S] != world->keystates_pre[SDL_SCANCODE_S]){
+                add_input_buffer(&world->p2,down,world->timestamp_w);
+            }
+        }
         //sauts
         if((keystates[SDL_SCANCODE_W] /*|| SDL_GameControllerGetAxis(world->joysticks[0],1)< (-10000)*/) && (world->p1.chara_state == idle || world->p1.chara_state == walk)){
             world->p1.chara_state = jump;
             if(keystates[SDL_SCANCODE_W] != world->keystates_pre[SDL_SCANCODE_W]){
-                add_input_buffer(&world->p1,forward,world->timestamp_w);
+                add_input_buffer(&world->p1,up,world->timestamp_w);
             }
         }
         if(keystates[SDL_SCANCODE_UP] && (world->p2.chara_state == idle || world->p2.chara_state == walk)){
             world->p2.chara_state = jump;
             if(keystates[SDL_SCANCODE_UP] != world->keystates_pre[SDL_SCANCODE_UP]){
-                add_input_buffer(&world->p2,forward,world->timestamp_w);
+                add_input_buffer(&world->p2,up,world->timestamp_w);
             }
         }
         //coups
         if(keystates[SDL_SCANCODE_G] && !keystates[SDL_SCANCODE_U] && !keystates[SDL_SCANCODE_Y]){
-            light_punch(&world->p1, &world->p2);
+           
             if(keystates[SDL_SCANCODE_G] != world->keystates_pre[SDL_SCANCODE_G]){
                 add_input_buffer(&world->p1,light_p,world->timestamp_w);
             }
+
+            wordld
         }
         //kicks
         if(!keystates[SDL_SCANCODE_G] && keystates[SDL_SCANCODE_U] && !keystates[SDL_SCANCODE_Y]){
@@ -389,12 +435,15 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
         //collision_perso(&world->p2, &world->p1, pos_init_P2x);
         bool combop1 = false;
         bool combop2 = false;
-        for(int i = 0 ; i<= NB_COMBOS && !combop1 ; i++){
+        int i,j;
+        for(i = 0 ; i< NB_COMBOS && !combop1 ; i++){
             combop1 = read_combo(&world->p1,i);
-            combop2 = read_combo(&world->p2,i);
+           
         }
-
-        printf("p1 : %d, p2 : %d \n", combop1, combop2);
+        for(j = 0;j<NB_COMBOS && !combop2;j++){
+             combop2 = read_combo(&world->p2,i);
+        }
+        //printf("p1 : %d, p2 : %d \n", combop1, combop2);
 }
 
 
