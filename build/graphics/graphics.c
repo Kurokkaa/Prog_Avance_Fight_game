@@ -1,13 +1,5 @@
 
 #include "graphics.h"
-/*SDL_Texture* load_image( char path[],SDL_Renderer *renderer){
-    
-    SDL_Surface* surfaceCharge = IMG_Load(path);
-    return SDL_CreateTextureFromSurface(renderer, surfaceCharge);
-}
-*/
-
-
 
 void init_texture(SDL_Renderer *renderer, sprite_perso *perso){
     perso->texture_perso = load_image( "build/ressources/stickman.png",renderer);
@@ -60,40 +52,52 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
 }
 
 void display_life(SDL_Renderer* renderer, jeu* world){
+    /*VIE JOUEUR 1*/
     SDL_Rect rect;
-    SDL_Rect rect2;
-    rect.x = 400 ;
-    rect.h = 20;
-    rect.y = SCREEN_HEIGHT- rect.h;
+    SDL_Rect rect_fond;
+    rect.x = 500 ;
+    rect.y = 0;
+    rect.h = 30;
+
+    rect_fond.x = 500 ;
+    rect_fond.h = 30;
+    rect_fond.y = 0;
+    rect_fond.w = -500;
+
     if(world->p1.life >= 0){
-        rect.w = world->p1.life * -20;
+        rect.w = world->p1.life * -50;
     }
     else{
         rect.w = 0;
     }
+
+    /*VIE JOUEUR 2*/
+    SDL_Rect rect2;
+    SDL_Rect rect_fond2;
+    rect2.x = SCREEN_WIDTH - 500 ;
+    rect2.y = 0;
+    rect2.h = 30;
+    
+    
+    rect_fond2.x = SCREEN_WIDTH - 500;
+    rect_fond2.h = 30;
+    rect_fond2.y = 0;
+    rect_fond2.w =  500 ;
+
     if(world->p2.life >= 0){
-        rect2.w = world->p2.life * 20 ;
+        rect2.w = world->p2.life * 50 ;
     }
     else{
         rect2.w = 0;
     } 
-    rect2.x = SCREEN_WIDTH - 400;
-    rect2.y = SCREEN_HEIGHT - rect.h;
-    rect2.h = 20;
-    SDL_Rect rect_fond;
-    SDL_Rect rect_fond2;
-    rect_fond.x = 400 ;
-    rect_fond.h = 20;
-    rect_fond.y = SCREEN_HEIGHT- rect.h;
-    rect_fond.w = -400;
-    rect_fond2.w =  400 ;
-    rect_fond2.x = SCREEN_WIDTH - 400;
-    rect_fond2.y = SCREEN_HEIGHT - rect.h;
-    rect_fond2.h = 20;
-    SDL_SetRenderDrawColor(renderer, 255, 0 , 0, 1);
+
+    /*RENDERING*/
+    SDL_SetRenderDrawColor(renderer, 255, 20 , 15, 1);
     SDL_RenderFillRect(renderer, &rect_fond);
     SDL_RenderFillRect(renderer, &rect_fond2);
+
     SDL_SetRenderDrawColor(renderer, 255, 179 , 92, 1);
+    SDL_SetRenderDrawColor(renderer, 0, 190, 25, 0);
     SDL_RenderFillRect(renderer, &rect);
     SDL_RenderFillRect(renderer, &rect2);
 }
