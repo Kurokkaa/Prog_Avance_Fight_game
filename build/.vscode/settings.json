@@ -1,5 +1,8 @@
 {
     "files.associations": {
-        "map_global": "c"
+        "map_global": "c",
+        "constante.h": "c",
+        "sdl.h": "c",
+        "sdl_image.h": "c"
     }
 }
