@@ -23,20 +23,12 @@ typedef struct hit_chara_s hit;
 struct hit_set_s{
     hit* light_punch;
     hit* heavy_punch;
-    hit* flight_punch;
-    hit* low_kick;
-    hit* middle_kick;
-    hit* flight_kick;
+    hit* kick;
     hit* special_attack;
 };
 
 typedef struct hit_set_s hit_set;
 
-/*struct personnage{
-};
-
-enum perso{p1,p2};
-*/
 
 struct inputs_s{
     enum combos_inputs input;

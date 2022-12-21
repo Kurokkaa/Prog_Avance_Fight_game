@@ -50,7 +50,7 @@ void init_jeu(jeu *world, SDL_Renderer* renderer){
 void init_map(jeu* world,SDL_Renderer* renderer){
     switch(world->choosed_map){
         case russia:
-            world->map.image_fond = load_image("build/map/russia/RussiaMap.png",renderer);
+            world->map.image_fond = load_image("build/map/city_night/city.bmp",renderer);
             world->map.map_structure = read_file_map("build/map/russia/russia_structure");
             world->map.plateformes = load_image("build/map/russia/plateforme.png",renderer);
             world->map.taille_cellule_H = sizeof(world->map.map_structure);
@@ -93,8 +93,11 @@ void init_perso(SDL_Renderer* renderer, sprite_perso* perso, int x, int y, int w
 
 void init_hits(sprite_perso* perso){
     perso->hits.light_punch = malloc(sizeof(hit));
-    perso->hits.low_kick = malloc(sizeof(hit));
+    perso->hits.heavy_punch = malloc(sizeof(hit));
+    perso->hits.kick = malloc(sizeof(hit));
     perso->hits.special_attack = malloc(sizeof(hit));
+    //perso->hits
+
     perso->hits.light_punch->dmg = 2;
     perso->hits.light_punch->speed = 0;
     perso->hits.light_punch->range_x = 250;
@@ -104,6 +107,7 @@ void init_hits(sprite_perso* perso){
     perso->hits.light_punch->launch = false;
     perso->hits.light_punch->timer = 0;
     perso->hits.light_punch->delay = 50;
+
 
     perso->hits.heavy_punch->dmg = 2;
     perso->hits.heavy_punch->speed = 0;
@@ -115,15 +119,25 @@ void init_hits(sprite_perso* perso){
     perso->hits.heavy_punch->timer = 0;
     perso->hits.heavy_punch->delay = 50;
 
-    perso->hits.low_kick->dmg = 1;
-    perso->hits.low_kick->speed = 0;
-    perso->hits.low_kick->range_x = 400;
-    perso->hits.low_kick->range_y = 0;
-    perso->hits.low_kick->frame = 0;
-    perso->hits.low_kick->animation = 0;
-    perso->hits.low_kick->launch = false;
-    perso->hits.low_kick->timer = 0;
-    perso->hits.light_punch->delay = 20;
+    perso->hits.kick->dmg = 1;
+    perso->hits.kick->speed = 0;
+    perso->hits.kick->range_x = 400;
+    perso->hits.kick->range_y = 0;
+    perso->hits.kick->frame = 0;
+    perso->hits.kick->animation = 0;
+    perso->hits.kick->launch = false;
+    perso->hits.kick->timer = 0;
+    perso->hits.kick->delay = 20;
+
+    perso->hits.special_attack->dmg = 1;
+    perso->hits.special_attack->speed = 0;
+    perso->hits.special_attack->range_x = 400;
+    perso->hits.special_attack->range_y = 0;
+    perso->hits.special_attack->frame = 0;
+    perso->hits.special_attack->animation = 0;
+    perso->hits.special_attack->launch = false;
+    perso->hits.special_attack->timer = 0;
+    perso->hits.special_attack->delay = 20;
 }
   
 void init(SDL_Window** window, SDL_Renderer** renderer, jeu* world){
@@ -399,7 +413,7 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
                 add_input_buffer(&world->p1,light_p,world->timestamp_w);
             }
 
-            wordld
+            //wordld
         }
         //kicks
         if(!keystates[SDL_SCANCODE_G] && keystates[SDL_SCANCODE_U] && !keystates[SDL_SCANCODE_Y]){
@@ -412,7 +426,7 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
 
          //coups
         if(keystates[SDL_SCANCODE_KP_4] && !keystates[SDL_SCANCODE_KP_8] && !keystates[SDL_SCANCODE_KP_9]){
-            light_punch(&world->p2, &world->p1);
+            //light_punch(&world->p2, &world->p1);
         }
         //kicks
         if(!keystates[SDL_SCANCODE_KP_4] && keystates[SDL_SCANCODE_KP_8] && !keystates[SDL_SCANCODE_KP_9]){

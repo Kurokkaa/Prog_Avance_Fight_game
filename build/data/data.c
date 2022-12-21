@@ -261,14 +261,6 @@ void sprites_collision(sprite_perso * p1, sprite_perso * p2, jeu * world){ // Ca
     if(!p1->mirror && p2->mirror){
         if( yAxis[0] >= p2->y &&  yAxis[1] <= p2->y - p2->h ){
             if(p1->x + p1->w >= p2->x && p1 ->backwards != 1){
-                printf("COLLISION \n");
-                /*if(!equals(p1->x - p1->speed / 2, p1->y + p1->h, world->map.map_structure, '0')){
-                    p1->x = p1->x - p1->speed / 2;
-                    p2->x = p2->x + p2->speed / 2;
-                }
-                else{
-                    p2->x = p1->x + p1->w;
-                }*/
                 p1->chara_state = knockback;
                 p2->chara_state = knockback;
             }
@@ -276,15 +268,6 @@ void sprites_collision(sprite_perso * p1, sprite_perso * p2, jeu * world){ // Ca
     }
     else{
         if( yAxis[0] >= p2->y &&  yAxis[1] <= p2->y - p2->h){
-            /*if(p1->x - p1->w <= p2->x ){
-                printf("COLLISION 2 \n");
-                if(!equals(p1->x + p1->speed, p1->y + p1->h, world->map.map_structure, '0')){
-                    p1->x = p2->x + p2->w;
-                }
-                else{
-                    p2->x = p1->x - p1->w;
-                }
-            }*/
             if(p1->x <= p2->x + p2->w && p1 ->backwards == 1){
                 p1->chara_state = knockback;
                 p2->chara_state = knockback;
