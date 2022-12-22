@@ -64,14 +64,13 @@ void init_perso(SDL_Renderer* renderer, sprite_perso* perso, int x, int y, int w
     perso->chara_state = idle;
     perso->backwards = false;
     perso->jump_origin = y;
-    perso->anim.frame = 0;
     perso->mirror = mirror;
     perso->life = 20;
     init_hits(perso);
     init_texture(renderer, perso);
     perso->pos_tab_combo = 0;
     perso->buffer = malloc(sizeof(inputs)*60);
-    init_state_animations(renderer, perso);
+    init_chara_state(renderer, perso);
 }
 
 void init_hits(sprite_perso* perso){
@@ -154,16 +153,23 @@ void init(SDL_Window** window, SDL_Renderer** renderer, jeu* world){
     init_jeu(world, *renderer);
 }
 
-void init_state_animations(SDL_Renderer* renderer, sprite_perso* perso){
+void init_state_animation(SDL_Renderer* renderer, sprite_perso* perso, enum character_state state, char* path, int nbFrame, int width){
+    
+    perso->anim[state].anim_text = load_image(path, renderer);
+    perso->anim[state].frame = 0;
+    perso->anim[state].nbFrame = nbFrame;
+    perso->anim[state].width = width;
+}
+
+void init_chara_state(SDL_Renderer* renderer, sprite_perso* perso){
     switch (perso->perso_choisi)
     {
     case 0:
-        perso->anim.anim_text[idle] = load_image("build/ressources/Characters/Chara1/Yellow_idle_spritesheet.png", renderer);
-        perso->anim.frame = 0;
+        init_state_animation(renderer, perso, idle, "build/ressources/Characters/Chara1/Yellow_idle_spritesheet.png", 30, 150);
         break;
     
     default:
-        perso->anim.anim_text[idle] = load_image("build/ressources/Characters/Chara1/Yellow_idle_spritesheet.png", renderer);
+        perso->anim[idle].anim_text = load_image("build/ressources/Characters/Chara1/Yellow_idle_spritesheet.png", renderer);
         break;
     }
 }
@@ -341,10 +347,10 @@ void movements(jeu* world, sprite_perso* perso, sprite_perso* adversaire){
     }
 
     if(perso->chara_state == landing){
-        perso->anim.frame++;
-        if(perso->anim.frame >= 20){
+        perso->anim[landing].frame++;
+        if(perso->anim[landing].frame >= perso->anim[landing].nbFrame){
             perso->chara_state = idle;
-            perso->anim.frame = 0;
+            perso->anim[landing].frame = 0;
         }
     }
 
@@ -359,10 +365,10 @@ void movements(jeu* world, sprite_perso* perso, sprite_perso* adversaire){
                 perso->x += perso->speed;
             }
         }
-        perso->anim.frame++;
-        if(perso->anim.frame >= 20){
+        perso->anim[knockback].frame++;
+        if(perso->anim[knockback].frame >= perso->anim[knockback].nbFrame){
             perso->chara_state = idle;
-            perso->anim.frame = 0;
+            perso->anim[knockback].frame = 0;
         }
     }
 }

@@ -23,7 +23,9 @@ typedef struct hit_chara_s hit;
 
 struct animation_s{
     int frame;
-    SDL_Texture * anim_text[2];
+    int nbFrame;
+    int width;
+    SDL_Texture * anim_text;
 };
 
 typedef struct animation_s anim_t;
@@ -67,7 +69,7 @@ struct sprite_p{
     bool mirror;
     int life;
     hit_set hits;
-    anim_t anim;
+    anim_t anim[2];
     inputs* buffer;
     int pos_tab_combo;
     combo tab_combo[2];

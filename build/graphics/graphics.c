@@ -22,11 +22,13 @@ void apply_sprite(SDL_Renderer *renderer, SDL_Texture *texture, sprite_perso* sp
     
 }
 
-void play_animations(SDL_Renderer *renderer, sprite_perso* sprite){
-    if(sprite->chara_state == idle){
-        apply_sprite(renderer, sprite->anim.anim_text[idle], sprite);
-    }
-    
+void play_animations(SDL_Renderer *renderer, sprite_perso* sprite, int chara_state){
+    /*SDL_Rect dst = {0, 0, 0, 0};
+    SDL_Rect src = {0, 0, 0, 0};
+
+    SDL_QueryTexture(sprite->anim[chara_state].anim_text, NULL, NULL, &dst.w, &dst.h);
+    dst.x = sprite->x; dst.y = sprite->y;*/
+    apply_sprite(renderer, sprite->anim[chara_state].anim_text, sprite);
 }
 
 void refresh_graphics(SDL_Renderer *renderer, jeu *world){
@@ -36,7 +38,7 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
             display_map(renderer,world);
             display_dynamic_texture(renderer, world->map.map_structure, world->map.plateformes);
             //apply_sprite(renderer, world->p1.texture_perso, &(world->p1));
-            play_animations(renderer, &(world->p1));
+            play_animations(renderer, &(world->p1), idle);
             apply_sprite(renderer, world->p2.texture_perso, &(world->p2));
             display_life(renderer, world);
         break;
