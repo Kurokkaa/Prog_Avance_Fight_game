@@ -23,12 +23,22 @@ void apply_sprite(SDL_Renderer *renderer, SDL_Texture *texture, sprite_perso* sp
 }
 
 void play_animations(SDL_Renderer *renderer, sprite_perso* sprite, int chara_state){
-    /*SDL_Rect dst = {0, 0, 0, 0};
+    SDL_Rect dst = {0, 0, 0, 0};
     SDL_Rect src = {0, 0, 0, 0};
 
-    SDL_QueryTexture(sprite->anim[chara_state].anim_text, NULL, NULL, &dst.w, &dst.h);
-    dst.x = sprite->x; dst.y = sprite->y;*/
-    apply_sprite(renderer, sprite->anim[chara_state].anim_text, sprite);
+    dst.x = sprite->x;
+    dst.y = sprite->y;
+    dst.w = sprite->anim[chara_state].width;
+    dst.h = 250;
+
+    int width;
+    SDL_QueryTexture(sprite->anim[chara_state].anim_text, NULL, NULL, &width, &src.h);
+    printf("width : %d\n", width);
+    src.x = sprite->anim[chara_state].frame * 500;
+    src.y = 0;
+    src.w = sprite->anim[chara_state].width;
+
+    SDL_RenderCopy(renderer, sprite->anim[chara_state].anim_text, &src, &dst);
 }
 
 void refresh_graphics(SDL_Renderer *renderer, jeu *world){

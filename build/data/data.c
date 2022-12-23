@@ -159,6 +159,7 @@ void init_state_animation(SDL_Renderer* renderer, sprite_perso* perso, enum char
     perso->anim[state].frame = 0;
     perso->anim[state].nbFrame = nbFrame;
     perso->anim[state].width = width;
+    perso->anim[state].counter = 0;
 }
 
 void init_chara_state(SDL_Renderer* renderer, sprite_perso* perso){
@@ -249,13 +250,38 @@ void checkJoystick(SDL_Joystick** joysticks){
 /**
  * FONCTIONS MOUVEMENTS + COUPS
 */
+void reset_state(sprite_perso* perso, enum character_state state){
+    for(int i = 0; i < 2; i++){
+        if( i != state){
+            perso->anim[i].frame = 0;
+        }
+    }
+}
+
 void movements(jeu* world, sprite_perso* perso, sprite_perso* adversaire){
     int x, y;
     x = perso->x;
     y = perso->y;
 
+    if(perso->chara_state == idle){
+        reset_state(perso, perso->chara_state);
+        if(perso->anim[idle].counter < 3){
+            perso->anim[idle].counter ++;
+        }
+        else{
+            perso->anim[idle].counter = 0;
+            perso->anim[idle].frame++;
+        }
+        
+        
+        if(perso->anim[idle].frame == perso->anim[idle].nbFrame){
+            perso->anim[idle].frame = 0;
+        }
+    }
+
     //Contrôle en marche
     if(perso->chara_state == walk){
+        reset_state(perso, perso->chara_state);
         if(canMove(perso, adversaire)){
             if(perso->backwards){
                 if(!equals(x - perso->speed, y + perso->h, world->map.map_structure, '0')){

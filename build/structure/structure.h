@@ -25,6 +25,7 @@ struct animation_s{
     int frame;
     int nbFrame;
     int width;
+    int counter;
     SDL_Texture * anim_text;
 };
 
