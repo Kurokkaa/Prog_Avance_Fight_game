@@ -30,7 +30,7 @@ void play_animations(SDL_Renderer *renderer, sprite_perso* sprite, int chara_sta
 
     int width;
     SDL_QueryTexture(sprite->anim[chara_state].anim_text, NULL, NULL, &width, &src.h);
-    
+    src.h -=10;
     src.x = sprite->anim[chara_state].frame * 500;
     src.y = 0;
     src.w = sprite->anim[chara_state].width;
