@@ -66,8 +66,8 @@ void init_perso(SDL_Renderer* renderer, sprite_perso* perso, int x, int y, int w
     perso->jump_origin = y;
     perso->mirror = mirror;
     perso->life = 20;
+    perso->attack_launched= false;
     init_hits(perso);
-    init_texture(renderer, perso);
     perso->pos_tab_combo = 0;
     perso->buffer = malloc(sizeof(inputs)*60);
     init_chara_state(renderer, perso);
@@ -83,40 +83,35 @@ void init_hits(sprite_perso* perso){
     perso->hits.light_punch->speed = 0;
     perso->hits.light_punch->range_x = 250;
     perso->hits.light_punch->range_y = 0;
-    perso->hits.light_punch->frame = 0;
-    perso->hits.light_punch->animation = 0;
-    perso->hits.light_punch->launch = false;
+    perso->hits.light_punch->effective_frame = 8;
     perso->hits.light_punch->timer = 0;
     perso->hits.light_punch->delay = 50;
+    perso->hits.light_punch->launch = 0;
 
 
     perso->hits.heavy_punch->dmg = 2;
     perso->hits.heavy_punch->speed = 0;
     perso->hits.heavy_punch->range_x = 250;
     perso->hits.heavy_punch->range_y = 0;
-    perso->hits.heavy_punch->frame = 0;
-    perso->hits.heavy_punch->animation = 0;
+    perso->hits.heavy_punch->effective_frame = 11;
     perso->hits.heavy_punch->launch = false;
     perso->hits.heavy_punch->timer = 0;
     perso->hits.heavy_punch->delay = 50;
+    perso->hits.heavy_punch->launch = 0;
 
     perso->hits.kick->dmg = 1;
     perso->hits.kick->speed = 0;
     perso->hits.kick->range_x = 400;
     perso->hits.kick->range_y = 0;
-    perso->hits.kick->frame = 0;
-    perso->hits.kick->animation = 0;
-    perso->hits.kick->launch = false;
+    perso->hits.kick->effective_frame = 7;
     perso->hits.kick->timer = 0;
     perso->hits.kick->delay = 20;
-
+    perso->hits.kick->launch = 0;
     perso->hits.special_attack->dmg = 1;
     perso->hits.special_attack->speed = 0;
     perso->hits.special_attack->range_x = 400;
     perso->hits.special_attack->range_y = 0;
-    perso->hits.special_attack->frame = 0;
-    perso->hits.special_attack->animation = 0;
-    perso->hits.special_attack->launch = false;
+    perso->hits.special_attack->effective_frame = 0;
     perso->hits.special_attack->timer = 0;
     perso->hits.special_attack->delay = 20;
 }
@@ -165,8 +160,24 @@ void init_state_animation(SDL_Renderer* renderer, sprite_perso* perso, enum char
 void init_chara_state(SDL_Renderer* renderer, sprite_perso* perso){
     switch (perso->perso_choisi)
     {
-    case 0:
-        init_state_animation(renderer, perso, idle, "build/ressources/Characters/Chara1/Yellow_idle_spritesheet.png", 30, 150);
+    case 0: 
+        init_state_animation(renderer, perso, idle, "build/ressources/Characters/Chara1/Idle.png", 15, 150);
+        init_state_animation(renderer,perso,walk,"build/ressources/Characters/Chara1/Walking.png",15,150);
+        init_state_animation(renderer,perso,jump,"build/ressources/Characters/Chara1/Jump.png",10,150);
+        init_state_animation(renderer,perso,crouch,"build/ressources/Characters/Chara1/Idle.png",15,150);
+        init_state_animation(renderer,perso,fall,"build/ressources/Characters/Chara1/Falling.png",10,150);
+        init_state_animation(renderer,perso,backwards,"build/ressources/Characters/Chara1/Walking.png",15,150);
+        init_state_animation(renderer,perso,flight,"build/ressources/Characters/Chara1/Jump.png",10,150);
+        init_state_animation(renderer,perso,flight_control,"build/ressources/Characters/Chara1/Jump.png",10,150);
+        init_state_animation(renderer,perso,fall_control,"build/ressources/Characters/Chara1/Falling.png",10,150);
+        init_state_animation(renderer,perso,landing,"build/ressources/Characters/Chara1/Landing.png",5,150);
+        init_state_animation(renderer,perso,knockback,"build/ressources/Characters/Chara1/KnockBack.png",5,150);
+        init_state_animation(renderer,perso,lpunch,"build/ressources/Characters/Chara1/LightPunch.png",16,150);
+        init_state_animation(renderer,perso,kickstate,"build/ressources/Characters/Chara1/Kick.png",14,150);
+        init_state_animation(renderer,perso,hpunch,"build/ressources/Characters/Chara1/HeavyPunch.png",15,150);
+        init_state_animation(renderer,perso,stun,"build/ressources/Characters/Chara1/Knocked.png",5,150);
+        
+       
         break;
     
     default:
@@ -198,7 +209,7 @@ SDL_Texture* load_image( char path[],SDL_Renderer *renderer){
     SDL_Texture* texture = NULL;
     tmp = IMG_Load(path);
     if(NULL == tmp){
-        fprintf(stderr, "Erreur pendant chargement image BMP: %s", SDL_GetError());
+        fprintf(stderr, "Erreur pendant chargement image BMP: %s\n", SDL_GetError());
         return NULL;
     }
     SDL_SetColorKey(tmp, SDL_TRUE, SDL_MapRGB(tmp->format, 255, 0, 255));
@@ -215,19 +226,24 @@ bool read_combo(sprite_perso* player, int val){
     //1er combo
     bool found = false;
     bool equal = true;
+    int j;
+    int depart;
     for(int i = 0 ; i<BUFFER_SIZE - player->tab_combo[val].nb_coups && !found ; i++){
-        for(int j = i; j<i+player->tab_combo[val].nb_coups && equal ; j++){
+        depart = i;
+        for( j = i; j<i+player->tab_combo[val].nb_coups && equal ; j++){
             if(player->tab_combo[val].input[j] != player->buffer[j].input){
                 equal = false;
             }
         }
         if(equal){
+            if(player->buffer[j-1].timestamp - player->buffer[depart].timestamp <= player->tab_combo[val].frame_between){
             found = true;
             for(int i = 0; i<BUFFER_SIZE ; i++){
                 player->buffer[i].input = 0;
                 player->buffer[i].timestamp = 0;
             }
             player->pos_tab_combo=0;
+            }
         }
     }
     return found;
@@ -262,9 +278,10 @@ void movements(jeu* world, sprite_perso* perso, sprite_perso* adversaire){
     int x, y;
     x = perso->x;
     y = perso->y;
-
+   
+    reset_state(perso,perso->chara_state);
     if(perso->chara_state == idle){
-        reset_state(perso, perso->chara_state);
+        
         if(perso->anim[idle].counter < 3){
             perso->anim[idle].counter ++;
         }
@@ -281,7 +298,7 @@ void movements(jeu* world, sprite_perso* perso, sprite_perso* adversaire){
 
     //Contrôle en marche
     if(perso->chara_state == walk){
-        reset_state(perso, perso->chara_state);
+        
         if(canMove(perso, adversaire)){
             if(perso->backwards){
                 if(!equals(x - perso->speed, y + perso->h, world->map.map_structure, '0')){
@@ -293,7 +310,20 @@ void movements(jeu* world, sprite_perso* perso, sprite_perso* adversaire){
                     perso->x += perso->speed;
                 }
             }
-        }
+            if(perso->anim[walk].counter < 3){
+                perso->anim[walk].counter ++;
+            }
+            else{
+                perso->anim[walk].counter = 0;
+                perso->anim[walk].frame++;
+            }
+            
+            
+            if(perso->anim[walk].frame == perso->anim[walk].nbFrame){
+                perso->anim[walk].frame = 0;
+            }
+            }
+        
     }
 
     //Contrôle en vol
@@ -328,8 +358,15 @@ void movements(jeu* world, sprite_perso* perso, sprite_perso* adversaire){
 
     //Initialisation du saut
     if(perso->chara_state == jump){
-        perso->jump_origin = perso->y;
-        perso->chara_state = flight;
+        
+        if(perso->anim[jump].frame = perso->anim[jump].nbFrame){
+            perso->jump_origin = perso->y;
+            perso->chara_state = flight;
+        }
+        else{
+            perso->anim[jump].frame ++;
+        }
+        
     }
 
     //Contrôle de la hauteur du saut
@@ -373,10 +410,17 @@ void movements(jeu* world, sprite_perso* perso, sprite_perso* adversaire){
     }
 
     if(perso->chara_state == landing){
-        perso->anim[landing].frame++;
-        if(perso->anim[landing].frame >= perso->anim[landing].nbFrame){
-            perso->chara_state = idle;
-            perso->anim[landing].frame = 0;
+        if(perso->anim[landing].counter == 3){
+            perso->anim[landing].frame++;
+            
+            if(perso->anim[landing].frame >= perso->anim[landing].nbFrame){
+                perso->chara_state = idle;
+                perso->anim[landing].frame = 0;
+            }
+            perso->anim[landing].counter = 0;
+        }
+        else{
+            perso->anim[landing].counter ++;
         }
     }
 
@@ -391,10 +435,74 @@ void movements(jeu* world, sprite_perso* perso, sprite_perso* adversaire){
                 perso->x += perso->speed;
             }
         }
-        perso->anim[knockback].frame++;
-        if(perso->anim[knockback].frame >= perso->anim[knockback].nbFrame){
+        if(perso->anim[knockback].counter==2){
+            perso->anim[knockback].frame++;
+            if(perso->anim[knockback].frame >= perso->anim[knockback].nbFrame){
+                perso->chara_state = idle;
+                perso->anim[knockback].frame = 0;
+            }
+            perso->anim[knockback].counter = 0;
+        }  
+        else{
+            perso->anim[knockback].counter ++;
+        }
+    }
+    if(perso->chara_state == lpunch){
+        if(perso->anim[lpunch].counter==1){
+            perso->anim[lpunch].frame++;
+            if(perso->anim[lpunch].frame == perso->hits.light_punch->effective_frame){
+                
+                light_punch(perso,adversaire);
+            }
+            if(perso->anim[lpunch].frame >= perso->anim[lpunch].nbFrame){
+                perso->chara_state = idle;
+                perso->anim[lpunch].frame = 0;
+                perso->attack_launched = false;
+            }
+            perso->anim[lpunch].counter = 0;
+        }  
+        else{
+            perso->anim[lpunch].counter ++;
+        }
+    }
+    if(perso->chara_state == hpunch){
+        if(perso->anim[hpunch].counter==3){
+            perso->anim[hpunch].frame++;
+            if(perso->anim[hpunch].frame == perso->hits.heavy_punch->effective_frame){
+                light_punch(perso,adversaire);
+            }
+            if(perso->anim[hpunch].frame >= perso->anim[hpunch].nbFrame){
+                perso->chara_state = idle;
+                perso->anim[hpunch].frame = 0;
+                perso->attack_launched = false;
+            }
+            perso->anim[hpunch].counter = 0;
+        }  
+        else{
+            perso->anim[hpunch].counter ++;
+        }
+    }
+    if(perso->chara_state == kickstate){
+        if(perso->anim[kickstate].counter==2){
+            perso->anim[kickstate].frame++;
+            if(perso->anim[kickstate].frame == perso->hits.kick->effective_frame){
+                light_punch(perso,adversaire);
+            }
+            if(perso->anim[kickstate].frame >= perso->anim[kickstate].nbFrame){
+                perso->chara_state = idle;
+                perso->anim[kickstate].frame = 0;
+                perso->attack_launched = false;
+            }
+            perso->anim[kickstate].counter = 0;
+        }  
+        else{
+            perso->anim[kickstate].counter ++;
+        }
+    }
+    if(perso->chara_state == stun){
+        perso->stun_time --;
+        if(perso->stun_time == 0 ){
             perso->chara_state = idle;
-            perso->anim[knockback].frame = 0;
         }
     }
 }
@@ -407,24 +515,40 @@ bool equals(int x, int y, char** map_point, char test){
 }
 
 void light_punch(sprite_perso* attacker, sprite_perso* receiver){
-    if((!attacker->hits.light_punch->launch)){
-        attacker->hits.light_punch->launch = true;
+  
         if(!attacker->mirror){
             if((attacker->x + attacker->w + attacker->hits.light_punch->range_x >= receiver->x) && (attacker->y + attacker->jump_height/2 >= receiver->y && attacker->y + attacker->jump_height/2 <= receiver->y + receiver->h)){
-                receiver->life -= attacker->hits.light_punch->dmg ;        
+                receiver->life -= attacker->hits.light_punch->dmg ;  
+                receiver->chara_state = stun;
+                receiver->stun_time = attacker->hits.light_punch->delay;      
             }
         }
         else{
             if((attacker->x - attacker->hits.light_punch->range_x <= receiver->x + receiver->w) && (attacker->y + attacker->jump_height/2 >= receiver->y && attacker->y + attacker->jump_height/2 <= receiver->y + receiver->h)){
+                
                 receiver->life -= attacker->hits.light_punch->dmg ;
             }
         }
     }
-    //check_life(receiver);
-}
+    
 
 void reset_hit(sprite_perso* perso){
     if(perso->hits.light_punch->launch){
+        perso->hits.light_punch->timer++;
+        if(perso->hits.light_punch->timer >= 50){
+            perso->hits.light_punch->launch = false;
+            perso->hits.light_punch->timer = 0;
+        }
+    }
+
+     if(perso->hits.heavy_punch->launch){
+        perso->hits.heavy_punch->timer++;
+        if(perso->hits.heavy_punch->timer >= 50){
+            perso->hits.heavy_punch->launch = false;
+            perso->hits.heavy_punch->timer = 0;
+        }
+    }
+     if(perso->hits.kick->launch){
         perso->hits.light_punch->timer++;
         if(perso->hits.light_punch->timer >= 50){
             perso->hits.light_punch->launch = false;
@@ -659,8 +783,8 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
     const Uint8 *keystates = SDL_GetKeyboardState(NULL);
     SDL_JoystickUpdate();
    // checkJoystick(world->joysticks);
-    reset_hit(&world->p1);
-    reset_hit(&world->p2);
+   // reset_hit(&world->p1);
+   //reset_hit(&world->p2);
     //printf("%d",world->p1.hits.punch->timer);
     while(SDL_PollEvent(event)){
         if(event->type == SDL_QUIT){
@@ -781,35 +905,65 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
                 add_input_buffer(&world->p2,up,world->timestamp_w);
             }
         }
-        //coups
-        if(keystates[SDL_SCANCODE_G] && !keystates[SDL_SCANCODE_U] && !keystates[SDL_SCANCODE_Y]){
-           
+        //coups de poings leger
+        if(keystates[SDL_SCANCODE_G] && !keystates[SDL_SCANCODE_Y] && !keystates[SDL_SCANCODE_J]){
             if(keystates[SDL_SCANCODE_G] != world->keystates_pre[SDL_SCANCODE_G]){
-                add_input_buffer(&world->p1,light_p,world->timestamp_w);
+                if(!world->p1.attack_launched){
+                    world->p1.chara_state = lpunch;
+                    world->p1.attack_launched = true;
+                    add_input_buffer(&world->p1,light_p,world->timestamp_w);
+                }
             }
-
-            //wordld
         }
-        //kicks
-        if(!keystates[SDL_SCANCODE_G] && keystates[SDL_SCANCODE_U] && !keystates[SDL_SCANCODE_Y]){
-            //special(world->p1, world->p2);
-        }
+        
         //coup spéciaux si la jauge est pleine
-        if(keystates[SDL_SCANCODE_Y] && !keystates[SDL_SCANCODE_G] && !keystates[SDL_SCANCODE_U]){
-           // kick(world->p1, world->p2);
+        if(!keystates[SDL_SCANCODE_G] && keystates[SDL_SCANCODE_Y] && !keystates[SDL_SCANCODE_J]){
+           if(keystates[SDL_SCANCODE_Y] != world->keystates_pre[SDL_SCANCODE_Y]){
+                if(!world->p1.attack_launched){
+                    world->p1.chara_state = hpunch;
+                    world->p1.attack_launched = true;
+                    add_input_buffer(&world->p1,heavy_p,world->timestamp_w);
+                }
+            }
         }
-
+        if(!keystates[SDL_SCANCODE_Y] && !keystates[SDL_SCANCODE_G] && keystates[SDL_SCANCODE_J]){
+           if(keystates[SDL_SCANCODE_J] != world->keystates_pre[SDL_SCANCODE_J]){
+                if(!world->p1.attack_launched){
+                    world->p1.chara_state = kickstate;
+                    world->p1.attack_launched = true;
+                    add_input_buffer(&world->p1,kick,world->timestamp_w);
+                }
+            }
+        }
          //coups
         if(keystates[SDL_SCANCODE_KP_4] && !keystates[SDL_SCANCODE_KP_8] && !keystates[SDL_SCANCODE_KP_9]){
-            //light_punch(&world->p2, &world->p1);
+             if(keystates[SDL_SCANCODE_KP_4] != world->keystates_pre[SDL_SCANCODE_KP_4]){
+                if(!world->p1.attack_launched){
+                    world->p1.chara_state = lpunch;
+                    world->p1.attack_launched = true;
+                    add_input_buffer(&world->p1,light_p,world->timestamp_w);
+                }
+            }
         }
-        //kicks
+        //speciaux
         if(!keystates[SDL_SCANCODE_KP_4] && keystates[SDL_SCANCODE_KP_8] && !keystates[SDL_SCANCODE_KP_9]){
-            //special(world->p2, world->p1);
+            if(keystates[SDL_SCANCODE_KP_8] != world->keystates_pre[SDL_SCANCODE_KP_8]){
+                if(!world->p1.attack_launched){
+                    world->p1.chara_state = hpunch;
+                    world->p1.attack_launched = true;
+                    add_input_buffer(&world->p1,heavy_p,world->timestamp_w);
+                }
+            }
         }
         //coup spéciaux si la jauge est pleine
         if(!keystates[SDL_SCANCODE_KP_4] && !keystates[SDL_SCANCODE_KP_8] && keystates[SDL_SCANCODE_KP_9]){
-           // kick(world->p2, world->p1);
+           if(keystates[SDL_SCANCODE_KP_9] != world->keystates_pre[SDL_SCANCODE_KP_9]){
+                if(!world->p1.attack_launched){
+                    world->p1.chara_state = kickstate;
+                    world->p1.attack_launched = true;
+                    add_input_buffer(&world->p1,kick,world->timestamp_w);
+                }
+            }
         }
         movements(world, &world->p1, &world->p2);
         movements(world,&world->p2, &world->p1);
@@ -820,8 +974,7 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
         for(int i = 0; i<123; i++){
             world->keystates_pre[i]=keystates[i];
         }
-        //collision_perso(&world->p1, &world->p2, pos_init_P1x);
-        //collision_perso(&world->p2, &world->p1, pos_init_P2x);
+       
         bool combop1 = false;
         bool combop2 = false;
         int i,j;

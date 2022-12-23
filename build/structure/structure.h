@@ -14,9 +14,8 @@ struct hit_chara_s{
     int speed;
     bool launch;
     int timer;
-    int frame;
+    int effective_frame;
     int delay;
-    SDL_Texture* animation;
 };
 
 typedef struct hit_chara_s hit;
@@ -63,6 +62,7 @@ struct sprite_p{
     int h; /*!<hauteur du sprite */
     int speed;
     int perso;
+    int stun_time;
     enum character_state chara_state;
     bool backwards;
     int jump_height;
@@ -70,10 +70,12 @@ struct sprite_p{
     bool mirror;
     int life;
     hit_set hits;
-    anim_t anim[2];
+    anim_t anim[15];
     inputs* buffer;
     int pos_tab_combo;
     combo tab_combo[2];
+    bool attack_launched;
+    
 };
 
 typedef struct sprite_p sprite_perso ;

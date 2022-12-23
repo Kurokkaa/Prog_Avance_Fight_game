@@ -1,10 +1,7 @@
 
 #include "graphics.h"
 
-void init_texture(SDL_Renderer *renderer, sprite_perso *perso){
-    perso->texture_perso = load_image( "build/ressources/stickman.png",renderer);
-    
-}
+
 
 void apply_sprite(SDL_Renderer *renderer, SDL_Texture *texture, sprite_perso* sprite){
     SDL_Rect dst = {0, 0, 0, 0};
@@ -33,12 +30,18 @@ void play_animations(SDL_Renderer *renderer, sprite_perso* sprite, int chara_sta
 
     int width;
     SDL_QueryTexture(sprite->anim[chara_state].anim_text, NULL, NULL, &width, &src.h);
-    printf("width : %d\n", width);
+    
     src.x = sprite->anim[chara_state].frame * 500;
     src.y = 0;
     src.w = sprite->anim[chara_state].width;
-
+ if(!sprite->mirror){
     SDL_RenderCopy(renderer, sprite->anim[chara_state].anim_text, &src, &dst);
+ }
+ else{
+    SDL_RendererFlip flip = SDL_FLIP_VERTICAL;
+        SDL_Point center = {150/2,250/2};
+        SDL_RenderCopyEx(renderer,  sprite->anim[chara_state].anim_text, &src, &dst,180, &center, flip);
+ }
 }
 
 void refresh_graphics(SDL_Renderer *renderer, jeu *world){
@@ -47,18 +50,17 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
         case combat:
             display_map(renderer,world);
             display_dynamic_texture(renderer, world->map.map_structure, world->map.plateformes);
-            //apply_sprite(renderer, world->p1.texture_perso, &(world->p1));
-            play_animations(renderer, &(world->p1), idle);
-            apply_sprite(renderer, world->p2.texture_perso, &(world->p2));
+            play_animations(renderer, &(world->p1), world->p1.chara_state);
+            play_animations(renderer, &(world->p2), world->p2.chara_state);
             display_life(renderer, world);
         break;
         case main_menu:
             apply_textures(world->menu_set.menu_fond, renderer, 0, 0);
             SDL_Rect rect;
-            rect.x = 400;
-            rect.y = 200 + 100 * world->menu_set.index_menu ;
-            rect.h = 100 ;
-            rect.w = 400; 
+            rect.x = 140;
+            rect.y = 250 + 150 * world->menu_set.index_menu ;
+            rect.h = 150 ;
+            rect.w = 950; 
             SDL_SetRenderDrawColor(renderer, 255, 255 , 0, 1);
             SDL_RenderDrawRect(renderer, &rect);
         break;
@@ -85,7 +87,7 @@ void display_life(SDL_Renderer* renderer, jeu* world){
     rect_fond.w = -500;
 
     if(world->p1.life >= 0){
-        rect.w = world->p1.life * -50;
+        rect.w = world->p1.life * -25;
     }
     else{
         rect.w = 0;
@@ -105,7 +107,7 @@ void display_life(SDL_Renderer* renderer, jeu* world){
     rect_fond2.w =  500 ;
 
     if(world->p2.life >= 0){
-        rect2.w = world->p2.life * 50 ;
+        rect2.w = world->p2.life * 25 ;
     }
     else{
         rect2.w = 0;
