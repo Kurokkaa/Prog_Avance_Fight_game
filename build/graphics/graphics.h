@@ -7,9 +7,9 @@
 #include "../structure/structure.h"
 #include "../data/data.h"
 #include "../constante.h"
+#include <SDL2/SDL_ttf.h>
 
 
-void init_texture(SDL_Renderer *renderer, sprite_perso *perso);
 void apply_sprite(SDL_Renderer *renderer, SDL_Texture *texture, sprite_perso* sprite);
 void play_animations(SDL_Renderer *renderer, sprite_perso* sprite, int chara_state);
 void refresh_graphics(SDL_Renderer *renderer, jeu *world);

@@ -11,7 +11,14 @@ void init_controller(jeu* world){
         }
     }
 }
+void init_timer(jeu* world){
+   world->timer.startTime = SDL_GetTicks();
+   world->timer.pause = false;
+    world->timer.start = true;
+    world->timer.timer = 60;
+    printf("%d",world->timer.timer);
 
+}
 void init_map(jeu* world,SDL_Renderer* renderer){
     switch(world->choosed_map){
         case russia:
@@ -145,6 +152,11 @@ void init(SDL_Window** window, SDL_Renderer** renderer, jeu* world){
         printf( "Erreur initialisation de SDL_Image: %s\n", IMG_GetError() );
         SDL_Quit();
     }
+
+    if(TTF_Init() == -1){
+        printf("erreur dans l'initialisation de TTF: %s",SDL_GetError());
+    }
+
     init_jeu(world, *renderer);
 }
 
@@ -261,6 +273,19 @@ void checkJoystick(SDL_Joystick** joysticks){
     }
     printf("joystick X :%d \n" ,SDL_GameControllerGetAxis(joysticks[0],0));
     printf("joystick Y : %d \n",SDL_GameControllerGetAxis(joysticks[0],1));
+}
+
+void check_timer(jeu* world){
+    
+    if(world->timer.start && !world->timer.pause){
+        
+        if((SDL_GetTicks() - world->timer.startTime) /1000 >=1.2){
+            world->timer.startTime = SDL_GetTicks();
+            world->timer.timer --;
+            printf("%d",world->timer.timer);
+        }    
+    }
+    
 }
 
 /**
@@ -647,7 +672,9 @@ void quit_game(jeu* world,SDL_Window** fenetre,SDL_Renderer** renderer){
     SDL_DestroyRenderer(*renderer);
     destroy_textures(world);
     free_map_structure(world->map.map_structure);
+    TTF_CloseFont(world->font.police_compteur);
     close_Joystick(world->joysticks);
+    TTF_Quit();
     IMG_Quit();
     SDL_Quit();
 }
@@ -692,6 +719,10 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer* renderer){
             if(event->key.keysym.sym == SDLK_ESCAPE){
                 if(world->state == pause){
                     world->state = combat;
+                    world->timer.pause = false;
+                    world->timer.startTime = SDL_GetTicks() - world->timer.pauseTime;
+                    world->timer.pause = false;
+
                 }
             }
 
@@ -768,11 +799,16 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer* renderer){
                     init_controller(world);
                     world->state = combat;
                     world->timestamp_w = 0;
-                    
+                    world->font.police_compteur = TTF_OpenFont("build/ressources/Reach_Story.ttf",20);
+                    init_timer(world);
+                    if(world->font.police_compteur == NULL){
+                        printf("chargement de la police incomplete");
+                    }
                     for(int i = 0; i<123;i++){
                         world->keystates_pre[i]=0;
                     }
                     init_combo(&world->p1);
+                    check_game(world);
                 
                 }
                 }
@@ -801,7 +837,8 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
         }
     }   
         if(keystates[SDL_SCANCODE_ESCAPE] && !world->keystates_pre[SDL_SCANCODE_ESCAPE] ){
-            
+            world->timer.pause = true;
+            world->timer.pauseTime = SDL_GetTicks() - world->timer.startTime;
             world->state = pause;
         }
         
@@ -1014,6 +1051,6 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
         for(j = 0;j<NB_COMBOS && !combop2;j++){
              combop2 = read_combo(&world->p2,i);
         }
-        //printf("p1 : %d, p2 : %d \n", combop1, combop2);
+        check_timer(world);
 }
 

@@ -53,6 +53,12 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
             play_animations(renderer, &(world->p1), world->p1.chara_state);
             play_animations(renderer, &(world->p2), world->p2.chara_state);
             display_life(renderer, world);
+            char* compteur = malloc(sizeof(char)*3);
+            sprintf(compteur, "%d",world->timer.timer);
+            SDL_Color color = {0,0,0};
+            SDL_Surface* surface_compteur = TTF_RenderText_Solid(world->font.police_compteur, compteur, color);
+            SDL_Texture* texture_compteur = SDL_CreateTextureFromSurface(renderer,surface_compteur);
+            apply_textures(texture_compteur,renderer,640,360);
         break;
         case main_menu:
             apply_textures(world->menu_set.menu_fond, renderer, 0, 0);

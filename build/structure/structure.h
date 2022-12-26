@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include "../constante.h"
 #include "../map/map_global.h"
+#include <SDL2/SDL_ttf.h>
 
 struct hit_chara_s{
     int dmg;
@@ -87,6 +88,20 @@ struct menu_p{
 };
 
 typedef struct menu_p menu;
+
+struct ressources_s{
+    TTF_Font* police_compteur;
+};
+typedef struct ressources_s ressources;
+struct compteur_s{
+    int startTime;
+    int pauseTime;
+    bool pause;
+    bool start;
+    int timer; 
+};
+typedef struct compteur_s compteur;
+
 struct world_s{
     enum game_state state;
     enum game_map choosed_map;
@@ -98,6 +113,8 @@ struct world_s{
     menu menu_set;
     int timestamp_w;
     int keystates_pre[123];
+    ressources font;
+    compteur timer;
 };
 
 typedef struct world_s jeu;

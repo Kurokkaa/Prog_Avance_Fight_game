@@ -4,6 +4,7 @@
         "constante.h": "c",
         "sdl.h": "c",
         "sdl_image.h": "c",
-        "structure.h": "c"
+        "structure.h": "c",
+        "sdl_ttf.h": "c"
     }
 }
