@@ -55,10 +55,23 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
             display_life(renderer, world);
             char* compteur = malloc(sizeof(char)*3);
             sprintf(compteur, "%d",world->timer.timer);
+
+
+            //Fond du timer
+            SDL_Rect timer_background;
+            timer_background.x = 500;
+            timer_background.y = 0;
+            timer_background.h = 30;
+            timer_background.w = 280;
+            SDL_SetRenderDrawColor(renderer, 215, 220, 230, 1);
+            SDL_RenderFillRect(renderer, &timer_background);
+            
+            //Affichage du timer
             SDL_Color color = {0,0,0};
             SDL_Surface* surface_compteur = TTF_RenderText_Solid(world->font.police_compteur, compteur, color);
             SDL_Texture* texture_compteur = SDL_CreateTextureFromSurface(renderer,surface_compteur);
-            apply_textures(texture_compteur,renderer,640,360);
+            apply_textures(texture_compteur,renderer,640, 10);
+            
         break;
         case main_menu:
             apply_textures(world->menu_set.menu_fond, renderer, 0, 0);

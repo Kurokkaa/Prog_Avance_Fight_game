@@ -409,7 +409,7 @@ void movements(jeu* world, sprite_perso* perso, sprite_perso* adversaire){
         }
     }
 
-    //Automatisaion de la chute
+    //Automatisation de la chute
     if((perso->chara_state == fall)){
         x = perso->x;
         y = perso->y;
@@ -418,7 +418,7 @@ void movements(jeu* world, sprite_perso* perso, sprite_perso* adversaire){
             perso->chara_state = landing;
         }
         else{
-            if(equals(x, y + perso->h + perso->jump_height*0.025, world->map.map_structure, ' ')){
+            if(equals(x + perso->w / 2, y + perso->h + perso->jump_height*0.025, world->map.map_structure, ' ') && equals(x + perso->w, y + perso->h + perso->jump_height *0.025 , world->map.map_structure, ' ')){
                 perso->y += perso->jump_height*0.025;
             }
             else{
@@ -430,7 +430,7 @@ void movements(jeu* world, sprite_perso* perso, sprite_perso* adversaire){
     //Cas où le personnage chute s'il n'y a pas de plateformes
     x = perso->x;
     y = perso->y;
-    if(perso->chara_state !=flight && equals(x, y + perso->h + perso->jump_height *0.025 , world->map.map_structure, ' ') && equals(x + perso->x, y + perso->h + perso->jump_height *0.025 , world->map.map_structure, ' ')){
+    if(perso->chara_state !=flight && equals(x + perso->w / 2, y + perso->h + perso->jump_height *0.025 , world->map.map_structure, ' ') && equals(x + perso->w, y + perso->h + perso->jump_height *0.025 , world->map.map_structure, ' ')){
         perso->chara_state = fall;
     }
 
@@ -808,9 +808,8 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer* renderer){
                         world->keystates_pre[i]=0;
                     }
                     init_combo(&world->p1);
-                    check_game(world);
-                
-                }
+                    //check_game(world); //???
+                    }
                 }
                 if(world->state!=combat){
                     for(int i = 0; i<123; i++){
