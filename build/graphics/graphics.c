@@ -106,7 +106,7 @@ void display_life(SDL_Renderer* renderer, jeu* world){
     rect_fond.w = -500;
 
     if(world->p1.life >= 0){
-        rect.w = world->p1.life * -25;
+        rect.w = world->p1.life * -5;
     }
     else{
         rect.w = 0;
@@ -126,7 +126,7 @@ void display_life(SDL_Renderer* renderer, jeu* world){
     rect_fond2.w =  500 ;
 
     if(world->p2.life >= 0){
-        rect2.w = world->p2.life * 25 ;
+        rect2.w = world->p2.life * 5 ;
     }
     else{
         rect2.w = 0;
@@ -181,3 +181,39 @@ void display_dynamic_texture(SDL_Renderer* renderer, char** map_struct, SDL_Text
         }
     }
 }
+
+
+
+void disque(int cx,int cy,int rayon,SDL_Color couleur,SDL_Renderer* renderer){
+    int d,y,x;
+    d = 3-(2*rayon);
+    x = 0;
+    y = rayon;
+
+    while(y>=x){
+        ligneHorizontale(cx-x,cy-y,2*x+1,couleur,renderer);
+        ligneHorizontale(cx-x,cy-y,2*x+1,couleur,renderer);
+        ligneHorizontale(cx-x,cy-y,2*x+1,couleur,renderer);
+        ligneHorizontale(cx-x,cy-y,2*x+1,couleur,renderer);
+    if (d < 0)
+      d = d + (4 * x) + 6;
+    else {
+      d = d + 4 * (x - y) + 10;
+      y--;
+    }
+ 
+    x++; 
+    }
+}
+void ligneHorizontale(int x, int y, int w, SDL_Color couleur,SDL_Renderer* renderer)
+{
+  SDL_Rect r;
+
+  r.x = x;
+  r.y = y;
+  r.w = w;
+  r.h = 1;
+  SDL_SetRenderDrawColor(renderer,couleur.r,couleur.g,couleur.b,couleur.a);
+  SDL_RenderFillRect(renderer,&r);
+}
+
