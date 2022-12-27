@@ -76,6 +76,7 @@ void init_perso(SDL_Renderer* renderer, sprite_perso* perso, int x, int y, int w
     perso->life = 100;
     perso->attack_launched= false;
     perso->guard = false;
+    perso->life_guard = 100;
     init_hits(perso);
     perso->pos_tab_combo = 0;
     perso->buffer = malloc(sizeof(inputs)*60);
@@ -569,16 +570,39 @@ void light_punch(sprite_perso* attacker, sprite_perso* receiver){
   
         if(!attacker->mirror){
             if((attacker->x + attacker->w + attacker->hits.light_punch->range_x >= receiver->x) && (attacker->y + attacker->jump_height/2 >= receiver->y && attacker->y + attacker->jump_height/2 <= receiver->y + receiver->h)){
+               if(receiver->guard){
+                printf("guard life : %d",receiver->life_guard);
+                receiver->life_guard -= attacker->hits.light_punch->dmg;
+                if(receiver->life_guard<=0){
+                    receiver->broken_guard = true;
+                    receiver->chara_state = stun;
+                    printf("brisé");
+                }
+               }
+               else{
                 receiver->life -= attacker->hits.light_punch->dmg ;  
                 receiver->chara_state = stun;
                 receiver->stun_time = attacker->hits.light_punch->delay;      
+                }
+
             }
         }
         else{
             if((attacker->x - attacker->hits.light_punch->range_x <= receiver->x + receiver->w) && (attacker->y + attacker->jump_height/2 >= receiver->y && attacker->y + attacker->jump_height/2 <= receiver->y + receiver->h)){
+                 if(receiver->guard){
+                receiver->life_guard -= attacker->hits.light_punch->dmg;
+                printf("guard life : %d",receiver->life_guard);
+                if(receiver->life_guard<=0){
+                    receiver->broken_guard = true;
+                    receiver->chara_state = stun;
+                    printf("brisé");
+                }
+               }
+               else{
+                receiver->life -= attacker->hits.light_punch->dmg ;  
                 receiver->chara_state = stun;
-                receiver->stun_time = attacker->hits.light_punch->delay;
-                receiver->life -= attacker->hits.light_punch->dmg ;
+                receiver->stun_time = attacker->hits.light_punch->delay;      
+                }
             }
         }
     }
@@ -810,8 +834,8 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer* renderer){
                         break;
                     }
                     init_map(world, renderer);
-                    init_perso(renderer,&world->p1,65, 465 ,150,230,CHARA_SPEED,false);
-                    init_perso(renderer,&world->p2,950, 465 ,150,230,CHARA_SPEED,true);
+                    init_perso(renderer,&world->p1,65, 465 ,100,230,CHARA_SPEED,false);
+                    init_perso(renderer,&world->p2,950, 465 ,100,230,CHARA_SPEED,true);
                     init_controller(world);
                     world->state = combat;
                     world->timestamp_w = 0;
@@ -855,7 +879,7 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
             world->state = pause;
         }
     
-    if(world->p1.chara_state != stun && !world->p1.attack_launched){
+    if(world->p1.chara_state != stun && !world->p1.attack_launched && !world->p1.guard){
         
         //aucune touche de déplacement appuyé
         if((!keystates[SDL_SCANCODE_A] && !keystates[SDL_SCANCODE_D] && !keystates[SDL_SCANCODE_S]||keystates[SDL_SCANCODE_A] && keystates[SDL_SCANCODE_D]) && (world->p1.chara_state == walk || world->p1.chara_state == crouch)){
@@ -957,8 +981,17 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
                 
             }
         }
+        if(keystates[SDL_SCANCODE_H] && (world->p1.chara_state == idle || world->p1.chara_state == walk)){
+            world->p1.guard = true;
+        }
+        if(!keystates[SDL_SCANCODE_H] && (world->p1.chara_state == idle || world->p1.chara_state == walk)){
+            world->p1.guard = false;
+        }
     }
-    if(world->p2.chara_state != stun && !world->p2.attack_launched){
+    if(!keystates[SDL_SCANCODE_H] && (world->p1.chara_state == idle || world->p1.chara_state == walk)){
+            world->p1.guard = false;
+        }
+    if(world->p2.chara_state != stun && !world->p2.attack_launched && !world->p2.guard ){
         if((!keystates[SDL_SCANCODE_LEFT] && !keystates[SDL_SCANCODE_RIGHT] && !keystates[SDL_SCANCODE_DOWN]|| keystates[SDL_SCANCODE_LEFT] && keystates[SDL_SCANCODE_RIGHT])  && (world->p2.chara_state == walk || world->p2.chara_state == crouch)){
             world->p2.chara_state = idle;
         }
@@ -1058,8 +1091,23 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
                 
             }
         }
+        if(keystates[SDL_SCANCODE_KP_5]){
+            world->p2.guard = true;
+        }
+      
     }
-        bool combop1 = false;
+      if(!keystates[SDL_SCANCODE_KP_5] && (world->p2.chara_state == idle || world->p2.chara_state == walk)){
+            world->p2.guard = false;
+        }
+       for(int i = 0; i<123; i++){
+            world->keystates_pre[i]=keystates[i];
+        }
+        printf("guard p1 : %d",world->p1.guard);
+        printf("guard p2 : %d",world->p2.guard);
+}
+
+void update_data(jeu* world){
+     bool combop1 = false;
         bool combop2 = false;
         int i,j;
         for(i = 0 ; i< NB_COMBOS && !combop1 ; i++){
@@ -1075,12 +1123,9 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
         sprites_collision(&world->p2, &world->p1, world);
         change_directions(&world->p1, &world->p2);
         world->timestamp_w++;
-        for(int i = 0; i<123; i++){
-            world->keystates_pre[i]=keystates[i];
-        }
+        
        
         
         
         check_timer(world);
 }
-

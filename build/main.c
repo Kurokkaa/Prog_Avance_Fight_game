@@ -22,11 +22,12 @@ int main(int argc, char *argv[]){
     while(!world.terminer){
         if(world.state == combat){
             gameplay_inputs(&events, &world);
+            update_data(&world);
         }
         else{
             handle_menu_inputs(&events, &world, renderer);
         }
-        //update_données
+       
         refresh_graphics(renderer,&world);
         SDL_Delay(10);
     }

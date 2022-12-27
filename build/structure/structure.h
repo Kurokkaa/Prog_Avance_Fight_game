@@ -77,6 +77,8 @@ struct sprite_p{
     combo tab_combo[2];
     bool attack_launched;
     bool guard;
+    int life_guard;
+    bool broken_guard;
     
 };
 

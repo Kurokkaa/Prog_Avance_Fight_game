@@ -32,6 +32,7 @@ bool read_combo(sprite_perso* player, int val);
 void checkJoystick(SDL_Joystick** joysticks);
 
 /*FONCTIONS MOUVEMENTS ET ACTIONS*/
+void update_data(jeu* world);
 void movements(jeu* world, sprite_perso* perso, sprite_perso* adversaire);
 bool equals(int x, int y, char** map_point, char test);
 void light_punch(sprite_perso* attacker, sprite_perso* receiver);
