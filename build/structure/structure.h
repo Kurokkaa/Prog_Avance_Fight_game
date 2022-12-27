@@ -8,7 +8,8 @@
 #include "../map/map_global.h"
 #include <SDL2/SDL_ttf.h>
 
-struct hit_chara_s{
+struct hit_chara_s
+{
     int dmg;
     int range_x;
     int range_y;
@@ -21,39 +22,50 @@ struct hit_chara_s{
 
 typedef struct hit_chara_s hit;
 
-struct animation_s{
+struct animation_s
+{
     int frame;
     int nbFrame;
     int width;
     int counter;
-    SDL_Texture * anim_text;
+    SDL_Texture *anim_text;
 };
 
 typedef struct animation_s anim_t;
 
-struct hit_set_s{
-    hit* light_punch;
-    hit* heavy_punch;
-    hit* kick;
-    hit* special_attack;
+struct hit_set_s
+{
+    hit *light_punch;
+    hit *heavy_punch;
+    hit *kick;
+    hit *special_attack;
 };
 
 typedef struct hit_set_s hit_set;
 
-
-struct inputs_s{
+struct inputs_s
+{
     enum combos_inputs input;
     int timestamp;
 };
 
 typedef struct inputs_s inputs;
-struct combos_s{
+struct combos_s
+{
     enum combos_inputs input[10];
     int frame_between;
     int nb_coups;
 };
 
 typedef struct combos_s combo;
+struct compteur_s{
+    int startTime;
+    int pauseTime;
+    bool pause;
+    bool start;
+    int timer; 
+};
+typedef struct compteur_s compteur;
 struct sprite_p{
     int perso_choisi; 
     SDL_Texture * texture_perso;
@@ -72,7 +84,7 @@ struct sprite_p{
     int life;
     hit_set hits;
     anim_t anim[15];
-    inputs* buffer;
+    inputs *buffer;
     int pos_tab_combo;
     combo tab_combo[2];
     bool attack_launched;
@@ -82,30 +94,27 @@ struct sprite_p{
     bool damage_bonus;
     int bonus_timer;
     int special_bar;
+    compteur chrono_guard;
 };
 
-typedef struct sprite_p sprite_perso ;
+typedef struct sprite_p sprite_perso;
 
-struct menu_p{
+struct menu_p
+{
     int index_menu;
-    SDL_Texture* menu_fond;
-    SDL_Texture* tab_map[3];
+    SDL_Texture *menu_fond;
+    SDL_Texture *tab_map[3];
 };
 
 typedef struct menu_p menu;
 
-struct ressources_s{
-    TTF_Font* police_compteur;
+struct ressources_s
+{
+    TTF_Font *police_compteur;
 };
 typedef struct ressources_s ressources;
-struct compteur_s{
-    int startTime;
-    int pauseTime;
-    bool pause;
-    bool start;
-    int timer; 
-};
-typedef struct compteur_s compteur;
+
+
 
 struct lootbox_s{
     int x;
@@ -127,7 +136,7 @@ struct world_s{
     sprite_perso p1;
     sprite_perso p2;
     set_map map;
-    SDL_GameController** joysticks;
+    SDL_GameController **joysticks;
     menu menu_set;
     int timestamp_w;
     int keystates_pre[123];
@@ -137,6 +146,5 @@ struct world_s{
 };
 
 typedef struct world_s jeu;
-
 
 #endif

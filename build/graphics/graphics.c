@@ -46,6 +46,7 @@ void play_animations(SDL_Renderer *renderer, sprite_perso* sprite, int chara_sta
 
 void refresh_graphics(SDL_Renderer *renderer, jeu *world){
     SDL_RenderClear(renderer);
+    SDL_SetRenderDrawBlendMode(renderer,SDL_BLENDMODE_NONE);
     switch(world->state){
         case combat:
             display_map(renderer,world);
@@ -53,6 +54,7 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
             play_animations(renderer, &(world->p1), world->p1.chara_state);
             play_animations(renderer, &(world->p2), world->p2.chara_state);
             display_life(renderer, world);
+            
             char* compteur = malloc(sizeof(char)*3);
             sprintf(compteur, "%d",world->timer.timer);
 
@@ -71,6 +73,13 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
             SDL_Surface* surface_compteur = TTF_RenderText_Solid(world->font.police_compteur, compteur, color);
             SDL_Texture* texture_compteur = SDL_CreateTextureFromSurface(renderer,surface_compteur);
             apply_textures(texture_compteur,renderer,620, -5);
+
+            if(world->p1.guard){
+                display_guard(renderer,world->p1);
+            }
+            if(world->p2.guard){
+                display_guard(renderer,world->p2);
+            }
             
         break;
         case main_menu:
@@ -91,7 +100,19 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
         //apply_texture(world->p1.texture_perso, renderer, world->p1.x , world->p1.y);
         SDL_RenderPresent(renderer);
 }
-
+void display_guard(SDL_Renderer* renderer,sprite_perso perso){
+   SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+    if(perso.life_guard >0){
+       SDL_SetRenderDrawColor(renderer,255,0,0,50);
+    }
+     if(perso.life_guard >=25){
+        SDL_SetRenderDrawColor(renderer,255,128,0,50);
+    }
+    if(perso.life_guard >=50){
+        SDL_SetRenderDrawColor(renderer,0,255,0,50);
+    }
+    disque(perso.x+perso.w/3,perso.y+perso.h/2,perso.life_guard*2,renderer);
+}
 void display_life(SDL_Renderer* renderer, jeu* world){
     /*VIE JOUEUR 1*/
     SDL_Rect rect;
@@ -184,17 +205,19 @@ void display_dynamic_texture(SDL_Renderer* renderer, char** map_struct, SDL_Text
 
 
 
-void disque(int cx,int cy,int rayon,SDL_Color couleur,SDL_Renderer* renderer){
-    int d,y,x;
-    d = 3-(2*rayon);
-    x = 0;
-    y = rayon;
-
-    while(y>=x){
-        ligneHorizontale(cx-x,cy-y,2*x+1,couleur,renderer);
-        ligneHorizontale(cx-x,cy-y,2*x+1,couleur,renderer);
-        ligneHorizontale(cx-x,cy-y,2*x+1,couleur,renderer);
-        ligneHorizontale(cx-x,cy-y,2*x+1,couleur,renderer);
+void disque(int cx,int cy,int rayon,SDL_Renderer* renderer){
+   int d, y, x;
+ 
+  d = 3 - (2 * rayon);
+  x = 0;
+  y = rayon;
+ 
+  while (y >= x) {
+    ligneHorizontale(cx - x, cy - y, 2 * x + 1,renderer);
+    ligneHorizontale(cx - x, cy + y, 2 * x + 1,renderer);
+    ligneHorizontale(cx - y, cy - x, 2 * y + 1,renderer);
+    ligneHorizontale(cx - y, cy + x, 2 * y + 1,renderer);
+ 
     if (d < 0)
       d = d + (4 * x) + 6;
     else {
@@ -202,10 +225,11 @@ void disque(int cx,int cy,int rayon,SDL_Color couleur,SDL_Renderer* renderer){
       y--;
     }
  
-    x++; 
+    x++;
+  }
     }
-}
-void ligneHorizontale(int x, int y, int w, SDL_Color couleur,SDL_Renderer* renderer)
+
+void ligneHorizontale(int x, int y, int w, SDL_Renderer* renderer)
 {
   SDL_Rect r;
 
@@ -213,7 +237,7 @@ void ligneHorizontale(int x, int y, int w, SDL_Color couleur,SDL_Renderer* rende
   r.y = y;
   r.w = w;
   r.h = 1;
-  SDL_SetRenderDrawColor(renderer,couleur.r,couleur.g,couleur.b,couleur.a);
+
   SDL_RenderFillRect(renderer,&r);
 }
 

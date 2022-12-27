@@ -36,6 +36,7 @@ void update_data(jeu* world);
 void movements(jeu* world, sprite_perso* perso, sprite_perso* adversaire);
 bool equals(int x, int y, char** map_point, char test);
 void light_punch(sprite_perso* attacker, sprite_perso* receiver);
+void heavy_punch(sprite_perso *attacker, sprite_perso *receiver);
 void reset_hit(sprite_perso* perso);
 void change_directions(sprite_perso * p1, sprite_perso * p2);
 bool canMove(sprite_perso * perso, sprite_perso * adversaire);
