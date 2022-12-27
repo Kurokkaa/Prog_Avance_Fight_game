@@ -423,7 +423,7 @@ void movements(jeu* world, sprite_perso* perso, sprite_perso* adversaire){
             perso->chara_state = landing;
         }
         else{
-            if(equals(x + perso->w / 2, y + perso->h + perso->jump_height*0.025, world->map.map_structure, ' ') && equals(x + perso->w, y + perso->h + perso->jump_height *0.025 , world->map.map_structure, ' ')){
+            if(equals(x, y + perso->h + perso->jump_height *0.025 , world->map.map_structure, ' ')){
                 perso->y += perso->jump_height*0.025;
             }
             else{
@@ -435,7 +435,8 @@ void movements(jeu* world, sprite_perso* perso, sprite_perso* adversaire){
     //Cas où le personnage chute s'il n'y a pas de plateformes
     x = perso->x;
     y = perso->y;
-    if(perso->chara_state !=flight && equals(x + perso->w / 2, y + perso->h + perso->jump_height *0.025 , world->map.map_structure, ' ') && equals(x + perso->w, y + perso->h + perso->jump_height *0.025 , world->map.map_structure, ' ')){
+    printf("perso X : %d \n",x);
+    if(perso->chara_state !=flight && equals(x , y + perso->h + perso->jump_height *0.025 , world->map.map_structure, ' ')){
         perso->chara_state = fall;
     }
 
@@ -531,14 +532,13 @@ void movements(jeu* world, sprite_perso* perso, sprite_perso* adversaire){
     }
     if(perso->chara_state == stun){
         if(perso->stun_time >=1){
-            printf("stun Time : %d",perso->stun_time);
+          
             perso->stun_time--;
             if(perso->anim[stun].counter==10){
                 perso->anim[stun].frame++;
-                
+            
                 if(perso->anim[stun].frame = perso->anim[stun].nbFrame){
                     perso->anim[stun].frame = 0;
-                    perso->chara_state = 0;
                 }
             }
             else{
@@ -804,8 +804,8 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer* renderer){
                         break;
                     }
                     init_map(world, renderer);
-                    init_perso(renderer,&world->p1,65, 465 ,100,230,CHARA_SPEED,false);
-                    init_perso(renderer,&world->p2,950, 465 ,100,230,CHARA_SPEED,true);
+                    init_perso(renderer,&world->p1,65, 465 ,150,230,CHARA_SPEED,false);
+                    init_perso(renderer,&world->p2,950, 465 ,150,230,CHARA_SPEED,true);
                     init_controller(world);
                     world->state = combat;
                     world->timestamp_w = 0;
@@ -953,7 +953,7 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
         }
     }
     if(world->p2.chara_state != stun){
-        if((!keystates[SDL_SCANCODE_LEFT] && !keystates[SDL_SCANCODE_RIGHT] && !keystates[SDL_SCANCODE_DOWN]|| keystates[SDL_SCANCODE_LEFT] && keystates[SDL_SCANCODE_RIGHT])  && (world->p2.chara_state == walk || world->p1.chara_state == crouch)){
+        if((!keystates[SDL_SCANCODE_LEFT] && !keystates[SDL_SCANCODE_RIGHT] && !keystates[SDL_SCANCODE_DOWN]|| keystates[SDL_SCANCODE_LEFT] && keystates[SDL_SCANCODE_RIGHT])  && (world->p2.chara_state == walk || world->p2.chara_state == crouch)){
             world->p2.chara_state = idle;
         }
         if(keystates[SDL_SCANCODE_LEFT] && !keystates[SDL_SCANCODE_RIGHT]){
@@ -1052,7 +1052,7 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
             }
         }
     }
-    
+   
         movements(world, &world->p1, &world->p2);
         movements(world,&world->p2, &world->p1);
         sprites_collision(&world->p1, &world->p2, world);

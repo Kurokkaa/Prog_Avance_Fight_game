@@ -176,7 +176,7 @@ void display_dynamic_texture(SDL_Renderer* renderer, char** map_struct, SDL_Text
     for(int i = 0 ; i<40 ; i++){
         for(int j = 0 ; j<20 ; j++){
             if(map_struct[i][j] == '5'){
-                apply_textures(texture, renderer, j * CELL_WIDTH, i * CELL_HEIGHT);
+                apply_textures(texture, renderer, j * CELL_WIDTH+64, i * CELL_HEIGHT);
             }
         }
     }
