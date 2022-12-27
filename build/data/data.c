@@ -16,7 +16,7 @@ void init_timer(jeu* world){
    world->timer.pause = false;
     world->timer.start = true;
     world->timer.timer = 60;
-    printf("%d",world->timer.timer);
+   
 
 }
 void init_map(jeu* world,SDL_Renderer* renderer){
@@ -53,7 +53,8 @@ void init_miniature(jeu* world,SDL_Renderer* renderer){
 }
 
 
-void init_jeu(jeu *world, SDL_Renderer* renderer){
+void 
+init_jeu(jeu *world, SDL_Renderer* renderer){
     world->menu_set.menu_fond = load_image("build/ressources/menu/menu.png", renderer);
     world->state = main_menu;
     world->terminer = false;
@@ -92,7 +93,7 @@ void init_hits(sprite_perso* perso){
     perso->hits.light_punch->range_y = 0;
     perso->hits.light_punch->effective_frame = 8;
     perso->hits.light_punch->timer = 0;
-    perso->hits.light_punch->delay = 50;
+    perso->hits.light_punch->delay = 5000;
     perso->hits.light_punch->launch = 0;
 
 
@@ -129,7 +130,8 @@ void init_combo(sprite_perso* player){
     player->tab_combo[0].input[0] = right;
     player->tab_combo[0].input[1] = left;
     player->tab_combo[0].input[2] = down;
-}
+    player->tab_combo[0].frame_between = 30;
+    }
   
 void init(SDL_Window** window, SDL_Renderer** renderer, jeu* world){
     if(SDL_Init(SDL_INIT_EVERYTHING) == -1){ // Initialisation de la SDL
@@ -258,6 +260,9 @@ bool read_combo(sprite_perso* player, int val){
             }
         }
     }
+    if(found){
+
+    }
     return found;
 }
 
@@ -279,10 +284,10 @@ void check_timer(jeu* world){
     
     if(world->timer.start && !world->timer.pause){
         
-        if((SDL_GetTicks() - world->timer.startTime) /1000 >=1.2){
+        if((SDL_GetTicks() - world->timer.startTime) /1000 >=1){
             world->timer.startTime = SDL_GetTicks();
             world->timer.timer --;
-            printf("%d",world->timer.timer);
+           
         }    
     }
     
@@ -525,17 +530,23 @@ void movements(jeu* world, sprite_perso* perso, sprite_perso* adversaire){
         }
     }
     if(perso->chara_state == stun){
-       
-         if(perso->anim[stun].counter==10){
-            perso->anim[stun].frame++;
-             if(perso->anim[stun].frame = perso->anim[stun].nbFrame){
-                perso->anim[stun].frame = 0;
-                perso->chara_state = 0;
-                perso->chara_state = idle;
+        if(perso->stun_time >=1){
+            printf("stun Time : %d",perso->stun_time);
+            perso->stun_time--;
+            if(perso->anim[stun].counter==10){
+                perso->anim[stun].frame++;
+                
+                if(perso->anim[stun].frame = perso->anim[stun].nbFrame){
+                    perso->anim[stun].frame = 0;
+                    perso->chara_state = 0;
+                }
             }
-         }
+            else{
+                perso->anim[stun].counter ++;
+            }
+        }
          else{
-            perso->anim[stun].counter ++;
+            perso->chara_state = idle;
          }
          
     }
@@ -559,7 +570,8 @@ void light_punch(sprite_perso* attacker, sprite_perso* receiver){
         }
         else{
             if((attacker->x - attacker->hits.light_punch->range_x <= receiver->x + receiver->w) && (attacker->y + attacker->jump_height/2 >= receiver->y && attacker->y + attacker->jump_height/2 <= receiver->y + receiver->h)){
-                
+                receiver->chara_state = stun;
+                receiver->stun_time = attacker->hits.light_punch->delay;
                 receiver->life -= attacker->hits.light_punch->dmg ;
             }
         }
@@ -660,9 +672,7 @@ void add_input_buffer(sprite_perso* player, enum combos_inputs touche_appui, int
     player->buffer[player->pos_tab_combo].input = touche_appui;
     player->buffer[player->pos_tab_combo++].timestamp = timestamp;
 
-    for(int i = 0 ;i<player->pos_tab_combo;i++){
-        printf("%d",player->buffer[i].input);
-    }
+    
 }
 
 
@@ -795,11 +805,11 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer* renderer){
                     }
                     init_map(world, renderer);
                     init_perso(renderer,&world->p1,65, 465 ,100,230,CHARA_SPEED,false);
-                    init_perso(renderer,&world->p2,1000, 465 ,100,230,CHARA_SPEED,true);
+                    init_perso(renderer,&world->p2,950, 465 ,100,230,CHARA_SPEED,true);
                     init_controller(world);
                     world->state = combat;
                     world->timestamp_w = 0;
-                    world->font.police_compteur = TTF_OpenFont("build/ressources/Reach_Story.ttf",20);
+                    world->font.police_compteur = TTF_OpenFont("build/ressources/Polices/Reach_Story.ttf",40);
                     init_timer(world);
                     if(world->font.police_compteur == NULL){
                         printf("chargement de la police incomplete");
@@ -827,25 +837,23 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
     const Uint8 *keystates = SDL_GetKeyboardState(NULL);
     SDL_JoystickUpdate();
    // checkJoystick(world->joysticks);
-   // reset_hit(&world->p1);
-   //reset_hit(&world->p2);
-    //printf("%d",world->p1.hits.punch->timer);
+
     while(SDL_PollEvent(event)){
         if(event->type == SDL_QUIT){
             world->terminer = true;
         }
     }   
-        if(keystates[SDL_SCANCODE_ESCAPE] && !world->keystates_pre[SDL_SCANCODE_ESCAPE] ){
+    if(keystates[SDL_SCANCODE_ESCAPE] && !world->keystates_pre[SDL_SCANCODE_ESCAPE] ){
             world->timer.pause = true;
             world->timer.pauseTime = SDL_GetTicks() - world->timer.startTime;
             world->state = pause;
         }
+    
+    if(world->p1.chara_state != stun){
         
+        //aucune touche de déplacement appuyé
         if((!keystates[SDL_SCANCODE_A] && !keystates[SDL_SCANCODE_D] && !keystates[SDL_SCANCODE_S]||keystates[SDL_SCANCODE_A] && keystates[SDL_SCANCODE_D]) && (world->p1.chara_state == walk || world->p1.chara_state == crouch)){
             world->p1.chara_state = idle;
-        }
-        if((!keystates[SDL_SCANCODE_LEFT] && !keystates[SDL_SCANCODE_RIGHT] && !keystates[SDL_SCANCODE_DOWN]|| keystates[SDL_SCANCODE_LEFT] && keystates[SDL_SCANCODE_RIGHT])  && (world->p2.chara_state == walk || world->p1.chara_state == crouch)){
-            world->p2.chara_state = idle;
         }
             //deplacement gauche
         if((keystates[SDL_SCANCODE_A] && !keystates[SDL_SCANCODE_D]) /*|| SDL_GameControllerGetAxis(world->joysticks[0],0)<-(10000)*/){
@@ -868,49 +876,7 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
                 }
             }
         }
-        if(keystates[SDL_SCANCODE_LEFT] && !keystates[SDL_SCANCODE_RIGHT]){
-            //world->p1.speed = -CHARA_SPEED;
-            if(!world->p1.attack_launched){
-                if(world->p2.chara_state == idle){
-                    world->p2.chara_state = walk;
-                    world->p2.backwards = true;
-                }
-                if(world->p2.chara_state == flight){
-                    world->p2.chara_state = flight_control;
-                    world->p2.backwards = true;
-                }
-                if(world->p2.chara_state == fall){
-                    world->p2.chara_state = fall_control;
-                    world->p2.backwards = true;
-                }
-                if(keystates[SDL_SCANCODE_LEFT] != world->keystates_pre[SDL_SCANCODE_LEFT]){
-                    add_input_buffer(&world->p2,left,world->timestamp_w);
-                }   
-            }
-        }
-
-        if(!keystates[SDL_SCANCODE_LEFT] && keystates[SDL_SCANCODE_RIGHT]){
-            //world->p1.speed = CHARA_SPEED;
-           if(!world->p1.attack_launched){
-                if(world->p2.chara_state == idle){
-                    world->p2.chara_state = walk;
-                    world->p2.backwards = false;
-                }
-                if(world->p2.chara_state == flight){
-                    world->p2.chara_state = flight_control;
-                    world->p2.backwards = false;
-                }
-                if(world->p2.chara_state == fall){
-                    world->p2.chara_state = fall_control;
-                    world->p2.backwards = false;
-                }
-                if(keystates[SDL_SCANCODE_RIGHT] != world->keystates_pre[SDL_SCANCODE_RIGHT]){
-                    add_input_buffer(&world->p2,right,world->timestamp_w);
-                }
-           }
-        }
-
-        //deplacement droite
+         //deplacement droite
         if(!keystates[SDL_SCANCODE_A] && keystates[SDL_SCANCODE_D]/*|| SDL_GameControllerGetAxis(world->joysticks[0],0)>10000*/){
             //world->p1.speed = CHARA_SPEED;
             if(!world->p1.attack_launched){
@@ -932,18 +898,14 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
             }
         }
         if(!keystates[SDL_SCANCODE_Z] && keystates[SDL_SCANCODE_S]){
-            world->p1.chara_state = crouch;
-            if(keystates[SDL_SCANCODE_S] != world->keystates_pre[SDL_SCANCODE_S]){
-                add_input_buffer(&world->p1,down,world->timestamp_w);
+            if(world->p1.chara_state == idle || world->p1.chara_state == walk){
+                world->p1.chara_state = crouch;
+                if(keystates[SDL_SCANCODE_S] != world->keystates_pre[SDL_SCANCODE_S]){
+                    add_input_buffer(&world->p1,down,world->timestamp_w);
+                }
             }
         }
-      
-        if(!keystates[SDL_SCANCODE_UP] && keystates[SDL_SCANCODE_DOWN]){
-            world->p2.chara_state = crouch;
-            if(keystates[SDL_SCANCODE_S] != world->keystates_pre[SDL_SCANCODE_S]){
-                add_input_buffer(&world->p2,down,world->timestamp_w);
-            }
-        }
+
         //sauts
         if((keystates[SDL_SCANCODE_W] /*|| SDL_GameControllerGetAxis(world->joysticks[0],1)< (-10000)*/) && (world->p1.chara_state == idle || world->p1.chara_state == walk)){
             world->p1.chara_state = jump;
@@ -951,13 +913,8 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
                 add_input_buffer(&world->p1,up,world->timestamp_w);
             }
         }
-        if(keystates[SDL_SCANCODE_UP] && (world->p2.chara_state == idle || world->p2.chara_state == walk)){
-            world->p2.chara_state = jump;
-            if(keystates[SDL_SCANCODE_UP] != world->keystates_pre[SDL_SCANCODE_UP]){
-                add_input_buffer(&world->p2,up,world->timestamp_w);
-            }
-        }
-        //coups de poings leger
+
+         //coups de poings leger
         if(keystates[SDL_SCANCODE_G] && !keystates[SDL_SCANCODE_Y] && !keystates[SDL_SCANCODE_J]){
             if(keystates[SDL_SCANCODE_G] != world->keystates_pre[SDL_SCANCODE_G]){
                 if(!world->p1.attack_launched){
@@ -994,6 +951,70 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
                 }
             }
         }
+    }
+    if(world->p2.chara_state != stun){
+        if((!keystates[SDL_SCANCODE_LEFT] && !keystates[SDL_SCANCODE_RIGHT] && !keystates[SDL_SCANCODE_DOWN]|| keystates[SDL_SCANCODE_LEFT] && keystates[SDL_SCANCODE_RIGHT])  && (world->p2.chara_state == walk || world->p1.chara_state == crouch)){
+            world->p2.chara_state = idle;
+        }
+        if(keystates[SDL_SCANCODE_LEFT] && !keystates[SDL_SCANCODE_RIGHT]){
+            //world->p1.speed = -CHARA_SPEED;
+            if(!world->p2.attack_launched){
+                if(world->p2.chara_state == idle){
+                    world->p2.chara_state = walk;
+                    world->p2.backwards = true;
+                }
+                if(world->p2.chara_state == flight){
+                    world->p2.chara_state = flight_control;
+                    world->p2.backwards = true;
+                }
+                if(world->p2.chara_state == fall){
+                    world->p2.chara_state = fall_control;
+                    world->p2.backwards = true;
+                }
+                if(keystates[SDL_SCANCODE_LEFT] != world->keystates_pre[SDL_SCANCODE_LEFT]){
+                    add_input_buffer(&world->p2,left,world->timestamp_w);
+                }   
+            }
+        }
+
+        if(!keystates[SDL_SCANCODE_LEFT] && keystates[SDL_SCANCODE_RIGHT]){
+            //world->p1.speed = CHARA_SPEED;
+           if(!world->p2.attack_launched){
+                if(world->p2.chara_state == idle){
+                    world->p2.chara_state = walk;
+                    world->p2.backwards = false;
+                }
+                if(world->p2.chara_state == flight){
+                    world->p2.chara_state = flight_control;
+                    world->p2.backwards = false;
+                }
+                if(world->p2.chara_state == fall){
+                    world->p2.chara_state = fall_control;
+                    world->p2.backwards = false;
+                }
+                if(keystates[SDL_SCANCODE_RIGHT] != world->keystates_pre[SDL_SCANCODE_RIGHT]){
+                    add_input_buffer(&world->p2,right,world->timestamp_w);
+                }
+           }
+        }
+
+       
+      
+        if(!keystates[SDL_SCANCODE_UP] && keystates[SDL_SCANCODE_DOWN]){
+            
+            world->p2.chara_state = crouch;
+            if(keystates[SDL_SCANCODE_DOWN] != world->keystates_pre[SDL_SCANCODE_DOWN]){
+                add_input_buffer(&world->p2,down,world->timestamp_w);
+            }
+        }
+        
+        if(keystates[SDL_SCANCODE_UP] && (world->p2.chara_state == idle || world->p2.chara_state == walk)){
+            world->p2.chara_state = jump;
+            if(keystates[SDL_SCANCODE_UP] != world->keystates_pre[SDL_SCANCODE_UP]){
+                add_input_buffer(&world->p2,up,world->timestamp_w);
+            }
+        }
+       
          //coups
         if(keystates[SDL_SCANCODE_KP_4] && !keystates[SDL_SCANCODE_KP_8] && !keystates[SDL_SCANCODE_KP_9]){
              if(keystates[SDL_SCANCODE_KP_4] != world->keystates_pre[SDL_SCANCODE_KP_4]){
@@ -1010,7 +1031,7 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
         if(!keystates[SDL_SCANCODE_KP_4] && keystates[SDL_SCANCODE_KP_8] && !keystates[SDL_SCANCODE_KP_9]){
             if(keystates[SDL_SCANCODE_KP_8] != world->keystates_pre[SDL_SCANCODE_KP_8]){
                 if(!world->p2.attack_launched){
-                    if(world->p1.chara_state == idle || world->p1.chara_state == walk){
+                    if(world->p2.chara_state == idle || world->p2.chara_state == walk){
                     world->p2.chara_state = hpunch;
                     world->p2.attack_launched = true;
                     add_input_buffer(&world->p1,heavy_p,world->timestamp_w);
@@ -1022,7 +1043,7 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
         if(!keystates[SDL_SCANCODE_KP_4] && !keystates[SDL_SCANCODE_KP_8] && keystates[SDL_SCANCODE_KP_9]){
            if(keystates[SDL_SCANCODE_KP_9] != world->keystates_pre[SDL_SCANCODE_KP_9]){
                 if(!world->p2.attack_launched){
-                    if(world->p1.chara_state == idle || world->p1.chara_state == walk){
+                    if(world->p2.chara_state == idle || world->p2.chara_state == walk){
                     world->p2.chara_state = kickstate;
                     world->p2.attack_launched = true;
                     add_input_buffer(&world->p1,kick,world->timestamp_w);
@@ -1030,6 +1051,8 @@ void gameplay_inputs(SDL_Event *event, jeu *world){
                 }
             }
         }
+    }
+    
         movements(world, &world->p1, &world->p2);
         movements(world,&world->p2, &world->p1);
         sprites_collision(&world->p1, &world->p2, world);

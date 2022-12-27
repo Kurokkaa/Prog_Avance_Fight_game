@@ -70,7 +70,7 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
             SDL_Color color = {0,0,0};
             SDL_Surface* surface_compteur = TTF_RenderText_Solid(world->font.police_compteur, compteur, color);
             SDL_Texture* texture_compteur = SDL_CreateTextureFromSurface(renderer,surface_compteur);
-            apply_textures(texture_compteur,renderer,640, 10);
+            apply_textures(texture_compteur,renderer,620, -5);
             
         break;
         case main_menu:
