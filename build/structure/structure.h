@@ -79,7 +79,9 @@ struct sprite_p{
     bool guard;
     int life_guard;
     bool broken_guard;
-    
+    bool damage_bonus;
+    int bonus_timer;
+    int special_bar;
 };
 
 typedef struct sprite_p sprite_perso ;
@@ -105,6 +107,19 @@ struct compteur_s{
 };
 typedef struct compteur_s compteur;
 
+struct lootbox_s{
+    int x;
+    int y;
+    int w;
+    int h;
+    int fallspeed;
+    enum bonus_type bonus;
+    bool active;
+    int collided;
+    bool falling;
+};
+typedef struct lootbox_s lootbox;
+
 struct world_s{
     enum game_state state;
     enum game_map choosed_map;
@@ -118,6 +133,7 @@ struct world_s{
     int keystates_pre[123];
     ressources font;
     compteur timer;
+    lootbox lootbox;
 };
 
 typedef struct world_s jeu;

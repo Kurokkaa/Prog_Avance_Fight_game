@@ -52,4 +52,14 @@ void destroy_textures(jeu* world);
 void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer* renderer);
 void gameplay_inputs(SDL_Event *event, jeu *world);
 
+/*FONCTION POUR LES LOOTBOXES*/
+int generate_number (int a, int b);
+void init_lootbox(jeu * world);
+void update_lootbox(jeu * world);
+void check_lootbox_pickup(sprite_perso * player, lootbox * lootbox, int player_number);
+void apply_bonus(jeu *world, sprite_perso * player);
+void lootbox_loop(jeu * world);
+
+
+
 #endif
