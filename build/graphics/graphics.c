@@ -106,7 +106,7 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
 
 void display_fireball(SDL_Renderer* renderer,sprite_perso perso){
    if(perso.fireball.launched_fireball){
-        apply_textures(perso.fireball.fireball,renderer,perso.x+perso.w,perso.y);
+        apply_textures(perso.fireball.fireball,renderer,perso.fireball.x,perso.fireball.y);
     }
 }
 char* barlvl(sprite_perso perso){

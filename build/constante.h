@@ -15,7 +15,8 @@
     #define RANDOM_SPAWN_CHANCE 10
     #define MAX_LIFE 100
     #define MAX_SPECIAL 300
-
+    #define DMG_DURATION 30
+    #define BROKEN_GUARD_STUN 400
     enum game_state{combat, main_menu, pause, options, selection_perso, selection_map};
 
     enum character_state{idle, walk, jump, crouch, fall, backwards, flight, flight_control, fall_control, landing, knockback, lpunch , kickstate,hpunch,stun,fireball};

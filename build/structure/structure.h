@@ -74,6 +74,7 @@ struct throwable_s
     bool launched_fireball;
     int x;
     int y;
+    int multiplicateur;
 };
 typedef struct throwable_s throwable;
 struct sprite_p{
@@ -105,6 +106,7 @@ struct sprite_p{
     int special_bar;
     compteur chrono_guard;
     compteur chrono_special;
+    compteur dmg_bonus_timer;
     throwable fireball;
 };
 
@@ -147,7 +149,8 @@ struct Sound_s{
     Mix_Chunk* kick;
     Mix_Chunk* fireball;
     Mix_Chunk* frappe;
-    Mix_Chunk* change;;
+    Mix_Chunk* change;
+    bool menuPlayed;
 };
 typedef struct Sound_s Sound;
 struct world_s{

@@ -63,6 +63,9 @@ void check_lootbox_pickup(sprite_perso * player, lootbox * lootbox, int player_n
 void apply_bonus(lootbox * lootbox, sprite_perso *player);
 void lootbox_loop(jeu *world);
 
-
+/*FONCTION CHRONOMETRE*/
+void unpause(compteur* chrono);
+void pauseChrono(compteur* chrono);
+void check_timer(jeu *world);
 
 #endif

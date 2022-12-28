@@ -80,6 +80,7 @@ void init_music(jeu* world){
     world->music.fireball = Mix_LoadWAV("build/ressources/Audio/missile_shot.wav");
     world->music.frappe = Mix_LoadWAV("build/ressources/Audio/missile_shot.wav");
     world->music.change = Mix_LoadWAV("build/ressources/Audio/missile_shot.wav");
+    world->music.menuPlayed = false;
     
 }
 void init_jeu(jeu *world, SDL_Renderer *renderer)
@@ -88,6 +89,7 @@ void init_jeu(jeu *world, SDL_Renderer *renderer)
     world->state = main_menu;
     world->terminer = false;
     world->menu_set.index_menu = 0;
+    world->font.police_compteur = TTF_OpenFont("build/ressources/Polices/Reach_Story.ttf", 40);
     init_music(world);
 }
 
@@ -130,6 +132,7 @@ void init_hits(sprite_perso *perso)
     perso->hits.heavy_punch = malloc(sizeof(hit));
     perso->hits.kick = malloc(sizeof(hit));
     perso->hits.special_attack = malloc(sizeof(hit));
+    
 
     perso->hits.light_punch->dmg = 10;
     perso->hits.light_punch->speed = 0;
@@ -174,7 +177,7 @@ void init_combo(int pos,int nb_coups,int frame_between,int required,sprite_perso
 void init_combos(sprite_perso *player)
 {
     // 1er combo
-    init_combo(0,3,30,100,player);
+    init_combo(0,3,50,100,player);
     player->tab_combo[0].input[0] = right;
     player->tab_combo[0].input[1] = left;
     player->tab_combo[0].input[2] = light_p;
@@ -239,7 +242,7 @@ void init(SDL_Window **window, SDL_Renderer **renderer, jeu *world)
         SDL_Quit();
     }
     else{
-         Mix_AllocateChannels(2); // Allouer 2 cannaux 
+         Mix_AllocateChannels(3); // Allouer 2 cannaux 
         Mix_Volume(0, MIX_MAX_VOLUME); // Mets le son a 100% en volume pour le premier cannaux
         Mix_Volume(1, 70); // Mets le son a 50% en volume pour le deuxièmme cannaux 
     }
@@ -374,6 +377,7 @@ bool read_combo(sprite_perso *player, int val)
             {
             case 0:
                 player->chara_state = fireball;
+                player->fireball.multiplicateur = player->mirror ? -1:1;
                 break;
             case 1:
                 player->x =1000;
@@ -776,19 +780,20 @@ void light_punch(sprite_perso *attacker, sprite_perso *receiver)
         {
             if (receiver->guard)
             {
-                printf("guard life : %d", receiver->life_guard);
-                receiver->life_guard -= attacker->hits.light_punch->dmg;
+               
+    
+                receiver->life_guard -= attacker->damage_bonus ? attacker->hits.light_punch->dmg *1.5 :attacker->hits.light_punch->dmg;
                 if (receiver->life_guard <= 0)
                 {
                     receiver->broken_guard = true;
                     receiver->chara_state = stun;
-                    receiver->stun_time = 400;
+                    receiver->stun_time = BROKEN_GUARD_STUN;
                 }
             }
             else
             {
                 receiver->special_bar +=10;
-                receiver->life -= attacker->hits.light_punch->dmg;
+                receiver->life -= attacker->damage_bonus ? attacker->hits.light_punch->dmg *1.5 :attacker->hits.light_punch->dmg;
                 if (!receiver->broken_guard)
                 {
                     receiver->chara_state = stun;
@@ -803,19 +808,19 @@ void light_punch(sprite_perso *attacker, sprite_perso *receiver)
         {
             if (receiver->guard)
             {
-                receiver->life_guard -= attacker->hits.light_punch->dmg;
-                printf("guard life : %d", receiver->life_guard);
+                receiver->life_guard -= attacker->damage_bonus ? attacker->hits.light_punch->dmg *1.5 : attacker->hits.light_punch->dmg;
+               
                 if (receiver->life_guard <= 0)
                 {
                     receiver->broken_guard = true;
                     receiver->chara_state = stun;
-                    receiver->stun_time = 400;
-                    printf("brisé");
+                    receiver->stun_time = BROKEN_GUARD_STUN;
+                   
                 }
             }
             else
             {   receiver->special_bar +=10;
-                receiver->life -= attacker->hits.light_punch->dmg;
+                receiver->life -= attacker->damage_bonus ? attacker->hits.light_punch->dmg *1.5 : attacker->hits.light_punch->dmg;
                 if (!receiver->broken_guard)
                 {
                     receiver->chara_state = stun;
@@ -835,20 +840,19 @@ void heavy_punch(sprite_perso *attacker, sprite_perso *receiver)
         {
             if (receiver->guard)
             {
-                printf("guard life : %d", receiver->life_guard);
-                receiver->life_guard -= attacker->hits.heavy_punch->dmg;
+                receiver->life_guard -= attacker->damage_bonus ? attacker->hits.heavy_punch->dmg*1.5 : attacker->hits.heavy_punch->dmg;
                 if (receiver->life_guard <= 0)
                 {
                     receiver->broken_guard = true;
                     receiver->chara_state = stun;
-                    receiver->stun_time = 400;
+                    receiver->stun_time = BROKEN_GUARD_STUN;
                 }
             }
             else
             {
                 receiver->special_bar +=20;
-                printf("%d",receiver->special_bar);
-                receiver->life -= attacker->hits.heavy_punch->dmg;
+               
+                receiver->life -= attacker->damage_bonus ? attacker->hits.heavy_punch->dmg*1.5 : attacker->hits.heavy_punch->dmg;
                 if (!receiver->broken_guard)
                 {
                     receiver->chara_state = stun;
@@ -863,20 +867,20 @@ void heavy_punch(sprite_perso *attacker, sprite_perso *receiver)
         {
             if (receiver->guard)
             {
-                receiver->life_guard -= attacker->hits.heavy_punch->dmg;
-                printf("guard life : %d", receiver->life_guard);
+                receiver->life_guard -= attacker->damage_bonus ? attacker->hits.heavy_punch->dmg*1.5 : attacker->hits.heavy_punch->dmg;
+                
                 if (receiver->life_guard <= 0)
                 {
                     receiver->broken_guard = true;
                     receiver->chara_state = stun;
-                    receiver->stun_time = 400;
-                    printf("brisé");
+                    receiver->stun_time = BROKEN_GUARD_STUN;
+                   
                 }
             }
             else
             {   
                 receiver->special_bar +=20;
-                receiver->life -= attacker->hits.heavy_punch->dmg;
+                receiver->life -= attacker->damage_bonus ? attacker->hits.heavy_punch->dmg*1.5 : attacker->hits.heavy_punch->dmg;
                 if (!receiver->broken_guard)
                 {
                     receiver->chara_state = stun;
@@ -896,8 +900,8 @@ void kick_hit(sprite_perso *attacker, sprite_perso *receiver)
         {
             if (receiver->guard)
             {
-                printf("guard life : %d", receiver->life_guard);
-                receiver->life_guard -= attacker->hits.kick->dmg;
+              
+                receiver->life_guard -= attacker->damage_bonus ? attacker->hits.kick->dmg*1.5 : attacker->hits.kick->dmg;
                 if (receiver->life_guard <= 0)
                 {
                     receiver->broken_guard = true;
@@ -908,7 +912,7 @@ void kick_hit(sprite_perso *attacker, sprite_perso *receiver)
             else
             {
                 receiver->special_bar +=20;
-                receiver->life -= attacker->hits.kick->dmg;
+                receiver->life -= attacker->damage_bonus ? attacker->hits.kick->dmg*1.5 : attacker->hits.kick->dmg;
                 if (!receiver->broken_guard)
                 {
                     receiver->chara_state = stun;
@@ -923,20 +927,20 @@ void kick_hit(sprite_perso *attacker, sprite_perso *receiver)
         {
             if (receiver->guard)
             {
-                receiver->life_guard -= attacker->hits.kick->dmg;
-                printf("guard life : %d", receiver->life_guard);
+                receiver->life_guard -= attacker->damage_bonus ? attacker->hits.kick->dmg*1.5 : attacker->hits.kick->dmg;
+              
                 if (receiver->life_guard <= 0)
                 {
                     receiver->broken_guard = true;
                     receiver->chara_state = stun;
                     receiver->stun_time = 400;
-                    printf("brisé");
+                 
                 }
             }
             else
             {
                 receiver->special_bar +=20;
-                receiver->life -= attacker->hits.kick->dmg;
+                receiver->life -= attacker->damage_bonus ? attacker->hits.kick->dmg*1.5 : attacker->hits.kick->dmg;
                 if (!receiver->broken_guard)
                 {
                     receiver->chara_state = stun;
@@ -1080,9 +1084,22 @@ void free_map_structure(char **map_structure)
     free(map_structure);
 }
 void destroy_anim(sprite_perso* perso){
-    for(int i = 0;i<=stun;i++){
-        SDL_DestroyTexture(perso->anim[i].anim_text);
-    }
+   
+
+    SDL_DestroyTexture(perso->anim[idle].anim_text);
+    SDL_DestroyTexture(perso->anim[walk].anim_text);
+    SDL_DestroyTexture(perso->anim[jump].anim_text);
+    SDL_DestroyTexture(perso->anim[crouch].anim_text);
+    SDL_DestroyTexture(perso->anim[fall].anim_text);
+    SDL_DestroyTexture(perso->anim[backwards].anim_text);
+    SDL_DestroyTexture(perso->anim[flight].anim_text);
+    SDL_DestroyTexture(perso->anim[flight_control].anim_text);
+    SDL_DestroyTexture(perso->anim[fall_control].anim_text);
+    SDL_DestroyTexture(perso->anim[landing].anim_text);
+    SDL_DestroyTexture(perso->anim[knockback].anim_text);
+    SDL_DestroyTexture(perso->anim[lpunch].anim_text);
+    SDL_DestroyTexture(perso->anim[kickstate].anim_text);
+    SDL_DestroyTexture(perso->anim[hpunch].anim_text);
     SDL_DestroyTexture(perso->fireball.fireball);
 }
 void destroy_map(jeu* world){
@@ -1095,9 +1112,9 @@ void destroy_textures(jeu *world)
    SDL_DestroyTexture(world->menu_set.menu_fond);
    destroy_anim(&world->p1);
    destroy_anim(&world->p2);
-    SDL_DestroyTexture(world->map.image_fond);
-    SDL_DestroyTexture(world->map.plateformes);
-    destroy_map(world);
+   SDL_DestroyTexture(world->map.image_fond);
+   SDL_DestroyTexture(world->map.plateformes);
+   destroy_map(world);
 
 }
 
@@ -1113,10 +1130,14 @@ void unpause(compteur* chrono){
 void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
 {
     Uint8 *keystates;
-    Mix_PlayChannel(1,world->music.menu,-1);
+   
 
     while (SDL_PollEvent(event))
     {
+        if(!world->music.menuPlayed){
+            Mix_PlayChannel(1,world->music.menu  ,-1);
+            world->music.menuPlayed = true;
+        }
         if (event->type == SDL_QUIT)
         {
             world->terminer = true;
@@ -1135,13 +1156,18 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                     unpause(&world->p2.chrono_guard);
                     unpause(&world->p1.chrono_special);
                     unpause(&world->p2.chrono_special);
+                    unpause(&world->p1.dmg_bonus_timer);
+                    unpause(&world->p2.dmg_bonus_timer);
                 }
             }
 
             if (event->key.keysym.sym == SDLK_z)
             {   
                 if (world->state != selection_map)
-                {   Mix_PlayChannel(0,world->music.change,1);
+                
+                {  
+                     Mix_PlayChannel(1,world->music.menu,-1);
+                     Mix_PlayChannel(0,world->music.change,1);
                     world->menu_set.index_menu--;
                     if (world->menu_set.index_menu < 0)
                     {
@@ -1228,7 +1254,7 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                     init_controller(world);
                     world->state = combat;
                     world->timestamp_w = 0;
-                    world->font.police_compteur = TTF_OpenFont("build/ressources/Polices/Reach_Story.ttf", 40);
+                    
                     init_timer(world);
                     if (world->font.police_compteur == NULL)
                     {
@@ -1240,6 +1266,7 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                     }
                     
                     init_lootbox(&world->lootbox,renderer);
+                    Mix_Volume(1,0);
                     // check_game(world); //???
                 }
             }
@@ -1282,6 +1309,8 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
         pauseChrono(&world->timer);
         pauseChrono(&world->p1.chrono_guard);
         pauseChrono(&world->p2.chrono_guard);
+        pauseChrono(&world->p1.dmg_bonus_timer);
+        pauseChrono(&world->p2.dmg_bonus_timer);
     }
 
     if (world->p1.chara_state != stun && !world->p1.attack_launched && !world->p1.guard)
@@ -1377,6 +1406,7 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
                     combop1 = read_combo(&world->p1, i);
                     }
                     if(!combop1){
+                    Mix_PlayChannel(0,world->music.light_punch,1);
                     world->p1.chara_state = lpunch;
                     world->p1.attack_launched = true;
                     }
@@ -1399,8 +1429,9 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
                     combop1 = read_combo(&world->p1, i);
                     }
                     if(!combop1){
-                    world->p1.chara_state = hpunch;
-                    world->p1.attack_launched = true;
+                        Mix_PlayChannel(0,world->music.heavy_punch,1);
+                        world->p1.chara_state = hpunch;
+                        world->p1.attack_launched = true;
                     }
 
                 }
@@ -1418,8 +1449,9 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
                     combop1 = read_combo(&world->p1, i);
                     }
                     if(!combop1){
-                    world->p1.chara_state = kickstate;
-                    world->p1.attack_launched = true;
+                        Mix_PlayChannel(0,world->music.kick,1);
+                        world->p1.chara_state = kickstate;
+                        world->p1.attack_launched = true;
                     }
 
                 }
@@ -1525,8 +1557,9 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
                         combop2 = read_combo(&world->p2, i);
                     }
                     if(!combop2){
-                    world->p2.chara_state = lpunch;
-                    world->p2.attack_launched = true;
+                        Mix_PlayChannel(2,world->music.light_punch,1);
+                        world->p2.chara_state = lpunch;
+                        world->p2.attack_launched = true;
                     }
                 }
             }
@@ -1544,8 +1577,9 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
                     combop2 = read_combo(&world->p2, i);
                     }
                     if(!combop2){
-                    world->p2.chara_state = hpunch;
-                    world->p2.attack_launched = true;
+                        Mix_PlayChannel(2,world->music.heavy_punch,1);
+                        world->p2.chara_state = hpunch;
+                        world->p2.attack_launched = true;
                     }
                 }
             }
@@ -1563,6 +1597,7 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
                     combop2 = read_combo(&world->p2, i);
                     }
                     if(!combop2){
+                    Mix_PlayChannel(2,world->music.kick,1);
                     world->p2.chara_state = kickstate;
                     world->p2.attack_launched = true;
                     }
@@ -1681,6 +1716,9 @@ void apply_bonus(lootbox * lootbox, sprite_perso *player){
 
     if (lootbox->bonus == damage_bonus){
         player->damage_bonus = true;
+        player->dmg_bonus_timer.start =true;
+        player->dmg_bonus_timer.startTime = SDL_GetTicks();
+        player->dmg_bonus_timer.pause = false;
     }
 
     if (lootbox->bonus == special_bonus){
@@ -1697,11 +1735,7 @@ void apply_bonus(lootbox * lootbox, sprite_perso *player){
  * @param world structure contenant les données du monde
  */
 void lootbox_loop(jeu *world){
-    printf("Lootbox:\n");
-    printf("x: %d\n", world->lootbox.x);
-    printf("y: %d\n", world->lootbox.y);
-    printf("Active: %d\n", world->lootbox.active);
-    printf("Falling: %d\n", world->lootbox.falling);
+    
     if (world->lootbox.active == 0){ // On ne fait pas apparaitre de lootbox s'il y en a déjà une
         int n = generate_number(0, RANDOM_SPAWN_CHANCE);
         
@@ -1757,25 +1791,65 @@ void increase_special(sprite_perso* perso){
 void compute_game(jeu *world){
     if(world->timer.timer == 0){
         if(world->p1.life > world->p2.life){
-            printf("Victoire P1\n");
+           
         }
         if(world->p1.life < world->p2.life){
-            printf("Victoire P2\n");
+         
         }
         else{
-            printf("Egalité\n");
+           
         }
     }
 
     if(world->p1.life <= 0){
-        printf("Victoire P2\n");
+        
     }
 
     if(world->p2.life <= 0){
-        printf("Victoire P1\n");
+     
     }
 }
 
+
+void move_fireball(sprite_perso* perso){
+    
+    if(perso->fireball.launched_fireball){
+        perso->fireball.x +=10*perso->fireball.multiplicateur;
+        
+    }
+    else{
+        perso->fireball.x = perso->mirror ? perso->x : perso->x+perso->w;
+        perso->fireball.y = perso->y+perso->h/2;
+    }
+}
+
+void check_fireball(sprite_perso* attacker, sprite_perso* receiver){
+    
+        if(attacker->fireball.x >= receiver->x && attacker->fireball.x <= receiver->x+receiver->w && attacker->fireball.launched_fireball){
+            if(receiver->guard){
+                receiver->life_guard-=attacker->hits.special_attack->dmg;
+                if(receiver->life_guard<=0){
+                    receiver->chara_state = stun;
+                    receiver->broken_guard = true;
+                    receiver->stun_time = BROKEN_GUARD_STUN;
+                }
+            }
+            else{
+                receiver->life-= attacker->hits.special_attack->dmg;
+            }
+            attacker->fireball.launched_fireball = false;
+        }
+        if(attacker->fireball.x > SCREEN_WIDTH || attacker->fireball.x <0){
+             attacker->fireball.launched_fireball = false;
+        }
+}
+
+void check_bonus(sprite_perso* perso){
+    if(perso->damage_bonus && !perso->dmg_bonus_timer.pause && (SDL_GetTicks() - perso->dmg_bonus_timer.startTime) /1000 >= DMG_DURATION){
+        perso->damage_bonus = false;
+        perso->dmg_bonus_timer.startTime = SDL_GetTicks();
+    }
+}
 /**
  * MISE A JOUR DES DONNEES DU JEU
  */
@@ -1787,15 +1861,14 @@ void update_data(jeu *world)
    regenerate_shield(&world->p2);
    increase_special(&world->p1);
    increase_special(&world->p2);
-  // move_fireball(world,&world->p1);
-   //move_fireball(world,&world->p2);
+   move_fireball(&world->p1);
+   move_fireball(&world->p2);
+   check_fireball(&world->p1,&world->p2);
+   check_fireball(&world->p2,&world->p1);
     lootbox_loop(world);
+    check_bonus(&world->p1);
+    check_bonus(&world->p2);
     
-    
-    
-    
-    
-
     movements(world, &world->p1, &world->p2);
     movements(world, &world->p2, &world->p1);
     sprites_collision(&world->p1, &world->p2, world);
