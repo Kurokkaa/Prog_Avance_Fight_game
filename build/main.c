@@ -14,7 +14,7 @@ int main(int argc, char *argv[]){
     SDL_Window* fenetre; // Déclaration de la fenêtre
     SDL_Renderer* renderer;// Déclaration du renderer
     SDL_Event events; //évenement du jeu
-    jeu world; //structure principal    
+    jeu world; //structure principal   
     init(&fenetre,&renderer,&world);
     
     refresh_graphics(renderer,&world);

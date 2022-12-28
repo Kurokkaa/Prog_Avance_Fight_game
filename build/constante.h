@@ -12,7 +12,7 @@
     #define KNOCKBACK_SPEED CELL_WIDTH * 0.1
     #define BUFFER_SIZE 60
     #define NB_COMBOS 1
-    #define RANDOM_SPAWN_CHANCE 20
+    #define RANDOM_SPAWN_CHANCE 2
     #define MAX_LIFE 100
     #define MAX_SPECIAL 300
 

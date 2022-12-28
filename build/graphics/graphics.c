@@ -51,6 +51,7 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
         case combat:
             display_map(renderer,world);
             display_dynamic_texture(renderer, world->map.map_structure, world->map.plateformes);
+            render_bonuses(renderer, &world->lootbox);
             play_animations(renderer, &(world->p1), world->p1.chara_state);
             play_animations(renderer, &(world->p2), world->p2.chara_state);
             display_life(renderer, world);
@@ -203,7 +204,21 @@ void display_dynamic_texture(SDL_Renderer* renderer, char** map_struct, SDL_Text
     }
 }
 
+void render_bonuses(SDL_Renderer * renderer, lootbox * lootbox){
+    if(lootbox->active){
+        if(lootbox->bonus == health_bonus){
+            apply_textures(lootbox->texture[health_bonus], renderer, lootbox->x, lootbox->y);
+        }
 
+        if(lootbox->bonus == damage_bonus){
+            apply_textures(lootbox->texture[damage_bonus], renderer, lootbox->x, lootbox->y);
+        }
+        
+        if(lootbox->bonus == special_bonus){
+            apply_textures(lootbox->texture[special_bonus], renderer, lootbox->x, lootbox->y);
+        }
+    }
+}
 
 void disque(int cx,int cy,int rayon,SDL_Renderer* renderer){
    int d, y, x;

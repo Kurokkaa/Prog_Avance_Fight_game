@@ -22,8 +22,7 @@ struct hit_chara_s
 
 typedef struct hit_chara_s hit;
 
-struct animation_s
-{
+struct animation_s{
     int frame;
     int nbFrame;
     int width;
@@ -117,6 +116,7 @@ typedef struct ressources_s ressources;
 
 
 struct lootbox_s{
+    SDL_Texture * texture[2];
     int x;
     int y;
     int w;

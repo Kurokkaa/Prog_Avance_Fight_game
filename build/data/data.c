@@ -153,6 +153,22 @@ void init_combo(sprite_perso *player)
     player->tab_combo[0].frame_between = 30;
 }
 
+void init_lootbox(lootbox * lootbox, SDL_Renderer * renderer){
+    srand ( time (NULL) ) ;
+    lootbox->texture[health_bonus] = load_image("build/ressources/Bonuses/Life_bonus.bmp", renderer);
+    lootbox->texture[damage_bonus] = load_image("build/ressources/Bonuses/Damage_bonus.bmp", renderer);
+    lootbox->texture[special_bonus] = load_image("build/ressources/Bonuses/Special_bonus.bmp", renderer);
+    lootbox->x = generate_number(65, 950);
+    lootbox->y = 0 - lootbox->h;
+    lootbox->h = 28;
+    lootbox->w = 18;
+    lootbox->fallspeed = 3;
+    lootbox->active = false;
+    lootbox->collided = 0;
+    lootbox->falling = false;
+    lootbox->bonus = generate_number(health_bonus, special_bonus);
+}
+
 void init(SDL_Window **window, SDL_Renderer **renderer, jeu *world)
 {
     if (SDL_Init(SDL_INIT_EVERYTHING) == -1)
@@ -1067,6 +1083,7 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                         world->keystates_pre[i] = 0;
                     }
                     init_combo(&world->p1);
+                    init_lootbox(&world->lootbox,renderer);
                     // check_game(world); //???
                 }
             }
@@ -1379,43 +1396,45 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
  * GESTION DES LOOTBOX
  */
 
-int generate_number(int a, int b)
-{
+int generate_number(int a, int b){
+    srand ( time (NULL) ) ;
     return rand() % (b - a) + a;
 }
 
-void init_lootbox(jeu *world)
-{
-    world->lootbox.x = generate_number(CELL_WIDTH + 1, SCREEN_WIDTH - CELL_WIDTH - 1);
-    world->lootbox.y = 0 - world->lootbox.h;
-    world->lootbox.h = CELL_HEIGHT;
-    world->lootbox.w = CELL_WIDTH;
-    world->lootbox.fallspeed = -10;
-    world->lootbox.active = true;
-    world->lootbox.collided = 0;
-    world->lootbox.falling = true;
-    world->lootbox.bonus = generate_number(health_bonus, special_bonus);
+void reset_activate_lootbox(lootbox * lootbox){
+    lootbox->active = true;
+    lootbox->falling = true;
+    lootbox->x = generate_number(65, 950);
+    lootbox->y = 0 - lootbox->h;
+    lootbox->collided = 0;
+    lootbox->bonus = generate_number(health_bonus, 1);
 }
 
-void update_lootbox(jeu *world)
-{
+void update_lootbox(jeu * world){
     if (world->lootbox.falling)
     {
-        if (equals(world->lootbox.x + world->lootbox.fallspeed, world->lootbox.y + world->lootbox.h, world->map.map_structure, ' ') || world->lootbox.y < CELL_HEIGHT + 1)
-        {
+        if ((equals(world->lootbox.x + world->lootbox.w / 2, world->lootbox.y + world->lootbox.h + world->lootbox.fallspeed, world->map.map_structure, ' ') || world->lootbox.y < CELL_HEIGHT + 20) && world->lootbox.y < 701 ){
             world->lootbox.y += world->lootbox.fallspeed;
         }
-        else
-        {
+        else{
             world->lootbox.falling = false;
         }
     }
 }
 
-void check_lootbox_pickup(sprite_perso *player, lootbox *lootbox, int player_number)
-{
-    if (lootbox->active)
-    {
+void check_lootbox_pickup(sprite_perso *player, lootbox *lootbox, int player_number){
+    int collision_x = lootbox->x - player->x;
+    int collision_y = lootbox->y - player->y - player->h;
+    int distance = sqrt(collision_x * collision_x + collision_y * collision_y);
+    if (distance < player->w && lootbox->active){ 
+        if (lootbox->collided != 0){
+            lootbox->collided = 3;
+        }
+        else{
+            lootbox->collided = player_number;
+        }
+    }
+    /*if (lootbox->active){
         int *yAxis = (int *)malloc(sizeof(int) * 2);
         yAxis[0] = player->y;
         yAxis[1] = player->y - player->h;
@@ -1453,14 +1472,12 @@ void check_lootbox_pickup(sprite_perso *player, lootbox *lootbox, int player_num
                 }
             }
         }
-    }
+    }*/
 }
 
-void apply_bonus(jeu *world, sprite_perso *player)
-{
+void apply_bonus(lootbox * lootbox, sprite_perso *player){
     int x = 50;
-    if (world->lootbox.bonus == health_bonus)
-    {
+    if (lootbox->bonus == health_bonus){
         player->life += x;
         if (player->life > MAX_LIFE)
         {
@@ -1468,16 +1485,13 @@ void apply_bonus(jeu *world, sprite_perso *player)
         }
     }
 
-    if (world->lootbox.bonus == damage_bonus)
-    {
+    if (lootbox->bonus == damage_bonus){
         player->damage_bonus = true;
     }
 
-    if (world->lootbox.bonus == special_bonus)
-    {
+    if (lootbox->bonus == special_bonus){
         player->special_bar += x;
-        if (player->special_bar > MAX_SPECIAL)
-        {
+        if (player->special_bar > MAX_SPECIAL){
             player->special_bar = MAX_SPECIAL;
         }
     }
@@ -1488,41 +1502,61 @@ void apply_bonus(jeu *world, sprite_perso *player)
  *
  * @param world structure contenant les données du monde
  */
-void lootbox_loop(jeu *world)
-{
-    if (world->lootbox.active == 0)
-    { // On ne fait pas apparaitre de lootbox s'il y en a déjà une
+void lootbox_loop(jeu *world){
+    printf("Lootbox:\n");
+    printf("x: %d\n", world->lootbox.x);
+    printf("y: %d\n", world->lootbox.y);
+    printf("Active: %d\n", world->lootbox.active);
+    printf("Falling: %d\n", world->lootbox.falling);
+    if (world->lootbox.active == 0){ // On ne fait pas apparaitre de lootbox s'il y en a déjà une
         int n = generate_number(0, RANDOM_SPAWN_CHANCE);
-        if (n == 1)
-        {                                    // Si la fonction renvoie 1, alors on créé une lootbox
-            init_lootbox(&(world->lootbox)); // place la lootbox de manière semi-aléatoire sur l'axe x
+        if (n == 1){  // Si la fonction renvoie 1, alors on créé une lootbox
+            reset_activate_lootbox(&world->lootbox); // place la lootbox de manière semi-aléatoire sur l'axe x
         }
     }
 
-    if (world->lootbox.active == 1)
-    {                                                         // Cas où une lootbox est active
+    if (world->lootbox.active == 1){  // Cas où une lootbox est active
         update_lootbox(world);                                // mouvement de la lootbox
         check_lootbox_pickup(&world->p1, &world->lootbox, 1); // vérifie si le joueur 1 a ramassé la lootbox
         check_lootbox_pickup(&world->p2, &world->lootbox, 2); // vérifie si le joueur 2 a ramassé la lootbox
     }
 
-    if (world->lootbox.collided == 1)
-    {
-        apply_bonus(&world, &world->p1);
+    if (world->lootbox.collided == 1){
+        apply_bonus(&world->lootbox, &world->p1);
         world->lootbox.active = false;
     }
 
-    if (world->lootbox.collided == 2)
-    {
-        apply_bonus(&world, &world->p2);
+    if (world->lootbox.collided == 2){
+        apply_bonus(&world->lootbox, &world->p2);
         world->lootbox.active = false;
     }
 
-    if (world->lootbox.collided == 3)
-    {
-        apply_bonus(&world, &world->p1);
-        apply_bonus(&world, &world->p2);
+    if (world->lootbox.collided == 3){
+        apply_bonus(&world->lootbox, &world->p1);
+        apply_bonus(&world->lootbox, &world->p2);
         world->lootbox.active = false;
+    }
+}
+
+void compute_game(jeu *world){
+    if(world->timer.timer == 0){
+        if(world->p1.life > world->p2.life){
+            printf("Victoire P1\n");
+        }
+        if(world->p1.life < world->p2.life){
+            printf("Victoire P2\n");
+        }
+        else{
+            printf("Egalité\n");
+        }
+    }
+
+    if(world->p1.life <= 0){
+        printf("Victoire P2\n");
+    }
+
+    if(world->p2.life <= 0){
+        printf("Victoire P1\n");
     }
 }
 
@@ -1548,7 +1582,7 @@ void update_data(jeu *world)
     int i, j;
 
     read_combo(&world->p1, 0);
-
+    lootbox_loop(world);
     movements(world, &world->p1, &world->p2);
     movements(world, &world->p2, &world->p1);
     sprites_collision(&world->p1, &world->p2, world);
@@ -1557,4 +1591,5 @@ void update_data(jeu *world)
     world->timestamp_w++;
 
     check_timer(world);
+    compute_game(world);
 }

@@ -37,7 +37,7 @@ void movements(jeu* world, sprite_perso* perso, sprite_perso* adversaire);
 bool equals(int x, int y, char** map_point, char test);
 void light_punch(sprite_perso* attacker, sprite_perso* receiver);
 void heavy_punch(sprite_perso *attacker, sprite_perso *receiver);
-void reset_hit(sprite_perso* perso);
+//void reset_hit(sprite_perso* perso); /* A ENLEVER???*/
 void change_directions(sprite_perso * p1, sprite_perso * p2);
 bool canMove(sprite_perso * perso, sprite_perso * adversaire);
 void sprites_collision(sprite_perso * p1, sprite_perso * p2, jeu * world);
@@ -55,11 +55,12 @@ void gameplay_inputs(SDL_Event *event, jeu *world);
 
 /*FONCTION POUR LES LOOTBOXES*/
 int generate_number (int a, int b);
-void init_lootbox(jeu * world);
+void init_lootbox(lootbox * lootbox, SDL_Renderer * renderer);
+
 void update_lootbox(jeu * world);
 void check_lootbox_pickup(sprite_perso * player, lootbox * lootbox, int player_number);
-void apply_bonus(jeu *world, sprite_perso * player);
-void lootbox_loop(jeu * world);
+void apply_bonus(lootbox * lootbox, sprite_perso *player);
+void lootbox_loop(jeu *world);
 
 
 

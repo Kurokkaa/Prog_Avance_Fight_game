@@ -22,5 +22,5 @@ file(GLOB SOURCES
 )
 
 add_executable(main ${SOURCES})
-
+target_link_libraries(${PROJECT_NAME} m)
 target_link_libraries(main ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARIES} ${SDL2_TTF_LIBRARIES} ${SDL2_MIXER_LIBRARIES})
