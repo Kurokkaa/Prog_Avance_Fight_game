@@ -15,6 +15,7 @@ int main(int argc, char *argv[]){
     SDL_Renderer* renderer;// Déclaration du renderer
     SDL_Event events; //évenement du jeu
     jeu world; //structure principal   
+   
     init(&fenetre,&renderer,&world);
     
     refresh_graphics(renderer,&world);
@@ -33,6 +34,6 @@ int main(int argc, char *argv[]){
     }
 
     // Quitter SDL
-    //quit_game(&world,&fenetre,&renderer);
+    quit_game(&world,&fenetre,&renderer);
     return 0;
 }

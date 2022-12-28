@@ -55,7 +55,8 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
             play_animations(renderer, &(world->p1), world->p1.chara_state);
             play_animations(renderer, &(world->p2), world->p2.chara_state);
             display_life(renderer, world);
-            
+            display_fireball(renderer,world->p1);
+            display_fireball(renderer,world->p2);
             char* compteur = malloc(sizeof(char)*3);
             sprintf(compteur, "%d",world->timer.timer);
 
@@ -74,7 +75,8 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
             SDL_Surface* surface_compteur = TTF_RenderText_Solid(world->font.police_compteur, compteur, color);
             SDL_Texture* texture_compteur = SDL_CreateTextureFromSurface(renderer,surface_compteur);
             apply_textures(texture_compteur,renderer,620, -5);
-
+            free(surface_compteur);
+            display_special(renderer,world);
             if(world->p1.guard){
                 display_guard(renderer,world->p1);
             }
@@ -101,6 +103,86 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
         //apply_texture(world->p1.texture_perso, renderer, world->p1.x , world->p1.y);
         SDL_RenderPresent(renderer);
 }
+
+void display_fireball(SDL_Renderer* renderer,sprite_perso perso){
+   if(perso.fireball.launched_fireball){
+        apply_textures(perso.fireball.fireball,renderer,perso.x+perso.w,perso.y);
+    }
+}
+char* barlvl(sprite_perso perso){
+     char* lvl;
+     if(perso.special_bar>=0){
+        lvl = "0";
+    }
+    if(perso.special_bar>=100){
+        lvl = "1";
+    }
+    if(perso.special_bar>=200){
+        lvl =  "2";
+    }
+    if(perso.special_bar>=300){
+        lvl = "3";
+    }
+    return lvl;
+}
+void display_special(SDL_Renderer* renderer, jeu* world){
+    char* lvlP1 = barlvl(world->p1);
+    char* lvlP2 = barlvl(world->p2);
+    
+    SDL_Rect rect;
+    SDL_Rect rect_fond;
+    rect.x = 500 ;
+    rect.y = 80;
+    rect.h = 30;
+
+    rect_fond.x = 500 ;
+    rect_fond.h = 30;
+    rect_fond.y = 80;
+    rect_fond.w = -500;
+
+    if(world->p1.special_bar < 300){
+        rect.w = (world->p1.special_bar % 100) * -5;
+    }
+    else{
+        rect.w = -500;
+    }
+    SDL_Color color = {255,0,0};
+    SDL_Surface* lvl1 = TTF_RenderText_Solid(world->font.police_compteur,lvlP1 , color);
+    SDL_Texture* texture_lvl1 = SDL_CreateTextureFromSurface(renderer,lvl1);
+    apply_textures(texture_lvl1,renderer,520, 75);
+    SDL_Surface* lvl2 = TTF_RenderText_Solid(world->font.police_compteur,lvlP2 , color);
+    SDL_Texture* texture_lvl2 = SDL_CreateTextureFromSurface(renderer,lvl2);
+    apply_textures(texture_lvl2,renderer,750, 75);
+    
+    //free(surface_compteur);
+    SDL_Rect rect2;
+    SDL_Rect rect_fond2;
+    rect2.x = SCREEN_WIDTH - 500 ;
+    rect2.y = 80;
+    rect2.h = 30;
+    
+    
+    rect_fond2.x = SCREEN_WIDTH - 500;
+    rect_fond2.h = 30;
+    rect_fond2.y = 80;
+    rect_fond2.w =  500 ;
+
+    if(world->p2.special_bar <300){
+        rect2.w = (world->p2.special_bar %100) * 5 ;
+    }
+    else{
+        rect2.w = 500;
+    }
+     /*RENDERING*/
+    SDL_SetRenderDrawColor(renderer, 255, 20 , 15, 1);
+    SDL_RenderFillRect(renderer, &rect_fond);
+    SDL_RenderFillRect(renderer, &rect_fond2);
+
+    SDL_SetRenderDrawColor(renderer, 255, 179 , 92, 1);
+    SDL_SetRenderDrawColor(renderer, 0, 190, 25, 0);
+    SDL_RenderFillRect(renderer, &rect);
+    SDL_RenderFillRect(renderer, &rect2);
+}
 void display_guard(SDL_Renderer* renderer,sprite_perso perso){
    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
     if(perso.life_guard >0){
@@ -112,7 +194,7 @@ void display_guard(SDL_Renderer* renderer,sprite_perso perso){
     if(perso.life_guard >=50){
         SDL_SetRenderDrawColor(renderer,0,255,0,50);
     }
-    disque(perso.x+perso.w/3,perso.y+perso.h/2,perso.life_guard*2,renderer);
+    disque(perso.x+perso.w - 20 ,perso.y+perso.h/2,perso.life_guard*1.5,renderer);
 }
 void display_life(SDL_Renderer* renderer, jeu* world){
     /*VIE JOUEUR 1*/
@@ -206,17 +288,7 @@ void display_dynamic_texture(SDL_Renderer* renderer, char** map_struct, SDL_Text
 
 void render_bonuses(SDL_Renderer * renderer, lootbox * lootbox){
     if(lootbox->active){
-        if(lootbox->bonus == health_bonus){
-            apply_textures(lootbox->texture[health_bonus], renderer, lootbox->x, lootbox->y);
-        }
-
-        if(lootbox->bonus == damage_bonus){
-            apply_textures(lootbox->texture[damage_bonus], renderer, lootbox->x, lootbox->y);
-        }
-        
-        if(lootbox->bonus == special_bonus){
-            apply_textures(lootbox->texture[special_bonus], renderer, lootbox->x, lootbox->y);
-        }
+        apply_textures(lootbox->texture[lootbox->bonus],renderer,lootbox->x,lootbox->y);
     }
 }
 

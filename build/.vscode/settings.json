@@ -6,6 +6,7 @@
         "sdl_image.h": "c",
         "structure.h": "c",
         "sdl_ttf.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "data.h": "c"
     }
 }

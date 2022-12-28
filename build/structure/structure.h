@@ -7,6 +7,7 @@
 #include "../constante.h"
 #include "../map/map_global.h"
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_mixer.h>
 
 struct hit_chara_s
 {
@@ -54,6 +55,7 @@ struct combos_s
     enum combos_inputs input[10];
     int frame_between;
     int nb_coups;
+    int required;
 };
 
 typedef struct combos_s combo;
@@ -65,9 +67,17 @@ struct compteur_s{
     int timer; 
 };
 typedef struct compteur_s compteur;
+
+struct throwable_s
+{
+    SDL_Texture * fireball;
+    bool launched_fireball;
+    int x;
+    int y;
+};
+typedef struct throwable_s throwable;
 struct sprite_p{
     int perso_choisi; 
-    SDL_Texture * texture_perso;
     int x;
     int y;
     int w; /*!<largeur du sprite */
@@ -94,6 +104,8 @@ struct sprite_p{
     int bonus_timer;
     int special_bar;
     compteur chrono_guard;
+    compteur chrono_special;
+    throwable fireball;
 };
 
 typedef struct sprite_p sprite_perso;
@@ -116,7 +128,7 @@ typedef struct ressources_s ressources;
 
 
 struct lootbox_s{
-    SDL_Texture * texture[2];
+    SDL_Texture * texture[3];
     int x;
     int y;
     int w;
@@ -128,7 +140,16 @@ struct lootbox_s{
     bool falling;
 };
 typedef struct lootbox_s lootbox;
-
+struct Sound_s{
+    Mix_Chunk* menu;
+    Mix_Chunk* light_punch;
+    Mix_Chunk* heavy_punch;
+    Mix_Chunk* kick;
+    Mix_Chunk* fireball;
+    Mix_Chunk* frappe;
+    Mix_Chunk* change;;
+};
+typedef struct Sound_s Sound;
 struct world_s{
     enum game_state state;
     enum game_map choosed_map;
@@ -143,6 +164,7 @@ struct world_s{
     ressources font;
     compteur timer;
     lootbox lootbox;
+    Sound music;
 };
 
 typedef struct world_s jeu;
