@@ -32,7 +32,6 @@ int main(int argc, char *argv[]){
         refresh_graphics(renderer,&world);
         SDL_Delay(10);
     }
-
     // Quitter SDL
     quit_game(&world,&fenetre,&renderer);
     return 0;

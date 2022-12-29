@@ -119,8 +119,7 @@ void init_perso(SDL_Renderer *renderer, sprite_perso *perso, int x, int y, int w
     perso->fireball.fireball = load_image("./build/ressources/Characters/Chara1/fireball.bmp",renderer);
     perso->fireball.launched_fireball = false;
     perso->buffer = malloc(sizeof(inputs) * BUFFER_SIZE);
-    for (int i = 0; i < BUFFER_SIZE; i++)
-    {
+    for (int i = 0; i < BUFFER_SIZE; i++){
         perso->buffer[i].input = 0;
         perso->buffer[i].timestamp = 0;
         perso->pos_tab_combo = 0;
@@ -627,37 +626,30 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
         }
     }
 
-    if (perso->chara_state == knockback)
-    {
-        if (!perso->mirror)
-        {
-            if (!equals(x - perso->speed, y + perso->h, world->map.map_structure, '0'))
-            {
-                perso->x -= perso->speed;
-            }
+    if (perso->chara_state == knockback){
+        if (!perso->mirror){
+            perso->x -= perso->speed;
         }
-        else
-        {
-            if (!equals(x + perso->speed, y + perso->h, world->map.map_structure, '0'))
-            {
-                perso->x += perso->speed;
-            }
+
+        else{
+            perso->x += perso->speed;
         }
-        if (perso->anim[knockback].counter == 2)
-        {
+
+        if (perso->anim[knockback].counter == 2){
             perso->anim[knockback].frame++;
             if (perso->anim[knockback].frame >= perso->anim[knockback].nbFrame)
             {
-                perso->chara_state = idle;
+                perso->chara_state = fall;
                 perso->anim[knockback].frame = 0;
             }
             perso->anim[knockback].counter = 0;
         }
-        else
-        {
+
+        else{
             perso->anim[knockback].counter++;
         }
     }
+
     if (perso->chara_state == lpunch)
     {
         if (perso->anim[lpunch].counter == 2)
@@ -747,8 +739,7 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
                 perso->anim[stun].counter++;
             }
         }
-        else
-        {
+        else{
             if (perso->broken_guard)
             {
                 perso->broken_guard = false;
@@ -761,7 +752,16 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
     if(perso->chara_state == fireball){
         perso->fireball.launched_fireball = true;
         perso->chara_state = idle;
+    }
+}
 
+void reset_knockback(sprite_perso * p1, sprite_perso * p2){ // résout le soucis où les deux personnages sont knockbacks et ne peuvent pas reculer
+    int counter = 0 ;
+    if(p1->chara_state == knockback){
+        counter++;
+    }
+    if(counter > 5){
+        printf("ERREUR Knockback\n");
     }
 }
 
@@ -1006,30 +1006,28 @@ bool canMove(sprite_perso *perso, sprite_perso *adversaire)
     return canMove;
 }
 
-void sprites_collision(sprite_perso *p1, sprite_perso *p2, jeu *world)
-{ // Cas où les deux sprites sont superposés (suite à par ex un saut), un choc se produit et ils reculent tout les deux si possibles
-    int *yAxis = (int *)malloc(sizeof(int) * 2);
-    yAxis[0] = p1->y;
-    yAxis[1] = p1->y - p1->h;
-    if (!p1->mirror && p2->mirror)
-    {
-        if (yAxis[0] >= p2->y && yAxis[1] <= p2->y - p2->h)
-        {
-            if (p1->x + p1->w >= p2->x && p1->backwards != 1)
-            {
-                p1->chara_state = knockback;
-                p2->chara_state = knockback;
+void sprites_collision(sprite_perso *p1, sprite_perso *p2, jeu *world){ // Cas où les deux sprites sont superposés (suite à par ex un saut), un choc se produit et ils reculent tout les deux si possibles
+    int tete = p1->y;
+    int pieds = p1->y - p1->h;
+    if (tete >= p2->y && pieds <= p2->y - p2->h){
+        if (!p1->mirror && p2->mirror){
+            if (p1->x + p1->w >= p2->x && p1->backwards != 1){
+                if (!equals(p1->x - p1->speed, p1->y + p1->h, world->map.map_structure, '0')){
+                    p1->chara_state = knockback;
+                }
+                else{
+                    p1->chara_state = fall;
+                }
             }
         }
-    }
-    else
-    {
-        if (yAxis[0] >= p2->y && yAxis[1] <= p2->y - p2->h)
-        {
-            if (p1->x <= p2->x + p2->w && p1->backwards == 1)
-            {
-                p1->chara_state = knockback;
-                p2->chara_state = knockback;
+        else{
+            if (p1->x <= p2->x + p2->w && p1->backwards == 1){
+                if (!equals(p1->x + p1->speed, p1->y + p1->h, world->map.map_structure, '0')){
+                    p1->chara_state = knockback;
+                }
+                else{
+                    p1->chara_state = fall;
+                }
             }
         }
     }
@@ -1670,7 +1668,7 @@ void reset_activate_lootbox(lootbox * lootbox){
 void update_lootbox(jeu * world){
     if (world->lootbox.falling)
     {
-        if ((equals(world->lootbox.x + world->lootbox.w / 2, world->lootbox.y + world->lootbox.h + world->lootbox.fallspeed, world->map.map_structure, ' ') || world->lootbox.y < CELL_HEIGHT + 20) && world->lootbox.y < 701 ){
+        if ((equals(world->lootbox.x + world->lootbox.w / 2, world->lootbox.y + world->lootbox.h + world->lootbox.fallspeed, world->map.map_structure, ' ') || world->lootbox.y < CELL_HEIGHT + 20) && world->lootbox.y < 667 ){
             world->lootbox.y += world->lootbox.fallspeed;
         }
         else{
@@ -1680,7 +1678,7 @@ void update_lootbox(jeu * world){
 }
 
 void check_lootbox_pickup(sprite_perso *player, lootbox *lootbox, int player_number){
-    int collision_x = lootbox->x - player->x;
+    /*int collision_x = lootbox->x - player->x;
     int collision_y = lootbox->y - player->y - player->h;
     int distance = sqrt(collision_x * collision_x + collision_y * collision_y);
     if (distance < player->w && lootbox->active){ 
@@ -1692,46 +1690,22 @@ void check_lootbox_pickup(sprite_perso *player, lootbox *lootbox, int player_num
         }
         lootbox->active=false;
         lootbox->falling=false;
-    }
-    /*if (lootbox->active){
-        int *yAxis = (int *)malloc(sizeof(int) * 2);
-        yAxis[0] = player->y;
-        yAxis[1] = player->y - player->h;
-        if (!player->mirror)
-        {
-            if (yAxis[0] >= lootbox->y && yAxis[1] <= lootbox->y - lootbox->h)
-            {
-                if (player->x + player->w >= lootbox->x && player->backwards != 1)
-                {
-                    if (lootbox->collided != 0)
-                    {
-                        lootbox->collided = 3;
-                    }
-                    else
-                    {
-                        lootbox->collided = player_number;
-                    }
-                }
-            }
-        }
-        else
-        {
-            if (yAxis[0] >= lootbox->y && yAxis[1] <= lootbox->y - lootbox->h)
-            {
-                if (player->x <= lootbox->x + lootbox->w && player->backwards == 1)
-                {
-                    if (lootbox->collided != 0)
-                    {
-                        lootbox->collided = 3;
-                    }
-                    else
-                    {
-                        lootbox->collided = player_number;
-                    }
-                }
-            }
-        }
     }*/
+    if (lootbox->active){
+        int pieds = player->y;
+        int tete = player->y - player->h; 
+
+        if (tete >= lootbox->y ){
+                if (player->x + player->w >= lootbox->x && player->x <= lootbox->x + lootbox->w){
+                    if (lootbox->collided != 0){
+                        lootbox->collided = 3;
+                    }
+                    else{
+                        lootbox->collided = player_number;
+                    }
+                }
+        }
+    }
 }
 
 void apply_bonus(lootbox * lootbox, sprite_perso *player){
@@ -2000,9 +1974,11 @@ void update_data(jeu *world)
     sprites_collision(&world->p2, &world->p1, world);
     change_directions(&world->p1, &world->p2);
     world->timestamp_w++;
-
     check_timer(world);
     check_stats(&world->p1);
     check_stats(&world->p2);
     compute_game(world);
+    printf("STATE p1: %d\n", world->p1.chara_state);
+    printf("STATE p2: %d\n", world->p2.chara_state);
+    SDL_Delay(5);
 }
