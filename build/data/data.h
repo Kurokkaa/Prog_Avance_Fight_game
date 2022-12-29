@@ -4,6 +4,8 @@
 
 #include "../structure/structure.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 #include "../constante.h"
 #include "../graphics/graphics.h"
 #include "SDL2/SDL.h"
@@ -13,6 +15,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_mixer.h>
 #include "sys/stat.h"
+
 /*FONCTIONS D'INITIALISATION*/
 void init_controller(jeu* world);
 void init_map(jeu* world,SDL_Renderer* renderer);

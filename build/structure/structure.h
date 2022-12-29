@@ -77,6 +77,7 @@ struct throwable_s
     int multiplicateur;
 };
 typedef struct throwable_s throwable;
+
 struct sprite_p{
     int perso_choisi; 
     int x;
@@ -154,6 +155,7 @@ struct Sound_s{
     bool menuPlayed;
 };
 typedef struct Sound_s Sound;
+
 struct world_s{
     enum game_state state;
     enum game_map choosed_map;
@@ -171,7 +173,6 @@ struct world_s{
     Sound music;
     bool game_over;
 };
-
 typedef struct world_s jeu;
 
 #endif

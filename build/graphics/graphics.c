@@ -210,7 +210,7 @@ void display_life(SDL_Renderer* renderer, jeu* world){
     rect_fond.w = -500;
 
     if(world->p1.life >= 0){
-        rect.w = world->p1.life * -5;
+        rect.w = world->p1.life * -500 / MAX_LIFE;
     }
     else{
         rect.w = 0;
@@ -230,7 +230,7 @@ void display_life(SDL_Renderer* renderer, jeu* world){
     rect_fond2.w =  500 ;
 
     if(world->p2.life >= 0){
-        rect2.w = world->p2.life * 5 ;
+        rect2.w = world->p2.life * 500 / MAX_LIFE ;
     }
     else{
         rect2.w = 0;

@@ -107,10 +107,10 @@ void init_perso(SDL_Renderer *renderer, sprite_perso *perso, int x, int y, int w
     perso->backwards = false;
     perso->jump_origin = y;
     perso->mirror = mirror;
-    perso->life = 100;
+    perso->life = MAX_LIFE;
     perso->attack_launched = false;
     perso->guard = false;
-    perso->life_guard = 100;
+    perso->life_guard = MAX_GUARD;
     perso->damage_bonus = false;
     init_hits(perso);
     init_combos(perso);
@@ -1049,27 +1049,43 @@ void add_input_buffer(sprite_perso *player, enum combos_inputs touche_appui, int
     player->buffer[player->pos_tab_combo].input = touche_appui;
     player->buffer[player->pos_tab_combo++].timestamp = timestamp;
 }
+
+
 void free_hits(sprite_perso* perso){
-    
+
     free(perso->buffer);
     free(perso->hits.light_punch);
     free(perso->hits.heavy_punch);
     free(perso->hits.kick);
 }
+
+void free_music(jeu * world){
+    Mix_FreeChunk(world->music.menu);
+    Mix_FreeChunk(world->music.light_punch);
+    Mix_FreeChunk(world->music.heavy_punch);
+    Mix_FreeChunk(world->music.kick);
+    Mix_FreeChunk(world->music.fireball);
+    Mix_FreeChunk(world->music.frappe);
+    Mix_FreeChunk(world->music.change);
+    Mix_FreeChunk(world->music.guard);
+}
+
 /*FONCTIONS DE LIBERATION ESPACE*/
 void quit_game(jeu *world, SDL_Window **fenetre, SDL_Renderer **renderer)
 {
-    SDL_DestroyWindow(*fenetre);
-    SDL_DestroyRenderer(*renderer);
     free_hits(&world->p1);
     free_hits(&world->p2);
     destroy_textures(world);
     free_map_structure(world->map.map_structure);
+    free_music(world);
     TTF_CloseFont(world->font.police_compteur);
     close_Joystick(world->joysticks);
     TTF_Quit();
     Mix_CloseAudio();
+
     IMG_Quit();
+    SDL_DestroyWindow(*fenetre);
+    SDL_DestroyRenderer(*renderer);
     SDL_Quit();
 }
 
@@ -1094,9 +1110,8 @@ void free_map_structure(char **map_structure)
     }
     free(map_structure);
 }
-void destroy_anim(sprite_perso* perso){
-   
 
+void destroy_anim(sprite_perso* perso){
     SDL_DestroyTexture(perso->anim[idle].anim_text);
     SDL_DestroyTexture(perso->anim[walk].anim_text);
     SDL_DestroyTexture(perso->anim[jump].anim_text);
@@ -1111,22 +1126,26 @@ void destroy_anim(sprite_perso* perso){
     SDL_DestroyTexture(perso->anim[lpunch].anim_text);
     SDL_DestroyTexture(perso->anim[kickstate].anim_text);
     SDL_DestroyTexture(perso->anim[hpunch].anim_text);
+    SDL_DestroyTexture(perso->anim[stun].anim_text);
     SDL_DestroyTexture(perso->fireball.fireball);
 }
+
 void destroy_map(jeu* world){
     SDL_DestroyTexture(world->menu_set.tab_map[0]);
     SDL_DestroyTexture(world->menu_set.tab_map[1]);
     SDL_DestroyTexture(world->menu_set.tab_map[2]);
 }
-void destroy_textures(jeu *world)
-{
+
+void destroy_textures(jeu *world){
    SDL_DestroyTexture(world->menu_set.menu_fond);
    destroy_anim(&world->p1);
    destroy_anim(&world->p2);
    SDL_DestroyTexture(world->map.image_fond);
    SDL_DestroyTexture(world->map.plateformes);
+   for(int i = 0; i < special_bonus; i++){
+    SDL_DestroyTexture(world->lootbox.texture[i]);
+   }
    destroy_map(world);
-
 }
 
 void unpause(compteur* chrono){
@@ -1177,8 +1196,8 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                 if (world->state != selection_map)
                 
                 {  
-                     Mix_PlayChannel(1,world->music.menu,-1);
-                     Mix_PlayChannel(0,world->music.change,1);
+                    /* Mix_PlayChannel(1,world->music.menu,-1);
+                     Mix_PlayChannel(0,world->music.change,1);*/
                     world->menu_set.index_menu--;
                     if (world->menu_set.index_menu < 0)
                     {
@@ -1232,7 +1251,6 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                     {
                     case 0:
                         world->menu_set.index_menu = 0;
-                        free(world->menu_set.menu_fond);
                         world->menu_set.menu_fond = load_image("build/ressources/menu/selection_map.png", renderer);
                         world->state = selection_map;
                         init_miniature(world, renderer);
@@ -1259,6 +1277,7 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                         world->choosed_map = street_art;
                         break;
                     }
+                    
                     init_map(world, renderer);
                     init_perso(renderer, &world->p1, 65, 465, 100, 230, CHARA_SPEED, false);
                     init_perso(renderer, &world->p2, 950, 465, 100, 230, CHARA_SPEED, true);
@@ -1279,7 +1298,6 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                     
                     init_lootbox(&world->lootbox,renderer);
                     Mix_Volume(1,0);
-                    // check_game(world); //???
                 }
             }
             if (world->state != combat)
@@ -1637,7 +1655,7 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
  */
 
 int generate_number(int a, int b){
-     srand ( time (NULL) ) ;
+    srand( time (NULL) );
     return rand() % (b - a) + a;
 }
 
@@ -1647,7 +1665,7 @@ void reset_activate_lootbox(lootbox * lootbox){
     lootbox->x = generate_number(65, 950);
     lootbox->y = 0 - lootbox->h;
     lootbox->collided = 0;
-    lootbox->bonus = generate_number(health_bonus,special_bonus+1);
+    lootbox->bonus = special_bonus;
 }
 void update_lootbox(jeu * world){
     if (world->lootbox.falling)
@@ -1720,24 +1738,17 @@ void apply_bonus(lootbox * lootbox, sprite_perso *player){
     int x = 50;
     if (lootbox->bonus == health_bonus){
         player->life += x;
-        if (player->life > MAX_LIFE)
-        {
-            player->life = MAX_LIFE;
-        }
     }
 
     if (lootbox->bonus == damage_bonus){
         player->damage_bonus = true;
-        player->dmg_bonus_timer.start =true;
+        player->dmg_bonus_timer.start = true;
         player->dmg_bonus_timer.startTime = SDL_GetTicks();
         player->dmg_bonus_timer.pause = false;
     }
 
     if (lootbox->bonus == special_bonus){
         player->special_bar += x;
-        if (player->special_bar > MAX_SPECIAL){
-            player->special_bar = MAX_SPECIAL;
-        }
     }
 }
 
@@ -1761,24 +1772,26 @@ void lootbox_loop(jeu *world){
         update_lootbox(world);                                // mouvement de la lootbox
         check_lootbox_pickup(&world->p1, &world->lootbox, 1); // vérifie si le joueur 1 a ramassé la lootbox
         check_lootbox_pickup(&world->p2, &world->lootbox, 2); // vérifie si le joueur 2 a ramassé la lootbox
-    }
+    
 
-    if (world->lootbox.collided == 1){
-        apply_bonus(&world->lootbox, &world->p1);
-        world->lootbox.active = false;
-    }
+        if (world->lootbox.collided == 1){
+            apply_bonus(&world->lootbox, &world->p1);
+            world->lootbox.active = false;
+        }
 
-    if (world->lootbox.collided == 2){
-        apply_bonus(&world->lootbox, &world->p2);
-        world->lootbox.active = false;
-    }
+        if (world->lootbox.collided == 2){
+            apply_bonus(&world->lootbox, &world->p2);
+            world->lootbox.active = false;
+        }
 
-    if (world->lootbox.collided == 3){
-        apply_bonus(&world->lootbox, &world->p1);
-        apply_bonus(&world->lootbox, &world->p2);
-        world->lootbox.active = false;
+        if (world->lootbox.collided == 3){
+            apply_bonus(&world->lootbox, &world->p1);
+            apply_bonus(&world->lootbox, &world->p2);
+            world->lootbox.active = false;
+        }
     }
 }
+
 void regenerate_shield(sprite_perso* perso){
      if (!perso->chrono_guard.pause && !perso->broken_guard && (SDL_GetTicks() - perso->chrono_guard.startTime) / 1000 >= 1 && perso->life_guard < 100 && !perso->guard)
     {
@@ -1879,6 +1892,23 @@ void save_victory(int player){
     fclose(file);
     write_victory(nb1,nb2);
 }
+
+void check_stats(sprite_perso * perso){
+    if(perso->life > MAX_LIFE){
+        perso->life = MAX_LIFE;
+    }
+    
+    if(perso->special_bar > MAX_SPECIAL){
+        perso->special_bar = MAX_SPECIAL;
+    }
+
+    if(perso->life_guard <= 0){
+        perso->broken_guard = true;
+        perso->chara_state = stun;
+        perso->stun_time = BROKEN_GUARD_STUN;
+    }
+}
+
 void compute_game(jeu *world){
    if(!world->game_over){
         if(world->timer.timer == 0){
@@ -1908,7 +1938,6 @@ void compute_game(jeu *world){
 
 
 void move_fireball(sprite_perso* perso){
-    
     if(perso->fireball.launched_fireball){
         perso->fireball.x +=10*perso->fireball.multiplicateur;
         
@@ -1973,5 +2002,7 @@ void update_data(jeu *world)
     world->timestamp_w++;
 
     check_timer(world);
+    check_stats(&world->p1);
+    check_stats(&world->p2);
     compute_game(world);
 }
