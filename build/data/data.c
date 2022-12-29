@@ -1809,9 +1809,9 @@ int numDigits (int n) {
     return r;
 }
 void write_victory(int nb1,int nb2){
-    char* new_score[7+numDigits(nb1)+numDigits(nb2)];
+    char new_score[8+numDigits(nb1)+numDigits(nb2)];
     FILE* file = fopen("build/victory.txt","w");
-    sprintf(new_score,"p1:%d\np2:%d",nb1,nb2);
+    sprintf(new_score,"p1:%d\np2:%dn",nb1,nb2);
     fwrite(new_score,7+numDigits(nb1)+numDigits(nb2),1,file);
     fclose(file);
     
@@ -1828,8 +1828,8 @@ void save_victory(int player){
     
     int line=1;
     int size;
-    int nb1;
-    int nb2;
+    int nb1=0;
+    int nb2=0;
     int i,j;
     for( i = 0 ;i<sz;i++){
         
@@ -1843,16 +1843,21 @@ void save_victory(int player){
         while(text_file[i+size+1]!='\n'){
             size++;
         }
-        
-        char* nombre[size];
+        i+=1;
         int index = 0;
-        while(text_file[i+index+1]!='\n' && size-1!=index){
-            nombre[index]=text_file[i+index+1];
-            printf("%c",nombre[index]);
+        char nombre[size+1];
+        int pos = 0;
+        nombre[size]='\0';
+        while (text_file[i+index] != '\n' && index < size)
+        {   
+            
+            nombre[pos++]=text_file[i+index];
+            
             index++;
         }
+      
         if(line==1){
-            nb1 = atoi(nombre);
+           nb1 = atoi(nombre);
         }
         if(line==2){
             nb2 = atoi(nombre);
@@ -1861,9 +1866,10 @@ void save_victory(int player){
         
         
         
-        //printf("nb1 : %d, nb2 : %d",nb1,nb2);
+        
        }
     }
+    printf("nb1 : %d, nb2 : %d",nb1,nb2);
     if(player == 1){
         nb1+=1;
     }
@@ -1871,7 +1877,7 @@ void save_victory(int player){
         nb2+=1;
     }
     fclose(file);
-    //write_victory(nb1,nb2);
+    write_victory(nb1,nb2);
 }
 void compute_game(jeu *world){
    if(!world->game_over){
@@ -1888,7 +1894,7 @@ void compute_game(jeu *world){
         else{
             
             if(world->p1.life <= 0){
-                //save_victory(1);
+                save_victory(2);
                 world->game_over = true;
             }
 
