@@ -71,6 +71,7 @@ struct compteur_s{
     bool pause;
     bool start;
     int timer; 
+    bool inf;
 };
 typedef struct compteur_s compteur;
 

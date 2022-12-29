@@ -20,7 +20,7 @@ void init_timer(jeu *world)
     world->timer.startTime = SDL_GetTicks();
     world->timer.pause = false;
     world->timer.start = true;
-    world->timer.timer = 60;
+    read_counter(world);
     world->p1.chrono_guard.startTime = SDL_GetTicks();
     world->p1.chrono_guard.pause = false;
     world->p1.chrono_guard.start = true;
@@ -405,7 +405,7 @@ void checkJoystick(SDL_Joystick **joysticks)
 void check_timer(jeu *world)
 {
 
-    if (world->timer.start && !world->timer.pause)
+    if (world->timer.start && !world->timer.pause && !world->timer.inf)
     {
 
         if ((SDL_GetTicks() - world->timer.startTime) / 1000 >= 1)
@@ -415,6 +415,30 @@ void check_timer(jeu *world)
         }
     }
 }
+
+void save_counter(char* select){
+     FILE *file = fopen("build/counter.txt", "w");
+    fwrite(select, strlen(select), 1, file);
+    fclose(file);
+}
+void read_counter(jeu* world){
+     char *File_name = "build/counter.txt";
+    struct stat stat_file;
+    FILE *file = fopen(File_name, "r"); // ouverture en mode lecture
+    stat(File_name, &stat_file);
+    int sz = stat_file.st_size;
+    char text_file[sz + 1];
+    fread(text_file, 1, sz, file);
+    text_file[sz] = '\0';
+    if(strcmp(text_file,"inf") == 0){
+        world->timer.inf = true;
+    }
+    else{
+        world->timer.inf = false;
+        world->timer.timer = atoi(text_file);
+    }
+}
+
 
 /**
  * FONCTIONS MOUVEMENTS + COUPS
@@ -1188,11 +1212,12 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
         if (event->type == SDL_KEYDOWN)
         {
             if (event->key.keysym.sym == SDLK_ESCAPE)
-            {
+            {   
+
                 if (world->state == pause)
                 {
                     world->state = combat;
-                    Mix_Volume(1, 0);
+                    Mix_Volume(1,0);
                     unpause(&world->timer);
                     unpause(&world->p1.chrono_guard);
                     unpause(&world->p2.chrono_guard);
@@ -1201,11 +1226,23 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                     unpause(&world->p1.dmg_bonus_timer);
                     unpause(&world->p2.dmg_bonus_timer);
                 }
+                else if (world->state == options)
+                {
+                    world->state = main_menu;
+                    world->menu_set.menu_fond = load_image("build/ressources/menu/menu.bmp",renderer);
+                    world->menu_set.index_menu =0;
+                }
+                else if (world->state == selection_map){
+                    world->state = main_menu;
+                    world->menu_set.menu_fond = load_image("build/ressources/menu/menu.bmp",renderer);
+                    world->menu_set.index_menu = 0;
+                }
+                
             }
 
             if (event->key.keysym.sym == SDLK_z)
             {
-                if (world->state != selection_map)
+                if (world->state == main_menu)
 
                 {
                     /* Mix_PlayChannel(1,world->music.menu,-1);
@@ -1216,11 +1253,18 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                         world->menu_set.index_menu = 2;
                     }
                 }
+                if(world->state == pause){
+                    world->menu_set.index_menu--;
+                     if (world->menu_set.index_menu < 0)
+                    {
+                        world->menu_set.index_menu = 1;
+                    }
+                }
             }
 
             if (event->key.keysym.sym == SDLK_s)
             {
-                if (world->state != selection_map)
+                if (world->state != selection_map || world->state != options)
                 {
                     Mix_PlayChannel(0, world->music.change, 1);
                     world->menu_set.index_menu++;
@@ -1228,12 +1272,18 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                     {
                         world->menu_set.index_menu = 0;
                     }
+                    if(world->state == pause){
+                        world->menu_set.index_menu++;
+                       if(world->menu_set.index_menu >1){
+                        world->menu_set.index_menu =0;
+                       }
+                    }
                 }
             }
 
             if (event->key.keysym.sym == SDLK_d)
             {
-                if (world->state == selection_map)
+                if (world->state == selection_map )
                 {
                     Mix_PlayChannel(0, world->music.change, 1);
                     world->menu_set.index_menu++;
@@ -1241,6 +1291,10 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                     {
                         world->menu_set.index_menu = 0;
                     }
+                }
+                if(world->state == options)
+                {
+                    world->menu_set.index_menu == 3 ? world->menu_set.index_menu = 0 : world->menu_set.index_menu++;  
                 }
             }
 
@@ -1255,6 +1309,9 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
 
                         world->menu_set.index_menu = NB_MAPS - 1;
                     }
+                }
+                if (world->state == options){
+                     world->menu_set.index_menu == 0 ? world->menu_set.index_menu = 3 : world->menu_set.index_menu--;
                 }
             }
 
@@ -1272,6 +1329,8 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                         break;
                     case 1:
                         world->state = options;
+                        world->menu_set.menu_fond = load_image("build/ressources/menu/Timer_menu.bmp",renderer);
+                        world->menu_set.index_menu = 0;
                         break;
                     case 2:
                         world->terminer = true;
@@ -1302,10 +1361,6 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                     world->timestamp_w = 0;
 
                     init_timer(world);
-                    if (world->font.police_compteur == NULL)
-                    {
-                        printf("chargement de la police incomplete");
-                    }
                     for (int i = 0; i < 123; i++)
                     {
                         world->keystates_pre[i] = 0;
@@ -1313,6 +1368,39 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
 
                     init_lootbox(&world->lootbox, renderer);
                     Mix_Volume(1, 0);
+                    world->menu_set.index_menu = 0;
+                }
+                else if(world->state == options){
+                     switch (world->menu_set.index_menu)
+                    {
+                    case 0:
+                        save_counter("60");
+                        break;
+                    case 1:
+                        save_counter("90");
+                        break;
+                    case 2:
+                        save_counter("120");
+                        break;
+                    case 3:
+                        save_counter("inf");
+                        break;
+                    }
+                    
+                }
+                else if(world->state == pause){
+                     switch (world->menu_set.index_menu)
+                    {
+                    case 0:
+                        world->state = combat;
+                        break;
+                    case 1:
+                        world->menu_set.menu_fond = load_image("build/ressources/menu/menu.bmp", renderer);
+                        world->state = main_menu;
+                        break;
+                 
+                   
+                    }
                 }
             }
             if (world->state != combat)
