@@ -21,7 +21,7 @@ void init_controller(jeu* world);
 void init_map(jeu* world,SDL_Renderer* renderer);
 void init_miniature(jeu* world,SDL_Renderer* renderer);
 void init_jeu(jeu *world, SDL_Renderer* renderer);
-void init_perso(SDL_Renderer* renderer, sprite_perso* perso, int x, int y, int w, int h, int speed,bool mirror);
+void init_perso(SDL_Renderer *renderer, sprite_perso *perso, int x, int y, int w, int h, int speed, bool mirror,int choice);
 void init_hits(sprite_perso* perso);
 void init_combos(sprite_perso *player);
 void init_combo(int pos,int nb_coups,int frame_between,int required,sprite_perso *player);

@@ -91,7 +91,7 @@ void init_jeu(jeu *world, SDL_Renderer *renderer)
     init_music(world);
 }
 
-void init_perso(SDL_Renderer *renderer, sprite_perso *perso, int x, int y, int w, int h, int speed, bool mirror)
+void init_perso(SDL_Renderer *renderer, sprite_perso *perso, int x, int y, int w, int h, int speed, bool mirror,int choice)
 {
     perso->perso_choisi = 0;
     perso->x = x;
@@ -109,6 +109,7 @@ void init_perso(SDL_Renderer *renderer, sprite_perso *perso, int x, int y, int w
     perso->guard = false;
     perso->life_guard = MAX_GUARD;
     perso->damage_bonus = false;
+    perso->perso_choisi = choice;
     init_hits(perso);
     init_combos(perso);
     perso->pos_tab_combo = 0;
@@ -283,7 +284,28 @@ void init_chara_state(SDL_Renderer *renderer, sprite_perso *perso)
         init_state_animation(renderer, perso, 16, "build/ressources/Characters/Powers/Transparent_Aura_Spritesheet.Bmp", 8, 190);
         perso->anim[15].aura = 0;
         break;
+    case 1:
+         init_state_animation(renderer, perso, idle, "build/ressources/Characters/Chara2/Idle.bmp", 15, 150);
+        init_state_animation(renderer, perso, walk, "build/ressources/Characters/Chara2/Walking.bmp", 15, 150);
+        init_state_animation(renderer, perso, jump, "build/ressources/Characters/Chara2/Jump.bmp", 10, 150);
+        init_state_animation(renderer, perso, crouch, "build/ressources/Characters/Chara2/Idle.bmp", 15, 150);
+        init_state_animation(renderer, perso, fall, "build/ressources/Characters/Chara2/Falling.bmp", 10, 150);
+        init_state_animation(renderer, perso, backwards, "build/ressources/Characters/Chara2/Walking.bmp", 15, 150);
+        init_state_animation(renderer, perso, flight, "build/ressources/Characters/Chara2/Jump.bmp", 10, 150);
+        init_state_animation(renderer, perso, flight_control, "build/ressources/Characters/Chara2/Jump.bmp", 10, 150);
+        init_state_animation(renderer, perso, fall_control, "build/ressources/Characters/Chara2/Falling.bmp", 10, 150);
+        init_state_animation(renderer, perso, landing, "build/ressources/Characters/Chara2/Landing.bmp", 5, 150);
+        init_state_animation(renderer, perso, knockback, "build/ressources/Characters/Chara2/KnockBack.bmp", 5, 150);
+        init_state_animation(renderer, perso, lpunch, "build/ressources/Characters/Chara2/LightPunch.bmp", 16, 150);
+        init_state_animation(renderer, perso, kickstate, "build/ressources/Characters/Chara2/Kick.bmp", 14, 150);
+        init_state_animation(renderer, perso, hpunch, "build/ressources/Characters/Chara2/HeavyPunch.bmp", 15, 150);
+        init_state_animation(renderer, perso, stun, "build/ressources/Characters/Chara2/Knocked.bmp", 5, 150);
+        init_state_animation(renderer, perso, 15, "build/ressources/Characters/Powers/Aura_Spritesheet.Bmp", 8, 190);
+        init_state_animation(renderer, perso, 16, "build/ressources/Characters/Powers/Transparent_Aura_Spritesheet.Bmp", 8, 190);
+        perso->anim[15].aura = 0;
+        break;
     }
+    
 }
 
 /**
@@ -445,7 +467,7 @@ void read_counter(jeu* world){
  */
 void reset_state(sprite_perso *perso, enum character_state state)
 {
-    for (int i = 0; i < 2; i++)
+    for (int i = 0; i < stun; i++)
     {
         if (i != state)
         {
@@ -756,10 +778,10 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
             if (perso->anim[stun].counter == 10)
             {
                 perso->anim[stun].frame++;
-
+                perso->anim[stun].counter = 0;
                 if (perso->anim[stun].frame = perso->anim[stun].nbFrame)
                 {
-                    perso->anim[stun].frame = 0;
+                    perso->anim[stun].frame = 4;
                 }
             }
             else
@@ -775,6 +797,7 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
                 perso->life_guard = 100;
             }
             perso->attack_launched = 0;
+            
             perso->chara_state = idle;
         }
     }
@@ -1264,13 +1287,14 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
 
             if (event->key.keysym.sym == SDLK_s)
             {
-                if (world->state != selection_map || world->state != options)
-                {
+                
                     Mix_PlayChannel(0, world->music.change, 1);
-                    world->menu_set.index_menu++;
-                    if (world->menu_set.index_menu > 2)
-                    {
-                        world->menu_set.index_menu = 0;
+                    if(world->state == main_menu){
+                        world->menu_set.index_menu++;
+                        if (world->menu_set.index_menu > 2)
+                        {
+                            world->menu_set.index_menu = 0;
+                        }
                     }
                     if(world->state == pause){
                         world->menu_set.index_menu++;
@@ -1278,7 +1302,7 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                         world->menu_set.index_menu =0;
                        }
                     }
-                }
+                
             }
 
             if (event->key.keysym.sym == SDLK_d)
@@ -1353,8 +1377,8 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                     }
 
                     init_map(world, renderer);
-                    init_perso(renderer, &world->p1, 65, 465, 100, 230, CHARA_SPEED, false);
-                    init_perso(renderer, &world->p2, 950, 465, 100, 230, CHARA_SPEED, true);
+                    init_perso(renderer, &world->p1, 65, 465, 100, 230, CHARA_SPEED, false,0);
+                    init_perso(renderer, &world->p2, 950, 465, 100, 230, CHARA_SPEED, true,1);
                     init_controller(world);
                     world->game_over = false;
                     world->state = combat;
@@ -1539,6 +1563,17 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
                     for (int i = 0; i < NB_COMBOS && !combop1; i++)
                     {
                         combop1 = read_combo(&world->p1, i);
+                        if(combop1){
+                            switch (i)
+                            {
+                            case 1:
+                                Mix_PlayChannel(0,world->music.fireball,1);
+                                break;
+                            
+                            default:
+                                break;
+                            }
+                        }
                     }
                     if (!combop1)
                     {

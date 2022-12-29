@@ -110,8 +110,8 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
                 SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
                 apply_textures(quit_texture,renderer,600,350 );
                 rect.x = 140;
-                rect.y = 250 + 150 * world->menu_set.index_menu ;
-                rect.h = 150 ;
+                rect.y = 300 + 50 * world->menu_set.index_menu ;
+                rect.h = 50 ;
                 rect.w = 950; 
                 SDL_SetRenderDrawColor(renderer, 255, 255 , 0, 255);
                 SDL_RenderDrawRect(renderer, &rect);
