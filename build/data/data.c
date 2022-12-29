@@ -14,6 +14,7 @@ void init_controller(jeu *world)
         }
     }
 }
+
 void init_timer(jeu *world)
 {
     world->timer.startTime = SDL_GetTicks();
@@ -33,6 +34,7 @@ void init_timer(jeu *world)
     world->p2.chrono_special.pause = false;
     world->p2.chrono_special.start = true;
 }
+
 void init_map(jeu *world, SDL_Renderer *renderer)
 {
     switch (world->choosed_map)
@@ -80,6 +82,7 @@ void init_music(jeu *world)
 
 void init_jeu(jeu *world, SDL_Renderer *renderer)
 {
+    srand(time(NULL));
     world->menu_set.menu_fond = load_image("build/ressources/menu/menu.bmp", renderer);
     world->state = main_menu;
     world->terminer = false;
@@ -243,7 +246,6 @@ void init(SDL_Window **window, SDL_Renderer **renderer, jeu *world)
         Mix_Volume(0, MIX_MAX_VOLUME); // Mets le son a 100% en volume pour le premier cannaux
         Mix_Volume(1, 70);             // Mets le son a 50% en volume pour le deuxièmme cannaux
     }
-
     init_jeu(world, *renderer);
 }
 
@@ -277,6 +279,9 @@ void init_chara_state(SDL_Renderer *renderer, sprite_perso *perso)
         init_state_animation(renderer, perso, kickstate, "build/ressources/Characters/Chara1/Kick.bmp", 14, 150);
         init_state_animation(renderer, perso, hpunch, "build/ressources/Characters/Chara1/HeavyPunch.bmp", 15, 150);
         init_state_animation(renderer, perso, stun, "build/ressources/Characters/Chara1/Knocked.bmp", 5, 150);
+        init_state_animation(renderer, perso, 15, "build/ressources/Characters/Powers/Aura_Spritesheet.Bmp", 8, 190);
+        init_state_animation(renderer, perso, 16, "build/ressources/Characters/Powers/Transparent_Aura_Spritesheet.Bmp", 8, 190);
+        perso->anim[15].aura = 0;
         break;
     }
 }
@@ -756,16 +761,43 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
     }
 }
 
-void reset_knockback(sprite_perso *p1, sprite_perso *p2)
-{ // résout le soucis où les deux personnages sont knockbacks et ne peuvent pas reculer
-    int counter = 0;
-    if (p1->chara_state == knockback)
-    {
-        counter++;
+void manage_aura(sprite_perso * perso)
+{
+    if(perso->anim[15].counter >= 5){
+        if(perso->anim[15].aura && !perso->damage_bonus ){
+            if(perso->anim[15].frame != perso->anim[15].nbFrame){
+                perso->anim[15].frame++;
+                perso->anim[16].frame++;
+            }
+            else{
+                perso->anim[15].aura = 0;
+                perso->anim[15].frame = 0;
+                perso->anim[16].frame = 0;
+            }
+        }
+
+        if(!perso->anim[15].aura && perso->damage_bonus){
+            perso->anim[15].frame++;
+            perso->anim[16].frame++;
+            if(perso->anim[15].frame == 2){
+                perso->anim[15].aura = 1;
+            }
+        }
+
+        if(perso->damage_bonus && perso->anim[15].aura){
+            if(perso->anim[15].frame == 4){
+                perso->anim[15].frame = 2;
+                perso->anim[16].frame = 2;
+            }
+            else{
+                perso->anim[15].frame++;
+                perso->anim[16].frame++;
+            }
+        }
+        perso->anim[15].counter = 0;
     }
-    if (counter > 5)
-    {
-        printf("ERREUR Knockback\n");
+    else{
+        perso->anim[15].counter++;
     }
 }
 
@@ -1652,7 +1684,6 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
 
 int generate_number(int a, int b)
 {
-    srand(time(NULL));
     return rand() % (b - a) + a;
 }
 
@@ -1663,7 +1694,7 @@ void reset_activate_lootbox(lootbox *lootbox)
     lootbox->x = generate_number(65, 950);
     lootbox->y = 0 - lootbox->h;
     lootbox->collided = 0;
-    lootbox->bonus = generate_number(health_bonus, special_bonus);
+    lootbox->bonus = generate_number(health_bonus, special_bonus+1);
 }
 
 void update_lootbox(jeu *world)
@@ -1713,8 +1744,7 @@ void apply_bonus(lootbox *lootbox, sprite_perso *player)
         player->life += x;
     }
 
-    if (lootbox->bonus == damage_bonus)
-    {
+    if(!player->damage_bonus && lootbox->bonus == damage_bonus && !player->anim[15].aura ){
         player->damage_bonus = true;
         player->dmg_bonus_timer.start = true;
         player->dmg_bonus_timer.startTime = SDL_GetTicks();
@@ -1999,12 +2029,13 @@ void update_data(jeu *world)
     lootbox_loop(world);
     check_bonus(&world->p1);
     check_bonus(&world->p2);
-
     movements(world, &world->p1, &world->p2);
     movements(world, &world->p2, &world->p1);
     sprites_collision(&world->p1, &world->p2, world);
     sprites_collision(&world->p2, &world->p1, world);
     change_directions(&world->p1, &world->p2);
+    manage_aura(&world->p1);
+    manage_aura(&world->p2);
     world->timestamp_w++;
     check_timer(world);
     check_stats(&world->p1);

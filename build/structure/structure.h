@@ -30,13 +30,13 @@ struct map_settings{
 typedef struct map_settings set_map;
 
 struct animation_s{
+    int aura;
     int frame;
     int nbFrame;
     int width;
     int counter;
     SDL_Texture *anim_text;
 };
-
 typedef struct animation_s anim_t;
 
 struct hit_set_s
@@ -85,6 +85,7 @@ struct throwable_s
 typedef struct throwable_s throwable;
 
 struct sprite_p{
+    SDL_Texture * aura;
     int perso_choisi; 
     int x;
     int y;
@@ -100,7 +101,7 @@ struct sprite_p{
     bool mirror;
     int life;
     hit_set hits;
-    anim_t anim[15];
+    anim_t anim[17];
     inputs *buffer;
     int pos_tab_combo;
     combo tab_combo[2];

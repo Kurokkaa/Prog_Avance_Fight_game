@@ -44,6 +44,24 @@ void play_animations(SDL_Renderer *renderer, sprite_perso* sprite, int chara_sta
  }
 }
 
+void render_aura(SDL_Renderer *renderer, sprite_perso* sprite, int numaura){
+    SDL_Rect dst = {0, 0, 0, 0};
+    SDL_Rect src = {0, 0, 0, 0};
+
+    dst.x = sprite->x - 10;
+    dst.y = sprite->y;
+    dst.w = sprite->anim[numaura].width;
+    dst.h = 250;
+
+    int width;
+    SDL_QueryTexture(sprite->anim[numaura].anim_text, NULL, NULL, &width, &src.h);
+    src.h -=10;
+    src.x = sprite->anim[numaura].frame * sprite->anim[numaura].width;
+    src.y = 0;
+    src.w = sprite->anim[numaura].width;
+    SDL_RenderCopy(renderer, sprite->anim[numaura].anim_text, &src, &dst);
+}
+
 void refresh_graphics(SDL_Renderer *renderer, jeu *world){
     SDL_RenderClear(renderer);
     SDL_SetRenderDrawBlendMode(renderer,SDL_BLENDMODE_NONE);
@@ -52,8 +70,22 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
             display_map(renderer,world);
             display_dynamic_texture(renderer, world->map.map_structure, world->map.plateformes);
             render_bonuses(renderer, &world->lootbox);
+
+            if(world->p1.anim[15].aura || world->p1.damage_bonus){
+                render_aura(renderer, &(world->p1),15);
+            }
+            if(world->p2.anim[15].aura || world->p2.damage_bonus){
+                render_aura(renderer, &(world->p2),15);
+            }
+
             play_animations(renderer, &(world->p1), world->p1.chara_state);
             play_animations(renderer, &(world->p2), world->p2.chara_state);
+            if(world->p1.anim[15].aura || world->p1.damage_bonus){
+                render_aura(renderer, &(world->p1),16);
+            }
+            if(world->p2.anim[15].aura || world->p2.damage_bonus){
+                render_aura(renderer, &(world->p2),16);
+            }
             display_life(renderer, world);
             display_fireball(renderer,world->p1);
             display_fireball(renderer,world->p2);
@@ -83,7 +115,6 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
             if(world->p2.guard){
                 display_guard(renderer,world->p2);
             }
-            
         break;
         case main_menu:
             apply_textures(world->menu_set.menu_fond, renderer, 0, 0);
@@ -102,6 +133,7 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
         }
         //apply_texture(world->p1.texture_perso, renderer, world->p1.x , world->p1.y);
         SDL_RenderPresent(renderer);
+
 }
 
 void display_fireball(SDL_Renderer* renderer,sprite_perso perso){
