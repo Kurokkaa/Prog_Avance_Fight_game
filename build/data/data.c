@@ -32,33 +32,27 @@ void init_timer(jeu *world)
     world->p2.chrono_special.startTime = SDL_GetTicks();
     world->p2.chrono_special.pause = false;
     world->p2.chrono_special.start = true;
-    
-
 }
 void init_map(jeu *world, SDL_Renderer *renderer)
 {
     switch (world->choosed_map)
     {
-    case russia:
-        world->map.image_fond = load_image("build/map/city_night/city.bmp", renderer);
-        world->map.map_structure = read_file_map("build/map/russia/russia_structure");
-        world->map.plateformes = load_image("build/map/russia/plateforme.png", renderer);
-        world->map.taille_cellule_H = sizeof(world->map.map_structure);
-        world->map.taille_cellule_W = sizeof(world->map.map_structure[0]);
+    case city_night:
+        world->map.image_fond = load_image("build/ressources/map/city_night/city.bmp", renderer);
+        world->map.map_structure = read_file_map("build/ressources/map/city_night/city_night_structure");
+        world->map.plateformes = load_image("build/ressources/map/city_night/plateforme.bmp", renderer);
         break;
+
     case forest:
-        world->map.image_fond = load_image("build/map/forest/forest.png", renderer);
-        world->map.map_structure = read_file_map("build/map/forest/forest_structure");
-        world->map.plateformes = load_image("build/map/forest/plateforme.png", renderer);
-        world->map.taille_cellule_H = sizeof(world->map.map_structure);
-        world->map.taille_cellule_W = sizeof(world->map.map_structure[0]);
+        world->map.image_fond = load_image("build/ressources/map/forest/forest.png", renderer);
+        world->map.map_structure = read_file_map("build/ressources/map/forest/forest_structure");
+        world->map.plateformes = load_image("build/ressources/map/forest/plateforme.png", renderer);
         break;
+
     case street_art:
-        world->map.image_fond = load_image("build/map/street_art/street.png", renderer);
-        world->map.map_structure = read_file_map("build/map/street_art/street_structure");
-        world->map.plateformes = load_image("build/map/street_art/plateforme.png", renderer);
-        world->map.taille_cellule_H = sizeof(world->map.map_structure);
-        world->map.taille_cellule_W = sizeof(world->map.map_structure[0]);
+        world->map.image_fond = load_image("build/ressources/map/street_art/street.png", renderer);
+        world->map.map_structure = read_file_map("build/ressources/map/street_art/street_structure");
+        world->map.plateformes = load_image("build/ressources/map/street_art/plateforme.png", renderer);
         break;
     }
 }
@@ -66,13 +60,13 @@ void init_map(jeu *world, SDL_Renderer *renderer)
 // fonction pour les miniatures de maps
 void init_miniature(jeu *world, SDL_Renderer *renderer)
 {
-    world->menu_set.tab_map[0] = load_image("build/map/russia/RussiaMap_mini.png", renderer);
-    world->menu_set.tab_map[1] = load_image("build/map/forest/forest_mini.png", renderer);
-    world->menu_set.tab_map[2] = load_image("build/map/street_art/street_mini.png", renderer);
+    world->menu_set.tab_map[0] = load_image("build/ressources/map/city_night/city_mini.bmp", renderer);
+    world->menu_set.tab_map[1] = load_image("build/ressources/map/forest/forest_mini.png", renderer);
+    world->menu_set.tab_map[2] = load_image("build/ressources/map/street_art/street_mini.png", renderer);
 }
-void init_music(jeu* world){
-    
 
+void init_music(jeu *world)
+{
     world->music.menu = Mix_LoadWAV("build/ressources/Audio/Game_theme.wav");
     world->music.light_punch = Mix_LoadWAV("build/ressources/Audio/missile_shot.wav");
     world->music.heavy_punch = Mix_LoadWAV("build/ressources/Audio/missile_shot.wav");
@@ -82,11 +76,11 @@ void init_music(jeu* world){
     world->music.change = Mix_LoadWAV("build/ressources/Audio/missile_shot.wav");
     world->music.guard = Mix_LoadWAV("build/ressources/Audio/missile_shot.wav");
     world->music.menuPlayed = false;
-    
 }
+
 void init_jeu(jeu *world, SDL_Renderer *renderer)
 {
-    world->menu_set.menu_fond = load_image("build/ressources/menu/menu.png", renderer);
+    world->menu_set.menu_fond = load_image("build/ressources/menu/menu.bmp", renderer);
     world->state = main_menu;
     world->terminer = false;
     world->menu_set.index_menu = 0;
@@ -95,7 +89,7 @@ void init_jeu(jeu *world, SDL_Renderer *renderer)
 }
 
 void init_perso(SDL_Renderer *renderer, sprite_perso *perso, int x, int y, int w, int h, int speed, bool mirror)
-{ // voir moyen pour charger texture spécifique
+{
     perso->perso_choisi = 0;
     perso->x = x;
     perso->y = y;
@@ -115,11 +109,12 @@ void init_perso(SDL_Renderer *renderer, sprite_perso *perso, int x, int y, int w
     init_hits(perso);
     init_combos(perso);
     perso->pos_tab_combo = 0;
-    perso->special_bar=0;
-    perso->fireball.fireball = load_image("./build/ressources/Characters/Chara1/fireball.bmp",renderer);
+    perso->special_bar = 0;
+    perso->fireball.fireball = load_image("./build/ressources/Characters/Chara1/fireball.bmp", renderer);
     perso->fireball.launched_fireball = false;
     perso->buffer = malloc(sizeof(inputs) * BUFFER_SIZE);
-    for (int i = 0; i < BUFFER_SIZE; i++){
+    for (int i = 0; i < BUFFER_SIZE; i++)
+    {
         perso->buffer[i].input = 0;
         perso->buffer[i].timestamp = 0;
         perso->pos_tab_combo = 0;
@@ -133,7 +128,6 @@ void init_hits(sprite_perso *perso)
     perso->hits.heavy_punch = malloc(sizeof(hit));
     perso->hits.kick = malloc(sizeof(hit));
     perso->hits.special_attack = malloc(sizeof(hit));
-    
 
     perso->hits.light_punch->dmg = 10;
     perso->hits.light_punch->speed = 0;
@@ -170,28 +164,28 @@ void init_hits(sprite_perso *perso)
     perso->hits.special_attack->timer = 0;
     perso->hits.special_attack->delay = 20;
 }
-void init_combo(int pos,int nb_coups,int frame_between,int required,sprite_perso *player){
+
+void init_combo(int pos, int nb_coups, int frame_between, int required, sprite_perso *player)
+{
     player->tab_combo[pos].nb_coups = nb_coups;
     player->tab_combo[pos].frame_between = frame_between;
-    player->tab_combo[pos].required =required;
+    player->tab_combo[pos].required = required;
 }
+
 void init_combos(sprite_perso *player)
 {
     // 1er combo
-    init_combo(0,3,50,100,player);
+    init_combo(0, 3, 50, 100, player);
     player->tab_combo[0].input[0] = right;
     player->tab_combo[0].input[1] = left;
     player->tab_combo[0].input[2] = light_p;
-    init_combo(1,2,30,200,player);
+    init_combo(1, 2, 30, 200, player);
     player->tab_combo[1].input[0] = left;
     player->tab_combo[1].input[1] = right;
-
-    
-    
 }
 
-void init_lootbox(lootbox * lootbox, SDL_Renderer * renderer){
-    
+void init_lootbox(lootbox *lootbox, SDL_Renderer *renderer)
+{
     lootbox->texture[health_bonus] = load_image("build/ressources/Bonuses/Life_bonus.bmp", renderer);
     lootbox->texture[damage_bonus] = load_image("build/ressources/Bonuses/Damage_bonus.bmp", renderer);
     lootbox->texture[special_bonus] = load_image("build/ressources/Bonuses/Special_bonus.bmp", renderer);
@@ -238,18 +232,19 @@ void init(SDL_Window **window, SDL_Renderer **renderer, jeu *world)
         SDL_Quit();
     }
 
-    if(Mix_OpenAudio( 44100, MIX_DEFAULT_FORMAT, 2, 1024)==-1 ){
-        printf("erreur SDL_mix %S",Mix_GetError());
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024) == -1)
+    {
+        printf("erreur SDL_mix %S", Mix_GetError());
         SDL_Quit();
     }
-    else{
-         Mix_AllocateChannels(3); // Allouer 2 cannaux 
+    else
+    {
+        Mix_AllocateChannels(3);       // Allouer 2 cannaux
         Mix_Volume(0, MIX_MAX_VOLUME); // Mets le son a 100% en volume pour le premier cannaux
-        Mix_Volume(1, 70); // Mets le son a 50% en volume pour le deuxièmme cannaux 
+        Mix_Volume(1, 70);             // Mets le son a 50% en volume pour le deuxièmme cannaux
     }
 
     init_jeu(world, *renderer);
-    
 }
 
 void init_state_animation(SDL_Renderer *renderer, sprite_perso *perso, enum character_state state, char *path, int nbFrame, int width)
@@ -267,26 +262,21 @@ void init_chara_state(SDL_Renderer *renderer, sprite_perso *perso)
     switch (perso->perso_choisi)
     {
     case 0:
-        init_state_animation(renderer, perso, idle, "build/ressources/Characters/Chara1/Idle.png", 15, 150);
-        init_state_animation(renderer, perso, walk, "build/ressources/Characters/Chara1/Walking.png", 15, 150);
-        init_state_animation(renderer, perso, jump, "build/ressources/Characters/Chara1/Jump.png", 10, 150);
-        init_state_animation(renderer, perso, crouch, "build/ressources/Characters/Chara1/Idle.png", 15, 150);
-        init_state_animation(renderer, perso, fall, "build/ressources/Characters/Chara1/Falling.png", 10, 150);
-        init_state_animation(renderer, perso, backwards, "build/ressources/Characters/Chara1/Walking.png", 15, 150);
-        init_state_animation(renderer, perso, flight, "build/ressources/Characters/Chara1/Jump.png", 10, 150);
-        init_state_animation(renderer, perso, flight_control, "build/ressources/Characters/Chara1/Jump.png", 10, 150);
-        init_state_animation(renderer, perso, fall_control, "build/ressources/Characters/Chara1/Falling.png", 10, 150);
-        init_state_animation(renderer, perso, landing, "build/ressources/Characters/Chara1/Landing.png", 5, 150);
-        init_state_animation(renderer, perso, knockback, "build/ressources/Characters/Chara1/KnockBack.png", 5, 150);
-        init_state_animation(renderer, perso, lpunch, "build/ressources/Characters/Chara1/LightPunch.png", 16, 150);
-        init_state_animation(renderer, perso, kickstate, "build/ressources/Characters/Chara1/Kick.png", 14, 150);
-        init_state_animation(renderer, perso, hpunch, "build/ressources/Characters/Chara1/HeavyPunch.png", 15, 150);
-        init_state_animation(renderer, perso, stun, "build/ressources/Characters/Chara1/Knocked.png", 5, 150);
-
-        break;
-
-    default:
-        perso->anim[idle].anim_text = load_image("build/ressources/Characters/Chara1/Yellow_idle_spritesheet.png", renderer);
+        init_state_animation(renderer, perso, idle, "build/ressources/Characters/Chara1/Idle.bmp", 15, 150);
+        init_state_animation(renderer, perso, walk, "build/ressources/Characters/Chara1/Walking.bmp", 15, 150);
+        init_state_animation(renderer, perso, jump, "build/ressources/Characters/Chara1/Jump.bmp", 10, 150);
+        init_state_animation(renderer, perso, crouch, "build/ressources/Characters/Chara1/Idle.bmp", 15, 150);
+        init_state_animation(renderer, perso, fall, "build/ressources/Characters/Chara1/Falling.bmp", 10, 150);
+        init_state_animation(renderer, perso, backwards, "build/ressources/Characters/Chara1/Walking.bmp", 15, 150);
+        init_state_animation(renderer, perso, flight, "build/ressources/Characters/Chara1/Jump.bmp", 10, 150);
+        init_state_animation(renderer, perso, flight_control, "build/ressources/Characters/Chara1/Jump.bmp", 10, 150);
+        init_state_animation(renderer, perso, fall_control, "build/ressources/Characters/Chara1/Falling.bmp", 10, 150);
+        init_state_animation(renderer, perso, landing, "build/ressources/Characters/Chara1/Landing.bmp", 5, 150);
+        init_state_animation(renderer, perso, knockback, "build/ressources/Characters/Chara1/KnockBack.bmp", 5, 150);
+        init_state_animation(renderer, perso, lpunch, "build/ressources/Characters/Chara1/LightPunch.bmp", 16, 150);
+        init_state_animation(renderer, perso, kickstate, "build/ressources/Characters/Chara1/Kick.bmp", 14, 150);
+        init_state_animation(renderer, perso, hpunch, "build/ressources/Characters/Chara1/HeavyPunch.bmp", 15, 150);
+        init_state_animation(renderer, perso, stun, "build/ressources/Characters/Chara1/Knocked.bmp", 5, 150);
         break;
     }
 }
@@ -315,7 +305,7 @@ SDL_Texture *load_image(char path[], SDL_Renderer *renderer)
 {
     SDL_Surface *tmp = NULL;
     SDL_Texture *texture = NULL;
-    tmp = IMG_Load(path);
+    tmp = SDL_LoadBMP(path);
     if (NULL == tmp)
     {
         fprintf(stderr, "Erreur pendant chargement image BMP: %s\n", SDL_GetError());
@@ -334,7 +324,6 @@ SDL_Texture *load_image(char path[], SDL_Renderer *renderer)
 
 bool read_combo(sprite_perso *player, int val)
 {
-
     // 1er combo
     bool found = false;
     bool equal;
@@ -360,32 +349,31 @@ bool read_combo(sprite_perso *player, int val)
             if (player->buffer[depart + player->tab_combo[val].nb_coups - 1].timestamp - player->buffer[depart].timestamp <= player->tab_combo[val].frame_between)
             {
                 found = true;
-                
             }
         }
     }
     if (found)
     {
         for (int i = 0; i < player->pos_tab_combo; i++)
-            {
-                player->buffer[i].input = 0;
-                player->buffer[i].timestamp = 0;
-            }
+        {
+            player->buffer[i].input = 0;
+            player->buffer[i].timestamp = 0;
+        }
         player->pos_tab_combo = 0;
-        if(player->special_bar>=player->tab_combo[val].required){
+        if (player->special_bar >= player->tab_combo[val].required)
+        {
             player->special_bar -= player->tab_combo[val].required;
             switch (val)
             {
             case 0:
                 player->chara_state = fireball;
-                player->fireball.multiplicateur = player->mirror ? -1:1;
+                player->fireball.multiplicateur = player->mirror ? -1 : 1;
                 break;
             case 1:
-                player->x =1000;
+                player->x = 1000;
             default:
                 break;
             }
-            
         }
     }
     return found;
@@ -575,20 +563,26 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
         }
     }
 
-    if (perso->chara_state == knockback){
-        if (!perso->mirror){
-            if (!equals(perso->x - perso->speed, perso->y + perso->h, world->map.map_structure, '0')){
+    if (perso->chara_state == knockback)
+    {
+        if (!perso->mirror)
+        {
+            if (!equals(perso->x - perso->speed, perso->y + perso->h, world->map.map_structure, '0'))
+            {
                 perso->x -= perso->speed;
             }
         }
 
-        else{
-            if (!equals(perso->x + perso->speed, perso->y + perso->h, world->map.map_structure, '0')){
+        else
+        {
+            if (!equals(perso->x + perso->speed, perso->y + perso->h, world->map.map_structure, '0'))
+            {
                 perso->x += perso->speed;
             }
         }
 
-        if (perso->anim[knockback].counter == 2){
+        if (perso->anim[knockback].counter == 2)
+        {
             perso->anim[knockback].frame++;
             if (perso->anim[knockback].frame >= perso->anim[knockback].nbFrame)
             {
@@ -598,13 +592,15 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
             perso->anim[knockback].counter = 0;
         }
 
-        else{
+        else
+        {
             perso->anim[knockback].counter++;
         }
     }
 
     // Automatisation de la chute
-    if ((perso->chara_state == fall)){
+    if ((perso->chara_state == fall))
+    {
         x = perso->x;
         y = perso->y;
         if (y > 465)
@@ -653,7 +649,6 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
         }
     }
 
-
     if (perso->chara_state == lpunch)
     {
         if (perso->anim[lpunch].counter == 2)
@@ -662,7 +657,7 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
             if (perso->anim[lpunch].frame == perso->hits.light_punch->effective_frame)
             {
 
-                light_punch(perso, adversaire,world);
+                light_punch(perso, adversaire, world);
             }
             if (perso->anim[lpunch].frame >= perso->anim[lpunch].nbFrame)
             {
@@ -684,7 +679,7 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
             perso->anim[hpunch].frame++;
             if (perso->anim[hpunch].frame == perso->hits.heavy_punch->effective_frame)
             {
-                heavy_punch(perso, adversaire,world);
+                heavy_punch(perso, adversaire, world);
             }
             if (perso->anim[hpunch].frame >= perso->anim[hpunch].nbFrame)
             {
@@ -706,7 +701,7 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
             perso->anim[kickstate].frame++;
             if (perso->anim[kickstate].frame == perso->hits.kick->effective_frame)
             {
-                kick_hit(perso, adversaire,world);
+                kick_hit(perso, adversaire, world);
             }
             if (perso->anim[kickstate].frame >= perso->anim[kickstate].nbFrame)
             {
@@ -743,7 +738,8 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
                 perso->anim[stun].counter++;
             }
         }
-        else{
+        else
+        {
             if (perso->broken_guard)
             {
                 perso->broken_guard = false;
@@ -753,18 +749,22 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
             perso->chara_state = idle;
         }
     }
-    if(perso->chara_state == fireball){
+    if (perso->chara_state == fireball)
+    {
         perso->fireball.launched_fireball = true;
         perso->chara_state = idle;
     }
 }
 
-void reset_knockback(sprite_perso * p1, sprite_perso * p2){ // résout le soucis où les deux personnages sont knockbacks et ne peuvent pas reculer
-    int counter = 0 ;
-    if(p1->chara_state == knockback){
+void reset_knockback(sprite_perso *p1, sprite_perso *p2)
+{ // résout le soucis où les deux personnages sont knockbacks et ne peuvent pas reculer
+    int counter = 0;
+    if (p1->chara_state == knockback)
+    {
         counter++;
     }
-    if(counter > 5){
+    if (counter > 5)
+    {
         printf("ERREUR Knockback\n");
     }
 }
@@ -777,7 +777,7 @@ bool equals(int x, int y, char **map_point, char test)
     return (map_point[y / height_factor][x / width_factor] == test);
 }
 
-void light_punch(sprite_perso *attacker, sprite_perso *receiver,jeu* world)
+void light_punch(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
 {
 
     if (!attacker->mirror)
@@ -786,23 +786,16 @@ void light_punch(sprite_perso *attacker, sprite_perso *receiver,jeu* world)
         {
             if (receiver->guard)
             {
-               
-                 
-                receiver->life_guard -= attacker->damage_bonus ? attacker->hits.light_punch->dmg *1.5 :attacker->hits.light_punch->dmg;
-                Mix_PlayChannel(0,world->music.guard,1);
-                if (receiver->life_guard <= 0)
-                {
-                    receiver->broken_guard = true;
-                    receiver->chara_state = stun;
-                    receiver->stun_time = BROKEN_GUARD_STUN;
-                }
+
+                receiver->life_guard -= attacker->damage_bonus ? attacker->hits.light_punch->dmg * 1.5 : attacker->hits.light_punch->dmg;
+                Mix_PlayChannel(0, world->music.guard, 1);
             }
             else
             {
-                receiver->special_bar +=10;
-                attacker->special_bar +=5;
-                receiver->life -= attacker->damage_bonus ? attacker->hits.light_punch->dmg *1.5 :attacker->hits.light_punch->dmg;
-                
+                receiver->special_bar += 10;
+                attacker->special_bar += 5;
+                receiver->life -= attacker->damage_bonus ? attacker->hits.light_punch->dmg * 1.5 : attacker->hits.light_punch->dmg;
+
                 if (!receiver->broken_guard)
                 {
                     receiver->chara_state = stun;
@@ -817,21 +810,14 @@ void light_punch(sprite_perso *attacker, sprite_perso *receiver,jeu* world)
         {
             if (receiver->guard)
             {
-                Mix_PlayChannel(0,world->music.guard,1);
-                receiver->life_guard -= attacker->damage_bonus ? attacker->hits.light_punch->dmg *1.5 : attacker->hits.light_punch->dmg;
-               
-                if (receiver->life_guard <= 0)
-                {
-                    receiver->broken_guard = true;
-                    receiver->chara_state = stun;
-                    receiver->stun_time = BROKEN_GUARD_STUN;
-                   
-                }
+                Mix_PlayChannel(0, world->music.guard, 1);
+                receiver->life_guard -= attacker->damage_bonus ? attacker->hits.light_punch->dmg * 1.5 : attacker->hits.light_punch->dmg;
             }
             else
-            {   receiver->special_bar +=10;
-                attacker->special_bar +=5;
-                receiver->life -= attacker->damage_bonus ? attacker->hits.light_punch->dmg *1.5 : attacker->hits.light_punch->dmg;
+            {
+                receiver->special_bar += 10;
+                attacker->special_bar += 5;
+                receiver->life -= attacker->damage_bonus ? attacker->hits.light_punch->dmg * 1.5 : attacker->hits.light_punch->dmg;
                 if (!receiver->broken_guard)
                 {
                     receiver->chara_state = stun;
@@ -842,7 +828,8 @@ void light_punch(sprite_perso *attacker, sprite_perso *receiver,jeu* world)
     }
 }
 
-void heavy_punch(sprite_perso *attacker, sprite_perso *receiver,jeu* world){
+void heavy_punch(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
+{
 
     if (!attacker->mirror)
     {
@@ -850,20 +837,14 @@ void heavy_punch(sprite_perso *attacker, sprite_perso *receiver,jeu* world){
         {
             if (receiver->guard)
             {
-                Mix_PlayChannel(0,world->music.guard,1);
-                receiver->life_guard -= attacker->damage_bonus ? attacker->hits.heavy_punch->dmg*1.5 : attacker->hits.heavy_punch->dmg;
-                if (receiver->life_guard <= 0)
-                {
-                    receiver->broken_guard = true;
-                    receiver->chara_state = stun;
-                    receiver->stun_time = BROKEN_GUARD_STUN;
-                }
+                Mix_PlayChannel(0, world->music.guard, 1);
+                receiver->life_guard -= attacker->damage_bonus ? attacker->hits.heavy_punch->dmg * 1.5 : attacker->hits.heavy_punch->dmg;
             }
             else
             {
-                receiver->special_bar +=20;
-                attacker->special_bar +=10;
-                receiver->life -= attacker->damage_bonus ? attacker->hits.heavy_punch->dmg*1.5 : attacker->hits.heavy_punch->dmg;
+                receiver->special_bar += 20;
+                attacker->special_bar += 10;
+                receiver->life -= attacker->damage_bonus ? attacker->hits.heavy_punch->dmg * 1.5 : attacker->hits.heavy_punch->dmg;
                 if (!receiver->broken_guard)
                 {
                     receiver->chara_state = stun;
@@ -878,22 +859,14 @@ void heavy_punch(sprite_perso *attacker, sprite_perso *receiver,jeu* world){
         {
             if (receiver->guard)
             {
-                Mix_PlayChannel(0,world->music.guard,1);
-                receiver->life_guard -= attacker->damage_bonus ? attacker->hits.heavy_punch->dmg*1.5 : attacker->hits.heavy_punch->dmg;
-                
-                if (receiver->life_guard <= 0)
-                {
-                    receiver->broken_guard = true;
-                    receiver->chara_state = stun;
-                    receiver->stun_time = BROKEN_GUARD_STUN;
-                   
-                }
+                Mix_PlayChannel(0, world->music.guard, 1);
+                receiver->life_guard -= attacker->damage_bonus ? attacker->hits.heavy_punch->dmg * 1.5 : attacker->hits.heavy_punch->dmg;
             }
             else
-            {   
-                receiver->special_bar +=20;
-                attacker->special_bar +=10;
-                receiver->life -= attacker->damage_bonus ? attacker->hits.heavy_punch->dmg*1.5 : attacker->hits.heavy_punch->dmg;
+            {
+                receiver->special_bar += 20;
+                attacker->special_bar += 10;
+                receiver->life -= attacker->damage_bonus ? attacker->hits.heavy_punch->dmg * 1.5 : attacker->hits.heavy_punch->dmg;
                 if (!receiver->broken_guard)
                 {
                     receiver->chara_state = stun;
@@ -904,7 +877,8 @@ void heavy_punch(sprite_perso *attacker, sprite_perso *receiver,jeu* world){
     }
 }
 
-void kick_hit(sprite_perso *attacker, sprite_perso *receiver,jeu* world){
+void kick_hit(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
+{
 
     if (!attacker->mirror)
     {
@@ -912,19 +886,13 @@ void kick_hit(sprite_perso *attacker, sprite_perso *receiver,jeu* world){
         {
             if (receiver->guard)
             {
-                Mix_PlayChannel(0,world->music.guard,1);
-                receiver->life_guard -= attacker->damage_bonus ? attacker->hits.kick->dmg*1.5 : attacker->hits.kick->dmg;
-                if (receiver->life_guard <= 0)
-                {
-                    receiver->broken_guard = true;
-                    receiver->chara_state = stun;
-                    receiver->stun_time = 400;
-                }
+                Mix_PlayChannel(0, world->music.guard, 1);
+                receiver->life_guard -= attacker->damage_bonus ? attacker->hits.kick->dmg * 1.5 : attacker->hits.kick->dmg;
             }
             else
             {
-                receiver->special_bar +=20;
-                receiver->life -= attacker->damage_bonus ? attacker->hits.kick->dmg*1.5 : attacker->hits.kick->dmg;
+                receiver->special_bar += 20;
+                receiver->life -= attacker->damage_bonus ? attacker->hits.kick->dmg * 1.5 : attacker->hits.kick->dmg;
                 if (!receiver->broken_guard)
                 {
                     receiver->chara_state = stun;
@@ -939,21 +907,13 @@ void kick_hit(sprite_perso *attacker, sprite_perso *receiver,jeu* world){
         {
             if (receiver->guard)
             {
-                Mix_PlayChannel(0,world->music.guard,1);
-                receiver->life_guard -= attacker->damage_bonus ? attacker->hits.kick->dmg*1.5 : attacker->hits.kick->dmg;
-              
-                if (receiver->life_guard <= 0)
-                {
-                    receiver->broken_guard = true;
-                    receiver->chara_state = stun;
-                    receiver->stun_time = 400;
-                 
-                }
+                Mix_PlayChannel(0, world->music.guard, 1);
+                receiver->life_guard -= attacker->damage_bonus ? attacker->hits.kick->dmg * 1.5 : attacker->hits.kick->dmg;
             }
             else
             {
-                receiver->special_bar +=20;
-                receiver->life -= attacker->damage_bonus ? attacker->hits.kick->dmg*1.5 : attacker->hits.kick->dmg;
+                receiver->special_bar += 20;
+                receiver->life -= attacker->damage_bonus ? attacker->hits.kick->dmg * 1.5 : attacker->hits.kick->dmg;
                 if (!receiver->broken_guard)
                 {
                     receiver->chara_state = stun;
@@ -978,7 +938,8 @@ void change_directions(sprite_perso *p1, sprite_perso *p2)
     }
 }
 
-bool canMove(sprite_perso *perso, sprite_perso *adversaire){
+bool canMove(sprite_perso *perso, sprite_perso *adversaire)
+{
     bool canMove = true;
     int *yAxis = (int *)malloc(sizeof(int) * 2);
     yAxis[0] = perso->y;
@@ -1007,28 +968,39 @@ bool canMove(sprite_perso *perso, sprite_perso *adversaire){
     return canMove;
 }
 
-void sprites_collision(sprite_perso *p1, sprite_perso *p2, jeu *world){ // Cas où les deux sprites sont superposés (suite à par ex un saut), un choc se produit et ils reculent tout les deux si possibles
+void sprites_collision(sprite_perso *p1, sprite_perso *p2, jeu *world)
+{ // Cas où les deux sprites sont superposés (suite à par ex un saut), un choc se produit et ils reculent tout les deux si possibles
     int tete = p1->y;
     int pieds = p1->y - p1->h;
-    if(p1->chara_state != jump || p2->chara_state != jump || p1->chara_state != flight || p2->chara_state != flight || p1->chara_state != flight_control || p2->chara_state != flight_control ){
-        if (tete >= p2->y && pieds <= p2->y - p2->h){
-            if (!p1->mirror && p2->mirror){
-                if (p1->x + p1->w >= p2->x && p1->backwards != 1){
-                    if (!equals(p1->x - p1->speed, p1->y + p1->h, world->map.map_structure, '0')){
+    if (p1->chara_state != jump || p2->chara_state != jump || p1->chara_state != flight || p2->chara_state != flight || p1->chara_state != flight_control || p2->chara_state != flight_control)
+    {
+        if (tete >= p2->y && pieds <= p2->y - p2->h)
+        {
+            if (!p1->mirror && p2->mirror)
+            {
+                if (p1->x + p1->w >= p2->x && p1->backwards != 1)
+                {
+                    if (!equals(p1->x - p1->speed, p1->y + p1->h, world->map.map_structure, '0'))
+                    {
                         p1->chara_state = knockback;
                     }
-                    else{
+                    else
+                    {
                         p1->chara_state = idle;
                     }
                 }
             }
 
-            else{
-                if (p1->x <= p2->x + p2->w && p1->backwards == 1){
-                    if (!equals(p1->x + p1->speed, p1->y + p1->h, world->map.map_structure, '0')){
+            else
+            {
+                if (p1->x <= p2->x + p2->w && p1->backwards == 1)
+                {
+                    if (!equals(p1->x + p1->speed, p1->y + p1->h, world->map.map_structure, '0'))
+                    {
                         p1->chara_state = knockback;
                     }
-                    else{
+                    else
+                    {
                         p1->chara_state = idle;
                     }
                 }
@@ -1052,8 +1024,8 @@ void add_input_buffer(sprite_perso *player, enum combos_inputs touche_appui, int
     player->buffer[player->pos_tab_combo++].timestamp = timestamp;
 }
 
-
-void free_hits(sprite_perso* perso){
+void free_hits(sprite_perso *perso)
+{
 
     free(perso->buffer);
     free(perso->hits.light_punch);
@@ -1061,7 +1033,8 @@ void free_hits(sprite_perso* perso){
     free(perso->hits.kick);
 }
 
-void free_music(jeu * world){
+void free_music(jeu *world)
+{
     Mix_FreeChunk(world->music.menu);
     Mix_FreeChunk(world->music.light_punch);
     Mix_FreeChunk(world->music.heavy_punch);
@@ -1113,7 +1086,8 @@ void free_map_structure(char **map_structure)
     free(map_structure);
 }
 
-void destroy_anim(sprite_perso* perso){
+void destroy_anim(sprite_perso *perso)
+{
     SDL_DestroyTexture(perso->anim[idle].anim_text);
     SDL_DestroyTexture(perso->anim[walk].anim_text);
     SDL_DestroyTexture(perso->anim[jump].anim_text);
@@ -1132,25 +1106,29 @@ void destroy_anim(sprite_perso* perso){
     SDL_DestroyTexture(perso->fireball.fireball);
 }
 
-void destroy_map(jeu* world){
+void destroy_map(jeu *world)
+{
     SDL_DestroyTexture(world->menu_set.tab_map[0]);
     SDL_DestroyTexture(world->menu_set.tab_map[1]);
     SDL_DestroyTexture(world->menu_set.tab_map[2]);
 }
 
-void destroy_textures(jeu *world){
-   SDL_DestroyTexture(world->menu_set.menu_fond);
-   destroy_anim(&world->p1);
-   destroy_anim(&world->p2);
-   SDL_DestroyTexture(world->map.image_fond);
-   SDL_DestroyTexture(world->map.plateformes);
-   for(int i = 0; i < special_bonus; i++){
-    SDL_DestroyTexture(world->lootbox.texture[i]);
-   }
-   destroy_map(world);
+void destroy_textures(jeu *world)
+{
+    SDL_DestroyTexture(world->menu_set.menu_fond);
+    destroy_anim(&world->p1);
+    destroy_anim(&world->p2);
+    SDL_DestroyTexture(world->map.image_fond);
+    SDL_DestroyTexture(world->map.plateformes);
+    for (int i = 0; i < special_bonus; i++)
+    {
+        SDL_DestroyTexture(world->lootbox.texture[i]);
+    }
+    destroy_map(world);
 }
 
-void unpause(compteur* chrono){
+void unpause(compteur *chrono)
+{
     chrono->startTime = SDL_GetTicks() - chrono->pauseTime;
     chrono->pause = false;
 }
@@ -1162,12 +1140,12 @@ void unpause(compteur* chrono){
 void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
 {
     Uint8 *keystates;
-   
 
     while (SDL_PollEvent(event))
     {
-        if(!world->music.menuPlayed){
-            Mix_PlayChannel(1,world->music.menu  ,-1);
+        if (!world->music.menuPlayed)
+        {
+            Mix_PlayChannel(1, world->music.menu, -1);
             world->music.menuPlayed = true;
         }
         if (event->type == SDL_QUIT)
@@ -1182,8 +1160,8 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                 if (world->state == pause)
                 {
                     world->state = combat;
-                    Mix_Volume(1,0);
-                   unpause(&world->timer);
+                    Mix_Volume(1, 0);
+                    unpause(&world->timer);
                     unpause(&world->p1.chrono_guard);
                     unpause(&world->p2.chrono_guard);
                     unpause(&world->p1.chrono_special);
@@ -1194,10 +1172,10 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
             }
 
             if (event->key.keysym.sym == SDLK_z)
-            {   
+            {
                 if (world->state != selection_map)
-                
-                {  
+
+                {
                     /* Mix_PlayChannel(1,world->music.menu,-1);
                      Mix_PlayChannel(0,world->music.change,1);*/
                     world->menu_set.index_menu--;
@@ -1209,9 +1187,10 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
             }
 
             if (event->key.keysym.sym == SDLK_s)
-            {    
+            {
                 if (world->state != selection_map)
-                {Mix_PlayChannel(0,world->music.change,1);
+                {
+                    Mix_PlayChannel(0, world->music.change, 1);
                     world->menu_set.index_menu++;
                     if (world->menu_set.index_menu > 2)
                     {
@@ -1223,7 +1202,8 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
             if (event->key.keysym.sym == SDLK_d)
             {
                 if (world->state == selection_map)
-                {    Mix_PlayChannel(0,world->music.change,1);
+                {
+                    Mix_PlayChannel(0, world->music.change, 1);
                     world->menu_set.index_menu++;
                     if (world->menu_set.index_menu > NB_MAPS - 1)
                     {
@@ -1235,7 +1215,8 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
             if (event->key.keysym.sym == SDLK_q)
             {
                 if (world->state == selection_map)
-                {   Mix_PlayChannel(0,world->music.change,1);
+                {
+                    Mix_PlayChannel(0, world->music.change, 1);
                     world->menu_set.index_menu--;
                     if (world->menu_set.index_menu < 0)
                     {
@@ -1270,7 +1251,7 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                     switch (world->menu_set.index_menu)
                     {
                     case 0:
-                        world->choosed_map = russia;
+                        world->choosed_map = city_night;
                         break;
                     case 1:
                         world->choosed_map = forest;
@@ -1279,7 +1260,7 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                         world->choosed_map = street_art;
                         break;
                     }
-                    
+
                     init_map(world, renderer);
                     init_perso(renderer, &world->p1, 65, 465, 100, 230, CHARA_SPEED, false);
                     init_perso(renderer, &world->p2, 950, 465, 100, 230, CHARA_SPEED, true);
@@ -1287,7 +1268,7 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                     world->game_over = false;
                     world->state = combat;
                     world->timestamp_w = 0;
-                    
+
                     init_timer(world);
                     if (world->font.police_compteur == NULL)
                     {
@@ -1297,9 +1278,9 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                     {
                         world->keystates_pre[i] = 0;
                     }
-                    
-                    init_lootbox(&world->lootbox,renderer);
-                    Mix_Volume(1,0);
+
+                    init_lootbox(&world->lootbox, renderer);
+                    Mix_Volume(1, 0);
                 }
             }
             if (world->state != combat)
@@ -1312,21 +1293,22 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
         }
     }
 }
-void pauseChrono(compteur* chrono){
-     chrono->pause = true;
-     chrono->pauseTime = SDL_GetTicks() - chrono->startTime;
+void pauseChrono(compteur *chrono)
+{
+    chrono->pause = true;
+    chrono->pauseTime = SDL_GetTicks() - chrono->startTime;
 }
 /**
  * INPUTS GAMEPLAY COMBAT
  */
 void gameplay_inputs(SDL_Event *event, jeu *world)
 {
-    
+
     const Uint8 *keystates = SDL_GetKeyboardState(NULL);
     SDL_JoystickUpdate();
     // checkJoystick(world->joysticks);
-     bool combop1 = false;
-     bool combop2 = false;
+    bool combop1 = false;
+    bool combop2 = false;
 
     while (SDL_PollEvent(event))
     {
@@ -1432,18 +1414,18 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
             {
 
                 if (world->p1.chara_state == idle || world->p1.chara_state == walk)
-                {   
+                {
                     add_input_buffer(&world->p1, light_p, world->timestamp_w);
-                    for(int i = 0; i<NB_COMBOS && !combop1;i++){
-                    combop1 = read_combo(&world->p1, i);
+                    for (int i = 0; i < NB_COMBOS && !combop1; i++)
+                    {
+                        combop1 = read_combo(&world->p1, i);
                     }
-                    if(!combop1){
-                    Mix_PlayChannel(0,world->music.light_punch,1);
-                    world->p1.chara_state = lpunch;
-                    world->p1.attack_launched = true;
+                    if (!combop1)
+                    {
+                        Mix_PlayChannel(0, world->music.light_punch, 1);
+                        world->p1.chara_state = lpunch;
+                        world->p1.attack_launched = true;
                     }
-
-                    
                 }
             }
         }
@@ -1457,15 +1439,16 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
                 if (world->p1.chara_state == idle || world->p1.chara_state == walk)
                 {
                     add_input_buffer(&world->p1, heavy_p, world->timestamp_w);
-                    for(int i = 0; i<NB_COMBOS && !combop1;i++){
-                    combop1 = read_combo(&world->p1, i);
+                    for (int i = 0; i < NB_COMBOS && !combop1; i++)
+                    {
+                        combop1 = read_combo(&world->p1, i);
                     }
-                    if(!combop1){
-                        Mix_PlayChannel(0,world->music.heavy_punch,1);
+                    if (!combop1)
+                    {
+                        Mix_PlayChannel(0, world->music.heavy_punch, 1);
                         world->p1.chara_state = hpunch;
                         world->p1.attack_launched = true;
                     }
-
                 }
             }
         }
@@ -1476,16 +1459,17 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
 
                 if (world->p1.chara_state == idle || world->p1.chara_state == walk)
                 {
-                  add_input_buffer(&world->p1, kick, world->timestamp_w);
-                    for(int i = 0; i<NB_COMBOS && !combop1;i++){
-                    combop1 = read_combo(&world->p1, i);
+                    add_input_buffer(&world->p1, kick, world->timestamp_w);
+                    for (int i = 0; i < NB_COMBOS && !combop1; i++)
+                    {
+                        combop1 = read_combo(&world->p1, i);
                     }
-                    if(!combop1){
-                        Mix_PlayChannel(0,world->music.kick,1);
+                    if (!combop1)
+                    {
+                        Mix_PlayChannel(0, world->music.kick, 1);
                         world->p1.chara_state = kickstate;
                         world->p1.attack_launched = true;
                     }
-
                 }
             }
         }
@@ -1584,12 +1568,14 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
 
                 if (world->p2.chara_state == idle || world->p2.chara_state == walk)
                 {
-                     add_input_buffer(&world->p2, light_p, world->timestamp_w);
-                    for(int i = 0; i<NB_COMBOS && !combop2;i++){
+                    add_input_buffer(&world->p2, light_p, world->timestamp_w);
+                    for (int i = 0; i < NB_COMBOS && !combop2; i++)
+                    {
                         combop2 = read_combo(&world->p2, i);
                     }
-                    if(!combop2){
-                        Mix_PlayChannel(2,world->music.light_punch,1);
+                    if (!combop2)
+                    {
+                        Mix_PlayChannel(2, world->music.light_punch, 1);
                         world->p2.chara_state = lpunch;
                         world->p2.attack_launched = true;
                     }
@@ -1606,11 +1592,13 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
                 if (world->p2.chara_state == idle || world->p2.chara_state == walk)
                 {
                     add_input_buffer(&world->p2, heavy_p, world->timestamp_w);
-                    for(int i = 0; i<NB_COMBOS && !combop2;i++){
-                    combop2 = read_combo(&world->p2, i);
+                    for (int i = 0; i < NB_COMBOS && !combop2; i++)
+                    {
+                        combop2 = read_combo(&world->p2, i);
                     }
-                    if(!combop2){
-                        Mix_PlayChannel(2,world->music.heavy_punch,1);
+                    if (!combop2)
+                    {
+                        Mix_PlayChannel(2, world->music.heavy_punch, 1);
                         world->p2.chara_state = hpunch;
                         world->p2.attack_launched = true;
                     }
@@ -1626,29 +1614,34 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
 
                 if (world->p2.chara_state == idle || world->p2.chara_state == walk)
                 {
-                     add_input_buffer(&world->p2, kick, world->timestamp_w);
-                    for(int i = 0; i<NB_COMBOS && !combop2;i++){
-                    combop2 = read_combo(&world->p2, i);
+                    add_input_buffer(&world->p2, kick, world->timestamp_w);
+                    for (int i = 0; i < NB_COMBOS && !combop2; i++)
+                    {
+                        combop2 = read_combo(&world->p2, i);
                     }
-                    if(!combop2){
-                    Mix_PlayChannel(2,world->music.kick,1);
-                    world->p2.chara_state = kickstate;
-                    world->p2.attack_launched = true;
+                    if (!combop2)
+                    {
+                        Mix_PlayChannel(2, world->music.kick, 1);
+                        world->p2.chara_state = kickstate;
+                        world->p2.attack_launched = true;
                     }
                 }
             }
         }
 
-        if (keystates[SDL_SCANCODE_KP_5] && !world->p2.broken_guard && (world->p2.chara_state == idle || world->p2.chara_state == walk)){
+        if (keystates[SDL_SCANCODE_KP_5] && !world->p2.broken_guard && (world->p2.chara_state == idle || world->p2.chara_state == walk))
+        {
             world->p2.guard = true;
             world->p2.chara_state = idle;
         }
     }
-    if (!keystates[SDL_SCANCODE_KP_5] && (world->p2.chara_state == idle || world->p2.chara_state == walk)){
+    if (!keystates[SDL_SCANCODE_KP_5] && (world->p2.chara_state == idle || world->p2.chara_state == walk))
+    {
         world->p2.guard = false;
     }
-    
-    for (int i = 0; i < 123; i++){
+
+    for (int i = 0; i < 123; i++)
+    {
         world->keystates_pre[i] = keystates[i];
     }
 }
@@ -1657,100 +1650,118 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
  * GESTION DES LOOTBOX
  */
 
-int generate_number(int a, int b){
-    srand( time (NULL) );
+int generate_number(int a, int b)
+{
+    srand(time(NULL));
     return rand() % (b - a) + a;
 }
 
-void reset_activate_lootbox(lootbox * lootbox){
+void reset_activate_lootbox(lootbox *lootbox)
+{
     lootbox->active = true;
     lootbox->falling = true;
     lootbox->x = generate_number(65, 950);
     lootbox->y = 0 - lootbox->h;
     lootbox->collided = 0;
-    lootbox->bonus = special_bonus;
+    lootbox->bonus = generate_number(health_bonus, special_bonus);
 }
-void update_lootbox(jeu * world){
+
+void update_lootbox(jeu *world)
+{
     if (world->lootbox.falling)
     {
-        if ((equals(world->lootbox.x, world->lootbox.y + world->lootbox.h + world->lootbox.fallspeed, world->map.map_structure, ' ') || (equals(world->lootbox.x + world->lootbox.w, world->lootbox.y + world->lootbox.h + world->lootbox.fallspeed, world->map.map_structure, ' ') || world->lootbox.y < CELL_HEIGHT + 20) && world->lootbox.y < 667 )){
+        if ((equals(world->lootbox.x, world->lootbox.y + world->lootbox.h + world->lootbox.fallspeed, world->map.map_structure, ' ') || (equals(world->lootbox.x + world->lootbox.w, world->lootbox.y + world->lootbox.h + world->lootbox.fallspeed, world->map.map_structure, ' ') || world->lootbox.y < CELL_HEIGHT + 20) && world->lootbox.y < 667))
+        {
             world->lootbox.y += world->lootbox.fallspeed;
         }
-        else{
+        else
+        {
             world->lootbox.falling = false;
         }
     }
 }
 
-void check_lootbox_pickup(sprite_perso *player, lootbox *lootbox, int player_number){
-    if (lootbox->active){
+void check_lootbox_pickup(sprite_perso *player, lootbox *lootbox, int player_number)
+{
+    if (lootbox->active)
+    {
         int tete = player->y;
-        int pieds = player->y + player->h; 
+        int pieds = player->y + player->h;
 
-        if (lootbox->y >= tete && lootbox->y <= pieds ){
-                if (player->x + player->w >= lootbox->x && player->x <= lootbox->x + lootbox->w){
-                    if (lootbox->collided != 0){
-                        lootbox->collided = 3;
-                    }
-                    else{
-                        lootbox->collided = player_number;
-                    }
+        if (lootbox->y >= tete && lootbox->y <= pieds)
+        {
+            if (player->x + player->w >= lootbox->x && player->x <= lootbox->x + lootbox->w)
+            {
+                if (lootbox->collided != 0)
+                {
+                    lootbox->collided = 3;
                 }
+                else
+                {
+                    lootbox->collided = player_number;
+                }
+            }
         }
     }
 }
 
-void apply_bonus(lootbox * lootbox, sprite_perso *player){
+void apply_bonus(lootbox *lootbox, sprite_perso *player)
+{
     int x = 50;
-    if (lootbox->bonus == health_bonus){
+    if (lootbox->bonus == health_bonus)
+    {
         player->life += x;
     }
 
-    if (lootbox->bonus == damage_bonus){
+    if (lootbox->bonus == damage_bonus)
+    {
         player->damage_bonus = true;
         player->dmg_bonus_timer.start = true;
         player->dmg_bonus_timer.startTime = SDL_GetTicks();
         player->dmg_bonus_timer.pause = false;
     }
 
-    if (lootbox->bonus == special_bonus){
+    if (lootbox->bonus == special_bonus)
+    {
         player->special_bar += x;
     }
 }
 
 /**
- * @brief boucle qui permet de gérer l'apparition et la récupération des lootbox
- *
- * @param world structure contenant les données du monde
+ * Système de lootbox
  */
-void lootbox_loop(jeu *world){
-    
-    if (world->lootbox.active == 0){ // On ne fait pas apparaitre de lootbox s'il y en a déjà une
+void lootbox_loop(jeu *world)
+{
+    if (world->lootbox.active == 0)
+    { // On ne fait pas apparaitre de lootbox s'il y en a déjà une
         int n = generate_number(0, RANDOM_SPAWN_CHANCE);
-        
-        if (n == 1){  // Si la fonction renvoie 1, alors on créé une lootbox
+
+        if (n == 1)
+        {                                            // Si la fonction renvoie 1, alors on créé une lootbox
             reset_activate_lootbox(&world->lootbox); // place la lootbox de manière semi-aléatoire sur l'axe x
         }
     }
 
-    
-    if (world->lootbox.active == 1){  // Cas où une lootbox est active
+    if (world->lootbox.active == 1)
+    {                                                         // Cas où une lootbox est active
         update_lootbox(world);                                // mouvement de la lootbox
         check_lootbox_pickup(&world->p1, &world->lootbox, 1); // vérifie si le joueur 1 a ramassé la lootbox
         check_lootbox_pickup(&world->p2, &world->lootbox, 2); // vérifie si le joueur 2 a ramassé la lootbox
-    
 
-        if (world->lootbox.collided == 1){
+        if (world->lootbox.collided == 1)
+        {
             apply_bonus(&world->lootbox, &world->p1);
             world->lootbox.active = false;
         }
 
-        if (world->lootbox.collided == 2){
+        if (world->lootbox.collided == 2)
+        {
             apply_bonus(&world->lootbox, &world->p2);
             world->lootbox.active = false;
         }
 
-        if (world->lootbox.collided == 3){
+        if (world->lootbox.collided == 3)
+        {
             apply_bonus(&world->lootbox, &world->p1);
             apply_bonus(&world->lootbox, &world->p2);
             world->lootbox.active = false;
@@ -1758,117 +1769,135 @@ void lootbox_loop(jeu *world){
     }
 }
 
-void regenerate_shield(sprite_perso* perso){
-     if (!perso->chrono_guard.pause && !perso->broken_guard && (SDL_GetTicks() - perso->chrono_guard.startTime) / 1000 >= 1 && perso->life_guard < 100 && !perso->guard)
+void regenerate_shield(sprite_perso *perso)
+{
+    if (!perso->chrono_guard.pause && !perso->broken_guard && (SDL_GetTicks() - perso->chrono_guard.startTime) / 1000 >= 1 && perso->life_guard < 100 && !perso->guard)
     {
         perso->life_guard += 10;
-        if(perso->special_bar >300){
-            perso->special_bar=300;
+        if (perso->special_bar > 300)
+        {
+            perso->special_bar = 300;
         }
         perso->chrono_guard.startTime = SDL_GetTicks();
     }
 }
-void increase_special(sprite_perso* perso){
-     if (!perso->chrono_special.pause && (SDL_GetTicks() - perso->chrono_special.startTime) / 1000 >= 0.5 && perso->special_bar < 300)
+
+void increase_special(sprite_perso *perso)
+{
+    if (!perso->chrono_special.pause && (SDL_GetTicks() - perso->chrono_special.startTime) / 1000 >= 0.5 && perso->special_bar < 300)
     {
-        perso->special_bar+= 1;
-        if(perso->special_bar >300){
-            perso->special_bar=300;
+        perso->special_bar += 1;
+        if (perso->special_bar > 300)
+        {
+            perso->special_bar = 300;
         }
         perso->chrono_special.startTime = SDL_GetTicks();
     }
 }
-int numDigits (int n) {
+
+int numDigits(int n)
+{
     int r = 1;
-    if (n < 0) n = -n;
-    while (n > 9) {
+    if (n < 0)
+        n = -n;
+    while (n > 9)
+    {
         n /= 10;
         r++;
     }
     return r;
 }
-void write_victory(int nb1,int nb2){
-    char new_score[8+numDigits(nb1)+numDigits(nb2)];
-    FILE* file = fopen("build/victory.txt","w");
-    sprintf(new_score,"p1:%d\np2:%dn",nb1,nb2);
-    fwrite(new_score,7+numDigits(nb1)+numDigits(nb2),1,file);
+
+void write_victory(int nb1, int nb2)
+{
+    char new_score[8 + numDigits(nb1) + numDigits(nb2)];
+    FILE *file = fopen("build/victory.txt", "w");
+    sprintf(new_score, "p1:%d\np2:%dn", nb1, nb2);
+    fwrite(new_score, 7 + numDigits(nb1) + numDigits(nb2), 1, file);
     fclose(file);
-    
-}
-void save_victory(int player){
-    char* File_name = "build/victory.txt";
-    struct stat stat_file;
-    FILE* file = fopen(File_name,"r"); //ouverture en mode lecture
-    stat(File_name, &stat_file);
-    int sz = stat_file.st_size;
-    char text_file[sz+1];
-    fread(text_file,1,sz,file);
-    text_file[sz]='\0';
-    
-    int line=1;
-    int size;
-    int nb1=0;
-    int nb2=0;
-    int i,j;
-    for( i = 0 ;i<sz;i++){
-        
-       if(text_file[i]=='\n'){
-        line++;
-        
-       }
-       if(text_file[i]==':'){
-        size = 0;
-        
-        while(text_file[i+size+1]!='\n'){
-            size++;
-        }
-        i+=1;
-        int index = 0;
-        char nombre[size+1];
-        int pos = 0;
-        nombre[size]='\0';
-        while (text_file[i+index] != '\n' && index < size)
-        {   
-            
-            nombre[pos++]=text_file[i+index];
-            
-            index++;
-        }
-      
-        if(line==1){
-           nb1 = atoi(nombre);
-        }
-        if(line==2){
-            nb2 = atoi(nombre);
-        }
-    
-        
-        
-        
-        
-       }
-    }
-    printf("nb1 : %d, nb2 : %d",nb1,nb2);
-    if(player == 1){
-        nb1+=1;
-    }
-    else{
-        nb2+=1;
-    }
-    fclose(file);
-    write_victory(nb1,nb2);
 }
 
-void check_stats(sprite_perso * perso){
-    if(perso->life > MAX_LIFE){
+void save_victory(int player)
+{
+    char *File_name = "build/victory.txt";
+    struct stat stat_file;
+    FILE *file = fopen(File_name, "r"); // ouverture en mode lecture
+    stat(File_name, &stat_file);
+    int sz = stat_file.st_size;
+    char text_file[sz + 1];
+    fread(text_file, 1, sz, file);
+    text_file[sz] = '\0';
+
+    int line = 1;
+    int size;
+    int nb1 = 0;
+    int nb2 = 0;
+    int i, j;
+    for (i = 0; i < sz; i++)
+    {
+
+        if (text_file[i] == '\n')
+        {
+            line++;
+        }
+        if (text_file[i] == ':')
+        {
+            size = 0;
+
+            while (text_file[i + size + 1] != '\n')
+            {
+                size++;
+            }
+            i += 1;
+            int index = 0;
+            char nombre[size + 1];
+            int pos = 0;
+            nombre[size] = '\0';
+            while (text_file[i + index] != '\n' && index < size)
+            {
+
+                nombre[pos++] = text_file[i + index];
+
+                index++;
+            }
+
+            if (line == 1)
+            {
+                nb1 = atoi(nombre);
+            }
+            if (line == 2)
+            {
+                nb2 = atoi(nombre);
+            }
+        }
+    }
+    printf("nb1 : %d, nb2 : %d", nb1, nb2);
+    if (player == 1)
+    {
+        nb1 += 1;
+    }
+    else
+    {
+        nb2 += 1;
+    }
+    fclose(file);
+    write_victory(nb1, nb2);
+}
+
+void check_stats(sprite_perso *perso)
+{
+    if (perso->life > MAX_LIFE)
+    {
         perso->life = MAX_LIFE;
     }
-    
-    if(perso->special_bar > MAX_SPECIAL){
+
+    if (perso->special_bar > MAX_SPECIAL)
+    {
         perso->special_bar = MAX_SPECIAL;
     }
 
-    if(perso->life_guard <= 0){
+    if (perso->life_guard <= 0)
+    {
         perso->broken_guard = true;
         perso->chara_state = stun;
         perso->guard = false;
@@ -1876,26 +1905,34 @@ void check_stats(sprite_perso * perso){
     }
 }
 
-void compute_game(jeu *world){
-   if(!world->game_over){
-        if(world->timer.timer == 0){
-            if(world->p1.life > world->p2.life){
-                //save_victory(1);
+void compute_game(jeu *world)
+{
+    if (!world->game_over)
+    {
+        if (world->timer.timer == 0)
+        {
+            if (world->p1.life > world->p2.life)
+            {
+                // save_victory(1);
                 world->game_over = true;
             }
-            if(world->p1.life < world->p2.life){
-                //save_victory(2);
+            if (world->p1.life < world->p2.life)
+            {
+                // save_victory(2);
                 world->game_over = true;
             }
         }
-        else{
-            
-            if(world->p1.life <= 0){
+        else
+        {
+
+            if (world->p1.life <= 0)
+            {
                 save_victory(2);
                 world->game_over = true;
             }
 
-            if(world->p2.life <= 0){
+            if (world->p2.life <= 0)
+            {
                 save_victory(1);
                 world->game_over = true;
             }
@@ -1903,41 +1940,44 @@ void compute_game(jeu *world){
     }
 }
 
-
-void move_fireball(sprite_perso* perso){
-    if(perso->fireball.launched_fireball){
-        perso->fireball.x +=10*perso->fireball.multiplicateur;
-        
+void move_fireball(sprite_perso *perso)
+{
+    if (perso->fireball.launched_fireball)
+    {
+        perso->fireball.x += 10 * perso->fireball.multiplicateur;
     }
-    else{
-        perso->fireball.x = perso->mirror ? perso->x : perso->x+perso->w;
-        perso->fireball.y = perso->y+perso->h/2;
+    else
+    {
+        perso->fireball.x = perso->mirror ? perso->x : perso->x + perso->w;
+        perso->fireball.y = perso->y + perso->h / 2;
     }
 }
 
-void check_fireball(sprite_perso* attacker, sprite_perso* receiver){
+void check_fireball(sprite_perso *attacker, sprite_perso *receiver)
+{
 
-        if(attacker->fireball.x >= receiver->x && attacker->fireball.x <= receiver->x+receiver->w && attacker->fireball.launched_fireball && attacker->fireball.y >= receiver->y && attacker->fireball.y >= receiver->y && attacker->fireball.y <= receiver->y+receiver->h){
-            if(receiver->guard){
-                receiver->life_guard-=attacker->hits.special_attack->dmg;
-                if(receiver->life_guard<=0){
-                    receiver->chara_state = stun;
-                    receiver->broken_guard = true;
-                    receiver->stun_time = BROKEN_GUARD_STUN;
-                }
-            }
-            else{
-                receiver->life-= attacker->hits.special_attack->dmg;
-            }
-            attacker->fireball.launched_fireball = false;
+    if (attacker->fireball.x >= receiver->x && attacker->fireball.x <= receiver->x + receiver->w && attacker->fireball.launched_fireball && attacker->fireball.y >= receiver->y && attacker->fireball.y >= receiver->y && attacker->fireball.y <= receiver->y + receiver->h)
+    {
+        if (receiver->guard)
+        {
+            receiver->life_guard -= attacker->hits.special_attack->dmg;
         }
-        if(attacker->fireball.x > SCREEN_WIDTH || attacker->fireball.x <0){
-             attacker->fireball.launched_fireball = false;
+        else
+        {
+            receiver->life -= attacker->hits.special_attack->dmg;
         }
+        attacker->fireball.launched_fireball = false;
+    }
+    if (attacker->fireball.x > SCREEN_WIDTH || attacker->fireball.x < 0)
+    {
+        attacker->fireball.launched_fireball = false;
+    }
 }
 
-void check_bonus(sprite_perso* perso){
-    if(perso->damage_bonus && !perso->dmg_bonus_timer.pause && (SDL_GetTicks() - perso->dmg_bonus_timer.startTime) /1000 >= DMG_DURATION){
+void check_bonus(sprite_perso *perso)
+{
+    if (perso->damage_bonus && !perso->dmg_bonus_timer.pause && (SDL_GetTicks() - perso->dmg_bonus_timer.startTime) / 1000 >= DMG_DURATION)
+    {
         perso->damage_bonus = false;
         perso->dmg_bonus_timer.startTime = SDL_GetTicks();
     }
@@ -1948,19 +1988,18 @@ void check_bonus(sprite_perso* perso){
 
 void update_data(jeu *world)
 {
-
-   regenerate_shield(&world->p1);
-   regenerate_shield(&world->p2);
-   increase_special(&world->p1);
-   increase_special(&world->p2);
-   move_fireball(&world->p1);
-   move_fireball(&world->p2);
-   check_fireball(&world->p1,&world->p2);
-   check_fireball(&world->p2,&world->p1);
+    regenerate_shield(&world->p1);
+    regenerate_shield(&world->p2);
+    increase_special(&world->p1);
+    increase_special(&world->p2);
+    move_fireball(&world->p1);
+    move_fireball(&world->p2);
+    check_fireball(&world->p1, &world->p2);
+    check_fireball(&world->p2, &world->p1);
     lootbox_loop(world);
     check_bonus(&world->p1);
     check_bonus(&world->p2);
-    
+
     movements(world, &world->p1, &world->p2);
     movements(world, &world->p2, &world->p1);
     sprites_collision(&world->p1, &world->p2, world);
@@ -1971,6 +2010,4 @@ void update_data(jeu *world)
     check_stats(&world->p1);
     check_stats(&world->p2);
     compute_game(world);
-    printf("STATE p1: %d\n", world->p1.chara_state);
-    printf("STATE p2: %d\n", world->p2.chara_state);
 }

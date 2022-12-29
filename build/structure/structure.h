@@ -5,7 +5,6 @@
 #include <SDL2/SDL_image.h>
 #include <stdbool.h>
 #include "../constante.h"
-#include "../map/map_global.h"
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_mixer.h>
 
@@ -20,8 +19,15 @@ struct hit_chara_s
     int effective_frame;
     int delay;
 };
-
 typedef struct hit_chara_s hit;
+
+struct map_settings{
+    enum game_map choosed_map;
+    char** map_structure;
+    SDL_Texture* image_fond;
+    SDL_Texture* plateformes;
+};
+typedef struct map_settings set_map;
 
 struct animation_s{
     int frame;
@@ -40,7 +46,6 @@ struct hit_set_s
     hit *kick;
     hit *special_attack;
 };
-
 typedef struct hit_set_s hit_set;
 
 struct inputs_s
@@ -50,6 +55,7 @@ struct inputs_s
 };
 
 typedef struct inputs_s inputs;
+
 struct combos_s
 {
     enum combos_inputs input[10];
@@ -57,8 +63,8 @@ struct combos_s
     int nb_coups;
     int required;
 };
-
 typedef struct combos_s combo;
+
 struct compteur_s{
     int startTime;
     int pauseTime;
@@ -110,7 +116,6 @@ struct sprite_p{
     compteur dmg_bonus_timer;
     throwable fireball;
 };
-
 typedef struct sprite_p sprite_perso;
 
 struct menu_p
@@ -119,7 +124,6 @@ struct menu_p
     SDL_Texture *menu_fond;
     SDL_Texture *tab_map[3];
 };
-
 typedef struct menu_p menu;
 
 struct ressources_s
@@ -127,8 +131,6 @@ struct ressources_s
     TTF_Font *police_compteur;
 };
 typedef struct ressources_s ressources;
-
-
 
 struct lootbox_s{
     SDL_Texture * texture[3];
@@ -143,6 +145,7 @@ struct lootbox_s{
     bool falling;
 };
 typedef struct lootbox_s lootbox;
+
 struct Sound_s{
     Mix_Chunk* menu;
     Mix_Chunk* light_punch;

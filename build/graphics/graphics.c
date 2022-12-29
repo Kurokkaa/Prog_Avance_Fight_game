@@ -258,7 +258,7 @@ void apply_textures(SDL_Texture * texture, SDL_Renderer *renderer, int x , int y
 
 void display_map(SDL_Renderer* renderer,jeu* world){
     switch(world->choosed_map){
-        case russia:
+        case city_night:
             apply_textures(world->map.image_fond,renderer,0,0);
             //read_structure(world->map.map_russia.map_structure);
         break;
