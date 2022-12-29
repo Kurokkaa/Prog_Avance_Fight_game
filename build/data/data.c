@@ -544,7 +544,7 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
     if (perso->chara_state == jump)
     {
 
-        if (perso->anim[jump].frame = perso->anim[jump].nbFrame)
+        if (perso->anim[jump].frame == perso->anim[jump].nbFrame)
         {
             perso->jump_origin = perso->y;
             perso->chara_state = flight;
@@ -575,9 +575,36 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
         }
     }
 
+    if (perso->chara_state == knockback){
+        if (!perso->mirror){
+            if (!equals(perso->x - perso->speed, perso->y + perso->h, world->map.map_structure, '0')){
+                perso->x -= perso->speed;
+            }
+        }
+
+        else{
+            if (!equals(perso->x + perso->speed, perso->y + perso->h, world->map.map_structure, '0')){
+                perso->x += perso->speed;
+            }
+        }
+
+        if (perso->anim[knockback].counter == 2){
+            perso->anim[knockback].frame++;
+            if (perso->anim[knockback].frame >= perso->anim[knockback].nbFrame)
+            {
+                perso->chara_state = idle;
+                perso->anim[knockback].frame = 0;
+            }
+            perso->anim[knockback].counter = 0;
+        }
+
+        else{
+            perso->anim[knockback].counter++;
+        }
+    }
+
     // Automatisation de la chute
-    if ((perso->chara_state == fall))
-    {
+    if ((perso->chara_state == fall)){
         x = perso->x;
         y = perso->y;
         if (y > 465)
@@ -626,29 +653,6 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
         }
     }
 
-    if (perso->chara_state == knockback){
-        if (!perso->mirror){
-            perso->x -= perso->speed;
-        }
-
-        else{
-            perso->x += perso->speed;
-        }
-
-        if (perso->anim[knockback].counter == 2){
-            perso->anim[knockback].frame++;
-            if (perso->anim[knockback].frame >= perso->anim[knockback].nbFrame)
-            {
-                perso->chara_state = fall;
-                perso->anim[knockback].frame = 0;
-            }
-            perso->anim[knockback].counter = 0;
-        }
-
-        else{
-            perso->anim[knockback].counter++;
-        }
-    }
 
     if (perso->chara_state == lpunch)
     {
@@ -838,8 +842,7 @@ void light_punch(sprite_perso *attacker, sprite_perso *receiver,jeu* world)
     }
 }
 
-void heavy_punch(sprite_perso *attacker, sprite_perso *receiver,jeu* world)
-{
+void heavy_punch(sprite_perso *attacker, sprite_perso *receiver,jeu* world){
 
     if (!attacker->mirror)
     {
@@ -901,8 +904,7 @@ void heavy_punch(sprite_perso *attacker, sprite_perso *receiver,jeu* world)
     }
 }
 
-void kick_hit(sprite_perso *attacker, sprite_perso *receiver,jeu* world)
-{
+void kick_hit(sprite_perso *attacker, sprite_perso *receiver,jeu* world){
 
     if (!attacker->mirror)
     {
@@ -976,8 +978,7 @@ void change_directions(sprite_perso *p1, sprite_perso *p2)
     }
 }
 
-bool canMove(sprite_perso *perso, sprite_perso *adversaire)
-{
+bool canMove(sprite_perso *perso, sprite_perso *adversaire){
     bool canMove = true;
     int *yAxis = (int *)malloc(sizeof(int) * 2);
     yAxis[0] = perso->y;
@@ -1009,24 +1010,27 @@ bool canMove(sprite_perso *perso, sprite_perso *adversaire)
 void sprites_collision(sprite_perso *p1, sprite_perso *p2, jeu *world){ // Cas où les deux sprites sont superposés (suite à par ex un saut), un choc se produit et ils reculent tout les deux si possibles
     int tete = p1->y;
     int pieds = p1->y - p1->h;
-    if (tete >= p2->y && pieds <= p2->y - p2->h){
-        if (!p1->mirror && p2->mirror){
-            if (p1->x + p1->w >= p2->x && p1->backwards != 1){
-                if (!equals(p1->x - p1->speed, p1->y + p1->h, world->map.map_structure, '0')){
-                    p1->chara_state = knockback;
-                }
-                else{
-                    p1->chara_state = fall;
+    if(p1->chara_state != jump || p2->chara_state != jump || p1->chara_state != flight || p2->chara_state != flight || p1->chara_state != flight_control || p2->chara_state != flight_control ){
+        if (tete >= p2->y && pieds <= p2->y - p2->h){
+            if (!p1->mirror && p2->mirror){
+                if (p1->x + p1->w >= p2->x && p1->backwards != 1){
+                    if (!equals(p1->x - p1->speed, p1->y + p1->h, world->map.map_structure, '0')){
+                        p1->chara_state = knockback;
+                    }
+                    else{
+                        p1->chara_state = idle;
+                    }
                 }
             }
-        }
-        else{
-            if (p1->x <= p2->x + p2->w && p1->backwards == 1){
-                if (!equals(p1->x + p1->speed, p1->y + p1->h, world->map.map_structure, '0')){
-                    p1->chara_state = knockback;
-                }
-                else{
-                    p1->chara_state = fall;
+
+            else{
+                if (p1->x <= p2->x + p2->w && p1->backwards == 1){
+                    if (!equals(p1->x + p1->speed, p1->y + p1->h, world->map.map_structure, '0')){
+                        p1->chara_state = knockback;
+                    }
+                    else{
+                        p1->chara_state = idle;
+                    }
                 }
             }
         }
@@ -1592,6 +1596,7 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
                 }
             }
         }
+
         // speciaux
         if (!keystates[SDL_SCANCODE_KP_4] && keystates[SDL_SCANCODE_KP_8] && !keystates[SDL_SCANCODE_KP_9])
         {
@@ -1612,6 +1617,7 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
                 }
             }
         }
+
         // coup spéciaux si la jauge est pleine
         if (!keystates[SDL_SCANCODE_KP_4] && !keystates[SDL_SCANCODE_KP_8] && keystates[SDL_SCANCODE_KP_9])
         {
@@ -1632,18 +1638,17 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
                 }
             }
         }
-        if (keystates[SDL_SCANCODE_KP_5] && !world->p2.broken_guard && (world->p2.chara_state == idle || world->p2.chara_state == walk))
-        {
+
+        if (keystates[SDL_SCANCODE_KP_5] && !world->p2.broken_guard && (world->p2.chara_state == idle || world->p2.chara_state == walk)){
             world->p2.guard = true;
             world->p2.chara_state = idle;
         }
     }
-    if (!keystates[SDL_SCANCODE_KP_5] && (world->p2.chara_state == idle || world->p2.chara_state == walk))
-    {
+    if (!keystates[SDL_SCANCODE_KP_5] && (world->p2.chara_state == idle || world->p2.chara_state == walk)){
         world->p2.guard = false;
     }
-    for (int i = 0; i < 123; i++)
-    {
+    
+    for (int i = 0; i < 123; i++){
         world->keystates_pre[i] = keystates[i];
     }
 }
@@ -1668,7 +1673,7 @@ void reset_activate_lootbox(lootbox * lootbox){
 void update_lootbox(jeu * world){
     if (world->lootbox.falling)
     {
-        if ((equals(world->lootbox.x + world->lootbox.w / 2, world->lootbox.y + world->lootbox.h + world->lootbox.fallspeed, world->map.map_structure, ' ') || world->lootbox.y < CELL_HEIGHT + 20) && world->lootbox.y < 667 ){
+        if ((equals(world->lootbox.x, world->lootbox.y + world->lootbox.h + world->lootbox.fallspeed, world->map.map_structure, ' ') || (equals(world->lootbox.x + world->lootbox.w, world->lootbox.y + world->lootbox.h + world->lootbox.fallspeed, world->map.map_structure, ' ') || world->lootbox.y < CELL_HEIGHT + 20) && world->lootbox.y < 667 )){
             world->lootbox.y += world->lootbox.fallspeed;
         }
         else{
@@ -1678,24 +1683,11 @@ void update_lootbox(jeu * world){
 }
 
 void check_lootbox_pickup(sprite_perso *player, lootbox *lootbox, int player_number){
-    /*int collision_x = lootbox->x - player->x;
-    int collision_y = lootbox->y - player->y - player->h;
-    int distance = sqrt(collision_x * collision_x + collision_y * collision_y);
-    if (distance < player->w && lootbox->active){ 
-        if (lootbox->collided != 0){
-            lootbox->collided = 3;
-        }
-        else{
-            lootbox->collided = player_number;
-        }
-        lootbox->active=false;
-        lootbox->falling=false;
-    }*/
     if (lootbox->active){
-        int pieds = player->y;
-        int tete = player->y - player->h; 
+        int tete = player->y;
+        int pieds = player->y + player->h; 
 
-        if (tete >= lootbox->y ){
+        if (lootbox->y >= tete && lootbox->y <= pieds ){
                 if (player->x + player->w >= lootbox->x && player->x <= lootbox->x + lootbox->w){
                     if (lootbox->collided != 0){
                         lootbox->collided = 3;
@@ -1879,6 +1871,7 @@ void check_stats(sprite_perso * perso){
     if(perso->life_guard <= 0){
         perso->broken_guard = true;
         perso->chara_state = stun;
+        perso->guard = false;
         perso->stun_time = BROKEN_GUARD_STUN;
     }
 }
@@ -1923,8 +1916,8 @@ void move_fireball(sprite_perso* perso){
 }
 
 void check_fireball(sprite_perso* attacker, sprite_perso* receiver){
-    
-        if(attacker->fireball.x >= receiver->x && attacker->fireball.x <= receiver->x+receiver->w && attacker->fireball.launched_fireball){
+
+        if(attacker->fireball.x >= receiver->x && attacker->fireball.x <= receiver->x+receiver->w && attacker->fireball.launched_fireball && attacker->fireball.y >= receiver->y && attacker->fireball.y >= receiver->y && attacker->fireball.y <= receiver->y+receiver->h){
             if(receiver->guard){
                 receiver->life_guard-=attacker->hits.special_attack->dmg;
                 if(receiver->life_guard<=0){
@@ -1980,5 +1973,4 @@ void update_data(jeu *world)
     compute_game(world);
     printf("STATE p1: %d\n", world->p1.chara_state);
     printf("STATE p2: %d\n", world->p2.chara_state);
-    SDL_Delay(5);
 }
