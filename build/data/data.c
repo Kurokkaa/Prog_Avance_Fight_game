@@ -80,6 +80,7 @@ void init_music(jeu* world){
     world->music.fireball = Mix_LoadWAV("build/ressources/Audio/missile_shot.wav");
     world->music.frappe = Mix_LoadWAV("build/ressources/Audio/missile_shot.wav");
     world->music.change = Mix_LoadWAV("build/ressources/Audio/missile_shot.wav");
+    world->music.guard = Mix_LoadWAV("build/ressources/Audio/missile_shot.wav");
     world->music.menuPlayed = false;
     
 }
@@ -110,6 +111,7 @@ void init_perso(SDL_Renderer *renderer, sprite_perso *perso, int x, int y, int w
     perso->attack_launched = false;
     perso->guard = false;
     perso->life_guard = 100;
+    perso->damage_bonus = false;
     init_hits(perso);
     init_combos(perso);
     perso->pos_tab_combo = 0;
@@ -664,7 +666,7 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
             if (perso->anim[lpunch].frame == perso->hits.light_punch->effective_frame)
             {
 
-                light_punch(perso, adversaire);
+                light_punch(perso, adversaire,world);
             }
             if (perso->anim[lpunch].frame >= perso->anim[lpunch].nbFrame)
             {
@@ -686,7 +688,7 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
             perso->anim[hpunch].frame++;
             if (perso->anim[hpunch].frame == perso->hits.heavy_punch->effective_frame)
             {
-                heavy_punch(perso, adversaire);
+                heavy_punch(perso, adversaire,world);
             }
             if (perso->anim[hpunch].frame >= perso->anim[hpunch].nbFrame)
             {
@@ -708,7 +710,7 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
             perso->anim[kickstate].frame++;
             if (perso->anim[kickstate].frame == perso->hits.kick->effective_frame)
             {
-                kick_hit(perso, adversaire);
+                kick_hit(perso, adversaire,world);
             }
             if (perso->anim[kickstate].frame >= perso->anim[kickstate].nbFrame)
             {
@@ -771,7 +773,7 @@ bool equals(int x, int y, char **map_point, char test)
     return (map_point[y / height_factor][x / width_factor] == test);
 }
 
-void light_punch(sprite_perso *attacker, sprite_perso *receiver)
+void light_punch(sprite_perso *attacker, sprite_perso *receiver,jeu* world)
 {
 
     if (!attacker->mirror)
@@ -781,8 +783,9 @@ void light_punch(sprite_perso *attacker, sprite_perso *receiver)
             if (receiver->guard)
             {
                
-    
+                 
                 receiver->life_guard -= attacker->damage_bonus ? attacker->hits.light_punch->dmg *1.5 :attacker->hits.light_punch->dmg;
+                Mix_PlayChannel(0,world->music.guard,1);
                 if (receiver->life_guard <= 0)
                 {
                     receiver->broken_guard = true;
@@ -793,7 +796,9 @@ void light_punch(sprite_perso *attacker, sprite_perso *receiver)
             else
             {
                 receiver->special_bar +=10;
+                attacker->special_bar +=5;
                 receiver->life -= attacker->damage_bonus ? attacker->hits.light_punch->dmg *1.5 :attacker->hits.light_punch->dmg;
+                
                 if (!receiver->broken_guard)
                 {
                     receiver->chara_state = stun;
@@ -808,6 +813,7 @@ void light_punch(sprite_perso *attacker, sprite_perso *receiver)
         {
             if (receiver->guard)
             {
+                Mix_PlayChannel(0,world->music.guard,1);
                 receiver->life_guard -= attacker->damage_bonus ? attacker->hits.light_punch->dmg *1.5 : attacker->hits.light_punch->dmg;
                
                 if (receiver->life_guard <= 0)
@@ -820,6 +826,7 @@ void light_punch(sprite_perso *attacker, sprite_perso *receiver)
             }
             else
             {   receiver->special_bar +=10;
+                attacker->special_bar +=5;
                 receiver->life -= attacker->damage_bonus ? attacker->hits.light_punch->dmg *1.5 : attacker->hits.light_punch->dmg;
                 if (!receiver->broken_guard)
                 {
@@ -831,7 +838,7 @@ void light_punch(sprite_perso *attacker, sprite_perso *receiver)
     }
 }
 
-void heavy_punch(sprite_perso *attacker, sprite_perso *receiver)
+void heavy_punch(sprite_perso *attacker, sprite_perso *receiver,jeu* world)
 {
 
     if (!attacker->mirror)
@@ -840,6 +847,7 @@ void heavy_punch(sprite_perso *attacker, sprite_perso *receiver)
         {
             if (receiver->guard)
             {
+                Mix_PlayChannel(0,world->music.guard,1);
                 receiver->life_guard -= attacker->damage_bonus ? attacker->hits.heavy_punch->dmg*1.5 : attacker->hits.heavy_punch->dmg;
                 if (receiver->life_guard <= 0)
                 {
@@ -851,7 +859,7 @@ void heavy_punch(sprite_perso *attacker, sprite_perso *receiver)
             else
             {
                 receiver->special_bar +=20;
-               
+                attacker->special_bar +=10;
                 receiver->life -= attacker->damage_bonus ? attacker->hits.heavy_punch->dmg*1.5 : attacker->hits.heavy_punch->dmg;
                 if (!receiver->broken_guard)
                 {
@@ -867,6 +875,7 @@ void heavy_punch(sprite_perso *attacker, sprite_perso *receiver)
         {
             if (receiver->guard)
             {
+                Mix_PlayChannel(0,world->music.guard,1);
                 receiver->life_guard -= attacker->damage_bonus ? attacker->hits.heavy_punch->dmg*1.5 : attacker->hits.heavy_punch->dmg;
                 
                 if (receiver->life_guard <= 0)
@@ -880,6 +889,7 @@ void heavy_punch(sprite_perso *attacker, sprite_perso *receiver)
             else
             {   
                 receiver->special_bar +=20;
+                attacker->special_bar +=10;
                 receiver->life -= attacker->damage_bonus ? attacker->hits.heavy_punch->dmg*1.5 : attacker->hits.heavy_punch->dmg;
                 if (!receiver->broken_guard)
                 {
@@ -891,7 +901,7 @@ void heavy_punch(sprite_perso *attacker, sprite_perso *receiver)
     }
 }
 
-void kick_hit(sprite_perso *attacker, sprite_perso *receiver)
+void kick_hit(sprite_perso *attacker, sprite_perso *receiver,jeu* world)
 {
 
     if (!attacker->mirror)
@@ -900,7 +910,7 @@ void kick_hit(sprite_perso *attacker, sprite_perso *receiver)
         {
             if (receiver->guard)
             {
-              
+                Mix_PlayChannel(0,world->music.guard,1);
                 receiver->life_guard -= attacker->damage_bonus ? attacker->hits.kick->dmg*1.5 : attacker->hits.kick->dmg;
                 if (receiver->life_guard <= 0)
                 {
@@ -927,6 +937,7 @@ void kick_hit(sprite_perso *attacker, sprite_perso *receiver)
         {
             if (receiver->guard)
             {
+                Mix_PlayChannel(0,world->music.guard,1);
                 receiver->life_guard -= attacker->damage_bonus ? attacker->hits.kick->dmg*1.5 : attacker->hits.kick->dmg;
               
                 if (receiver->life_guard <= 0)
@@ -1252,6 +1263,7 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                     init_perso(renderer, &world->p1, 65, 465, 100, 230, CHARA_SPEED, false);
                     init_perso(renderer, &world->p2, 950, 465, 100, 230, CHARA_SPEED, true);
                     init_controller(world);
+                    world->game_over = false;
                     world->state = combat;
                     world->timestamp_w = 0;
                     
@@ -1787,26 +1799,104 @@ void increase_special(sprite_perso* perso){
         perso->chrono_special.startTime = SDL_GetTicks();
     }
 }
-
-void compute_game(jeu *world){
-    if(world->timer.timer == 0){
-        if(world->p1.life > world->p2.life){
-           
+int numDigits (int n) {
+    int r = 1;
+    if (n < 0) n = -n;
+    while (n > 9) {
+        n /= 10;
+        r++;
+    }
+    return r;
+}
+void write_victory(int nb1,int nb2){
+    char* new_score[7+numDigits(nb1)+numDigits(nb2)];
+    FILE* file = fopen("build/victory.txt","w");
+    sprintf(new_score,"p1:%d\np2:%d",nb1,nb2);
+    fwrite(new_score,7+numDigits(nb1)+numDigits(nb2),1,file);
+    fclose(file);
+    
+}
+void save_victory(int player){
+    char* File_name = "build/victory.txt";
+    struct stat stat_file;
+    FILE* file = fopen(File_name,"r"); //ouverture en mode lecture
+    stat(File_name, &stat_file);
+    int sz = stat_file.st_size;
+    char text_file[sz+1];
+    fread(text_file,1,sz,file);
+    text_file[sz]='\0';
+    
+    int line=1;
+    int size;
+    int nb1;
+    int nb2;
+    int i,j;
+    for( i = 0 ;i<sz;i++){
+        
+       if(text_file[i]=='\n'){
+        line++;
+        
+       }
+       if(text_file[i]==':'){
+        size = 0;
+        
+        while(text_file[i+size+1]!='\n'){
+            size++;
         }
-        if(world->p1.life < world->p2.life){
-         
+        
+        char* nombre[size];
+        int index = 0;
+        while(text_file[i+index+1]!='\n' && size-1!=index){
+            nombre[index]=text_file[i+index+1];
+            printf("%c",nombre[index]);
+            index++;
+        }
+        if(line==1){
+            nb1 = atoi(nombre);
+        }
+        if(line==2){
+            nb2 = atoi(nombre);
+        }
+    
+        
+        
+        
+        //printf("nb1 : %d, nb2 : %d",nb1,nb2);
+       }
+    }
+    if(player == 1){
+        nb1+=1;
+    }
+    else{
+        nb2+=1;
+    }
+    fclose(file);
+    //write_victory(nb1,nb2);
+}
+void compute_game(jeu *world){
+   if(!world->game_over){
+        if(world->timer.timer == 0){
+            if(world->p1.life > world->p2.life){
+                //save_victory(1);
+                world->game_over = true;
+            }
+            if(world->p1.life < world->p2.life){
+                //save_victory(2);
+                world->game_over = true;
+            }
         }
         else{
-           
+            
+            if(world->p1.life <= 0){
+                //save_victory(1);
+                world->game_over = true;
+            }
+
+            if(world->p2.life <= 0){
+                save_victory(1);
+                world->game_over = true;
+            }
         }
-    }
-
-    if(world->p1.life <= 0){
-        
-    }
-
-    if(world->p2.life <= 0){
-     
     }
 }
 

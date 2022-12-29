@@ -34,6 +34,6 @@ int main(int argc, char *argv[]){
     }
 
     // Quitter SDL
-    quit_game(&world,&fenetre,&renderer);
+    //quit_game(&world,&fenetre,&renderer);
     return 0;
 }

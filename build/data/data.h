@@ -12,6 +12,7 @@
 #include <math.h>
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_mixer.h>
+#include "sys/stat.h"
 /*FONCTIONS D'INITIALISATION*/
 void init_controller(jeu* world);
 void init_map(jeu* world,SDL_Renderer* renderer);
@@ -36,8 +37,9 @@ void checkJoystick(SDL_Joystick** joysticks);
 void update_data(jeu* world);
 void movements(jeu* world, sprite_perso* perso, sprite_perso* adversaire);
 bool equals(int x, int y, char** map_point, char test);
-void light_punch(sprite_perso* attacker, sprite_perso* receiver);
-void heavy_punch(sprite_perso *attacker, sprite_perso *receiver);
+void light_punch(sprite_perso* attacker, sprite_perso* receiver,jeu* world);
+void heavy_punch(sprite_perso *attacker, sprite_perso *receiver,jeu* world);
+void kick_hit(sprite_perso *attacker, sprite_perso *receiver,jeu* world);
 //void reset_hit(sprite_perso* perso); /* A ENLEVER???*/
 void change_directions(sprite_perso * p1, sprite_perso * p2);
 bool canMove(sprite_perso * perso, sprite_perso * adversaire);

@@ -150,6 +150,7 @@ struct Sound_s{
     Mix_Chunk* fireball;
     Mix_Chunk* frappe;
     Mix_Chunk* change;
+    Mix_Chunk* guard;
     bool menuPlayed;
 };
 typedef struct Sound_s Sound;
@@ -168,6 +169,7 @@ struct world_s{
     compteur timer;
     lootbox lootbox;
     Sound music;
+    bool game_over;
 };
 
 typedef struct world_s jeu;
