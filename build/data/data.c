@@ -93,7 +93,7 @@ void init_jeu(jeu *world, SDL_Renderer *renderer)
 
 void init_perso(SDL_Renderer *renderer, sprite_perso *perso, int x, int y, int w, int h, int speed, bool mirror,int choice)
 {
-    perso->perso_choisi = 0;
+    perso->perso_choisi = choice;
     perso->x = x;
     perso->y = y;
     perso->w = w;
@@ -109,11 +109,11 @@ void init_perso(SDL_Renderer *renderer, sprite_perso *perso, int x, int y, int w
     perso->guard = false;
     perso->life_guard = MAX_GUARD;
     perso->damage_bonus = false;
-    perso->perso_choisi = choice;
+    perso->damage_bonus = false;
     init_hits(perso);
     init_combos(perso);
     perso->pos_tab_combo = 0;
-    perso->special_bar = 0;
+    perso->special_bar = 300;
     perso->fireball.fireball = load_image("./build/ressources/Characters/Chara1/fireball.bmp", renderer);
     perso->fireball.launched_fireball = false;
     perso->buffer = malloc(sizeof(inputs) * BUFFER_SIZE);
@@ -152,7 +152,7 @@ void init_hits(sprite_perso *perso)
     perso->hits.heavy_punch->delay = 5;
     perso->hits.heavy_punch->launch = 0;
 
-    perso->hits.kick->dmg = 1;
+    perso->hits.kick->dmg = 30;
     perso->hits.kick->speed = 0;
     perso->hits.kick->range_x = 400;
     perso->hits.kick->range_y = 0;
@@ -160,7 +160,8 @@ void init_hits(sprite_perso *perso)
     perso->hits.kick->timer = 0;
     perso->hits.kick->delay = 20;
     perso->hits.kick->launch = 0;
-    perso->hits.special_attack->dmg = 1;
+
+    perso->hits.special_attack->dmg = 50;
     perso->hits.special_attack->speed = 0;
     perso->hits.special_attack->range_x = 400;
     perso->hits.special_attack->range_y = 0;
@@ -183,9 +184,17 @@ void init_combos(sprite_perso *player)
     player->tab_combo[0].input[0] = right;
     player->tab_combo[0].input[1] = left;
     player->tab_combo[0].input[2] = light_p;
-    init_combo(1, 2, 30, 200, player);
-    player->tab_combo[1].input[0] = left;
-    player->tab_combo[1].input[1] = right;
+
+    //2eme combos
+    init_combo(1, 3, 50, 200, player);
+    player->tab_combo[1].input[0] = right;
+    player->tab_combo[1].input[1] = left;
+    player->tab_combo[1].input[2] = kick;
+
+    init_combo(2, 3, 50, 299, player);
+    player->tab_combo[2].input[0] = right;
+    player->tab_combo[2].input[1] = left;
+    player->tab_combo[2].input[2] = heavy_p;
 }
 
 void init_lootbox(lootbox *lootbox, SDL_Renderer *renderer)
@@ -252,7 +261,6 @@ void init(SDL_Window **window, SDL_Renderer **renderer, jeu *world)
 
 void init_state_animation(SDL_Renderer *renderer, sprite_perso *perso, enum character_state state, char *path, int nbFrame, int width)
 {
-
     perso->anim[state].anim_text = load_image(path, renderer);
     perso->anim[state].frame = 0;
     perso->anim[state].nbFrame = nbFrame;
@@ -305,7 +313,6 @@ void init_chara_state(SDL_Renderer *renderer, sprite_perso *perso)
         perso->anim[15].aura = 0;
         break;
     }
-    
 }
 
 /**
@@ -396,9 +403,15 @@ bool read_combo(sprite_perso *player, int val)
                 player->chara_state = fireball;
                 player->fireball.multiplicateur = player->mirror ? -1 : 1;
                 break;
-            case 1:
+            case 2:
                 player->x = 1000;
-            default:
+                break;
+            case 1:
+                //player->berserk = true;
+                player->damage_bonus = true;
+                player->dmg_bonus_timer.start = true;
+                player->dmg_bonus_timer.startTime = SDL_GetTicks();
+                player->dmg_bonus_timer.pause = false;
                 break;
             }
         }
@@ -856,6 +869,7 @@ bool equals(int x, int y, char **map_point, char test)
     return (map_point[y / height_factor][x / width_factor] == test);
 }
 
+
 void light_punch(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
 {
 
@@ -866,7 +880,7 @@ void light_punch(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
             if (receiver->guard)
             {
 
-                receiver->life_guard -= attacker->damage_bonus ? attacker->hits.light_punch->dmg * 1.5 : attacker->hits.light_punch->dmg;
+                receiver->life_guard -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.light_punch->dmg * 100 : attacker->hits.light_punch->dmg * 1.5  ) : attacker->hits.light_punch->dmg;
                 Mix_PlayChannel(0, world->music.guard, 1);
             }
             else
@@ -2133,6 +2147,7 @@ void check_bonus(sprite_perso *perso)
     {
         perso->damage_bonus = false;
         perso->dmg_bonus_timer.startTime = SDL_GetTicks();
+        perso->berserk = false;
     }
 }
 /**
