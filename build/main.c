@@ -21,6 +21,9 @@ int main(int argc, char *argv[]){
     refresh_graphics(renderer,&world);
     // Boucle principale
     while(!world.terminer){
+        if(world.state == endgame){
+            endgame_data(&world);
+        }
         if(world.state == combat){
             gameplay_inputs(&events, &world);
             update_data(&world);

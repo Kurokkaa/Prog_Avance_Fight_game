@@ -41,7 +41,6 @@ void render_aura(SDL_Renderer *renderer, sprite_perso* sprite, int numaura){
 void play_animations(SDL_Renderer *renderer, sprite_perso* sprite, int chara_state){
     SDL_Rect dst = {0, 0, 0, 0};
     SDL_Rect src = {0, 0, 0, 0};
-
     dst.x = sprite->x;
     dst.y = sprite->y;
     dst.w = sprite->anim[chara_state].width;
@@ -58,7 +57,8 @@ void play_animations(SDL_Renderer *renderer, sprite_perso* sprite, int chara_sta
  }
  else{
     SDL_RendererFlip flip = SDL_FLIP_VERTICAL;
-        SDL_Point center = {sprite->anim[chara_state].width/2,250/2};
+
+        SDL_Point center = {sprite->anim[chara_state].width / 2,250/2};
         SDL_RenderCopyEx(renderer,  sprite->anim[chara_state].anim_text, &src, &dst,180, &center, flip);
  }
 }
@@ -71,35 +71,37 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
         case combat:
             case pause:
             display_map(renderer,world);
-            apply_textures(world->menu_set.cadreVie, renderer, 0 , 0); //Cadres contenant les vies et spécials
-            display_dynamic_texture(renderer, world->map.map_structure, world->map.plateformes);
-            render_bonuses(renderer, &world->lootbox);
-             if(world->p1.anim[15].aura || world->p1.damage_bonus){
-                render_aura(renderer, &(world->p1),15);
-            }
-            if(world->p2.anim[15].aura || world->p2.damage_bonus){
-                render_aura(renderer, &(world->p2),15);
-            }
-            play_animations(renderer, &(world->p1), world->p1.chara_state);
-            play_animations(renderer, &(world->p2), world->p2.chara_state);
-             if(world->p1.anim[15].aura || world->p1.damage_bonus){
-                render_aura(renderer, &(world->p1),16);
-            }
-            if(world->p2.anim[15].aura || world->p2.damage_bonus){
-                render_aura(renderer, &(world->p2),16);
-            }
-            display_life(renderer, world);
-            display_throwable(renderer,world->p1.fireball);
-            display_throwable(renderer,world->p2.fireball);
-            display_throwable(renderer,world->p1.gravityball);
-            display_throwable(renderer,world->p2.gravityball);
-            display_timer(world,renderer);
-            display_special(renderer,world);
-            if(world->p1.guard){
-                display_guard(renderer,world->p1);
-            }
-            if(world->p2.guard){
-                display_guard(renderer,world->p2);
+            if(world->state == combat){
+                apply_textures(world->menu_set.cadreVie, renderer, 0 , 0); //Cadres contenant les vies et spécials
+                display_dynamic_texture(renderer, world->map.map_structure, world->map.plateformes);
+                render_bonuses(renderer, &world->lootbox);
+                if(world->p1.anim[17].aura || world->p1.damage_bonus){
+                    render_aura(renderer, &(world->p1),17);
+                }
+                if(world->p2.anim[17].aura || world->p2.damage_bonus){
+                    render_aura(renderer, &(world->p2),17);
+                }
+                play_animations(renderer, &(world->p1), world->p1.chara_state);
+                play_animations(renderer, &(world->p2), world->p2.chara_state);
+                if(world->p1.anim[17].aura || world->p1.damage_bonus){
+                    render_aura(renderer, &(world->p1),18);
+                }
+                if(world->p2.anim[17].aura || world->p2.damage_bonus){
+                    render_aura(renderer, &(world->p2),18);
+                }
+                display_life(renderer, world);
+                display_throwable(renderer,world->p1.fireball);
+                display_throwable(renderer,world->p2.fireball);
+                display_throwable(renderer,world->p1.gravityball);
+                display_throwable(renderer,world->p2.gravityball);
+                display_timer(world,renderer);
+                display_special(renderer,world);
+                if(world->p1.guard){
+                    display_guard(renderer,world->p1);
+                }
+                if(world->p2.guard){
+                    display_guard(renderer,world->p2);
+                }
             }
             if(world->state == pause){
                 //blend mode pour gérer la transparence
@@ -123,6 +125,13 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
                 SDL_RenderDrawRect(renderer, &rect);
             }
             break;
+
+        case endgame:
+            display_map(renderer,world);
+            play_animations(renderer, &(world->p1), world->p1.chara_state);
+            play_animations(renderer, &(world->p2), world->p2.chara_state);
+            break;
+
         case main_menu:
             apply_textures(world->menu_set.menu_fond, renderer, 0, 0);
             
@@ -344,6 +353,10 @@ void display_map(SDL_Renderer* renderer,jeu* world){
         break;
 
         case forest:
+            apply_textures(world->map.image_fond,renderer,0,0);
+        break;
+
+        case japan:
             apply_textures(world->map.image_fond,renderer,0,0);
         break;
     }

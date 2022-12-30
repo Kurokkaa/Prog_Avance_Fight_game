@@ -50,7 +50,15 @@ void init_map(jeu *world, SDL_Renderer *renderer)
         world->map.map_structure = read_file_map("build/ressources/map/forest/forest_structure");
         world->map.plateformes = load_image("build/ressources/map/forest/plateforme.bmp", renderer);
         break;
+
+    case japan :
+        world->map.image_fond = load_image("build/ressources/map/Japan/Japan.bmp", renderer);
+        world->map.map_structure = read_file_map("build/ressources/map/Japan/Japan_structure");
+        world->map.plateformes = load_image("build/ressources/map/Japan/plateforme.bmp", renderer);
+        break;
     }
+
+    
 }
 
 // fonction pour les miniatures de maps
@@ -58,6 +66,7 @@ void init_miniature(jeu *world, SDL_Renderer *renderer)
 {
     world->menu_set.tab_map[0] = load_image("build/ressources/map/city_night/city_mini.bmp", renderer);
     world->menu_set.tab_map[1] = load_image("build/ressources/map/forest/forest_mini.bmp", renderer);
+    world->menu_set.tab_map[2] = load_image("build/ressources/map/Japan/Japan_mini.bmp", renderer);
 }
 
 void init_music(jeu *world)
@@ -279,44 +288,57 @@ void init_chara_state(SDL_Renderer *renderer, sprite_perso *perso)
     switch (perso->perso_choisi)
     {
     case 0:
-        init_state_animation(renderer, perso, idle, "build/ressources/Characters/Chara1/Idle.bmp", 15, 115);
+        init_state_animation(renderer, perso, idle, "build/ressources/Characters/Chara1/Idle.bmp", 15, 90);
         init_state_animation(renderer, perso, walk, "build/ressources/Characters/Chara1/Walking.bmp", 15, 90);
-        init_state_animation(renderer, perso, jump, "build/ressources/Characters/Chara1/Jump.bmp", 10, 71);
-        init_state_animation(renderer, perso, crouch, "build/ressources/Characters/Chara1/Idle.bmp", 15, 115);
+        init_state_animation(renderer, perso, jump, "build/ressources/Characters/Chara1/Jump.bmp", 10, 85);
+        init_state_animation(renderer, perso, crouch, "build/ressources/Characters/Chara1/Idle.bmp", 15, 85);
         init_state_animation(renderer, perso, fall, "build/ressources/Characters/Chara1/Falling.bmp", 10, 95);
-        init_state_animation(renderer, perso, backwards, "build/ressources/Characters/Chara1/Walking.bmp", 15, 90);
-        init_state_animation(renderer, perso, flight, "build/ressources/Characters/Chara1/Jump.bmp", 10, 80);
-        init_state_animation(renderer, perso, flight_control, "build/ressources/Characters/Chara1/Jump.bmp", 10, 80);
-        init_state_animation(renderer, perso, fall_control, "build/ressources/Characters/Chara1/Falling.bmp", 10, 95);
-        init_state_animation(renderer, perso, landing, "build/ressources/Characters/Chara1/Landing.bmp", 5, 71);
-        init_state_animation(renderer, perso, knockback, "build/ressources/Characters/Chara1/KnockBack.bmp", 5, 100);
-        init_state_animation(renderer, perso, lpunch, "build/ressources/Characters/Chara1/LightPunch.bmp", 16, 90);
-        init_state_animation(renderer, perso, kickstate, "build/ressources/Characters/Chara1/Kick.bmp", 14, 118);
-        init_state_animation(renderer, perso, hpunch, "build/ressources/Characters/Chara1/HeavyPunch.bmp", 15, 77);
-        init_state_animation(renderer, perso, stun, "build/ressources/Characters/Chara1/Knocked.bmp", 5, 100);
-        init_state_animation(renderer, perso, 15, "build/ressources/Characters/Powers/Aura_Spritesheet.Bmp", 8, 190);
-        init_state_animation(renderer, perso, 16, "build/ressources/Characters/Powers/Transparent_Aura_Spritesheet.Bmp", 8, 190);
-        perso->anim[15].aura = 0;
+        init_state_animation(renderer, perso, backwards, "build/ressources/Characters/Chara1/Walking.bmp", 15, 85);
+        init_state_animation(renderer, perso, flight, "build/ressources/Characters/Chara1/Jump.bmp", 10, 85);
+        init_state_animation(renderer, perso, flight_control, "build/ressources/Characters/Chara1/Jump.bmp", 10, 85);
+        init_state_animation(renderer, perso, fall_control, "build/ressources/Characters/Chara1/Falling.bmp", 10, 85);
+        init_state_animation(renderer, perso, landing, "build/ressources/Characters/Chara1/Landing.bmp", 5, 90);
+        init_state_animation(renderer, perso, knockback, "build/ressources/Characters/Chara1/KnockBack.bmp", 5, 85);
+        init_state_animation(renderer, perso, lpunch, "build/ressources/Characters/Chara1/LightPunch.bmp", 16, 85);
+        init_state_animation(renderer, perso, kickstate, "build/ressources/Characters/Chara1/Kick.bmp", 14, 110);
+        init_state_animation(renderer, perso, hpunch, "build/ressources/Characters/Chara1/HeavyPunch.bmp", 15, 85);
+        init_state_animation(renderer, perso, stun, "build/ressources/Characters/Chara1/Knocked.bmp", 5, 85);
+
+        init_state_animation(renderer, perso, fireball, "build/ressources/Characters/Chara1/Fireball.bmp", 30, 90);
+        init_state_animation(renderer, perso, gravityball, "build/ressources/Characters/Chara1/Fireball.bmp", 30, 90);
+        init_state_animation(renderer, perso, looser, "build/ressources/Characters/Chara1/Defeat.bmp", 28, 90);
+        init_state_animation(renderer, perso, winner, "build/ressources/Characters/Chara1/Victory.bmp", 30, 100);
+
+        init_state_animation(renderer, perso, 17, "build/ressources/Characters/Powers/Aura_Spritesheet.Bmp", 8, 190);
+        init_state_animation(renderer, perso, 18, "build/ressources/Characters/Powers/Transparent_Aura_Spritesheet.Bmp", 8, 190);
+        perso->anim[17].aura = 0;
         break;
+
     case 1:
          init_state_animation(renderer, perso, idle, "build/ressources/Characters/Chara2/Idle.bmp", 15, 90);
         init_state_animation(renderer, perso, walk, "build/ressources/Characters/Chara2/Walking.bmp", 15, 90);
-        init_state_animation(renderer, perso, jump, "build/ressources/Characters/Chara2/Jump.bmp", 10, 71);
-        init_state_animation(renderer, perso, crouch, "build/ressources/Characters/Chara2/Idle.bmp", 15, 74);
-        init_state_animation(renderer, perso, fall, "build/ressources/Characters/Chara2/Falling.bmp", 10, 71);
-        init_state_animation(renderer, perso, backwards, "build/ressources/Characters/Chara2/Walking.bmp", 15, 90);
-        init_state_animation(renderer, perso, flight, "build/ressources/Characters/Chara2/Jump.bmp", 10, 71);
-        init_state_animation(renderer, perso, flight_control, "build/ressources/Characters/Chara2/Jump.bmp", 10, 71);
-        init_state_animation(renderer, perso, fall_control, "build/ressources/Characters/Chara2/Falling.bmp", 10, 71);
-        init_state_animation(renderer, perso, landing, "build/ressources/Characters/Chara2/Landing.bmp", 5, 71);
-        init_state_animation(renderer, perso, knockback, "build/ressources/Characters/Chara2/KnockBack.bmp", 5, 100);
-        init_state_animation(renderer, perso, lpunch, "build/ressources/Characters/Chara2/LightPunch.bmp", 16, 90);
-        init_state_animation(renderer, perso, kickstate, "build/ressources/Characters/Chara2/Kick.bmp", 14, 105);
-        init_state_animation(renderer, perso, hpunch, "build/ressources/Characters/Chara2/HeavyPunch.bmp", 15, 90);
-        init_state_animation(renderer, perso, stun, "build/ressources/Characters/Chara2/Knocked.bmp", 5, 100);
-        init_state_animation(renderer, perso, 15, "build/ressources/Characters/Powers/Aura_Spritesheet.Bmp", 8, 190);
-        init_state_animation(renderer, perso, 16, "build/ressources/Characters/Powers/Transparent_Aura_Spritesheet.Bmp", 8, 190);
-        perso->anim[15].aura = 0;
+        init_state_animation(renderer, perso, jump, "build/ressources/Characters/Chara2/Jump.bmp", 10, 85);
+        init_state_animation(renderer, perso, crouch, "build/ressources/Characters/Chara2/Idle.bmp", 15, 85);
+        init_state_animation(renderer, perso, fall, "build/ressources/Characters/Chara2/Falling.bmp", 10, 90);
+        init_state_animation(renderer, perso, backwards, "build/ressources/Characters/Chara2/Walking.bmp", 15, 85);
+        init_state_animation(renderer, perso, flight, "build/ressources/Characters/Chara2/Jump.bmp", 10, 85);
+        init_state_animation(renderer, perso, flight_control, "build/ressources/Characters/Chara2/Jump.bmp", 10, 85);
+        init_state_animation(renderer, perso, fall_control, "build/ressources/Characters/Chara2/Falling.bmp", 10, 95);
+        init_state_animation(renderer, perso, landing, "build/ressources/Characters/Chara2/Landing.bmp", 5, 90);
+        init_state_animation(renderer, perso, knockback, "build/ressources/Characters/Chara2/KnockBack.bmp", 5, 85);
+        init_state_animation(renderer, perso, lpunch, "build/ressources/Characters/Chara2/LightPunch.bmp", 16, 85);
+        init_state_animation(renderer, perso, kickstate, "build/ressources/Characters/Chara2/Kick.bmp", 14, 110);
+        init_state_animation(renderer, perso, hpunch, "build/ressources/Characters/Chara2/HeavyPunch.bmp", 15, 85);
+        init_state_animation(renderer, perso, stun, "build/ressources/Characters/Chara2/Knocked.bmp", 5, 85);
+
+        init_state_animation(renderer, perso, fireball, "build/ressources/Characters/Chara1/Fireball.bmp", 30, 90);
+        init_state_animation(renderer, perso, gravityball, "build/ressources/Characters/Chara1/Fireball.bmp", 30, 90);
+        init_state_animation(renderer, perso, looser, "build/ressources/Characters/Chara1/Defeat.bmp", 28, 90);
+        init_state_animation(renderer, perso, winner, "build/ressources/Characters/Chara1/Victory.bmp", 30, 100);
+
+        init_state_animation(renderer, perso, 17, "build/ressources/Characters/Powers/Aura_Spritesheet.Bmp", 8, 190);
+        init_state_animation(renderer, perso, 18, "build/ressources/Characters/Powers/Transparent_Aura_Spritesheet.Bmp", 8, 190);
+        perso->anim[17].aura = 0;
         break;
     }
 }
@@ -824,10 +846,16 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
             perso->chara_state = idle;
         }
     }
+
+    /*  THROWABLES */
     if (perso->chara_state == fireball)
     {
-        perso->fireball.launched_fireball = true;
-        perso->chara_state = idle;
+        perso->anim[fireball].frame++;
+        if(perso->anim[fireball].frame == perso->anim[fireball].nbFrame){
+            perso->fireball.launched_fireball = true;
+            perso->chara_state = idle;
+        }
+        
     }
     if (perso->chara_state == gravityball)
     {
@@ -835,48 +863,52 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
             perso->gravityball.timer_throw.startTime = SDL_GetTicks();
             perso->gravityball.timer_throw.pause = false;
         }
-        perso->gravityball.launched_fireball = true;
-        perso->chara_state = idle;
+        perso->anim[gravityball].frame++;
+        if(perso->anim[gravityball].frame == perso->anim[gravityball].nbFrame){
+            perso->gravityball.launched_fireball = true;
+            perso->chara_state = idle;
+        }
     }
+
 }
 
 void manage_aura(sprite_perso * perso)
 {
-    if(perso->anim[15].counter >= 5){
-        if(perso->anim[15].aura && !perso->damage_bonus ){
-            if(perso->anim[15].frame != perso->anim[15].nbFrame){
-                perso->anim[15].frame++;
-                perso->anim[16].frame++;
+    if(perso->anim[17].counter >= 5){
+        if(perso->anim[17].aura && !perso->damage_bonus ){
+            if(perso->anim[17].frame != perso->anim[17].nbFrame){
+                perso->anim[17].frame++;
+                perso->anim[18].frame++;
             }
             else{
-                perso->anim[15].aura = 0;
-                perso->anim[15].frame = 0;
-                perso->anim[16].frame = 0;
+                perso->anim[17].aura = 0;
+                perso->anim[17].frame = 0;
+                perso->anim[18].frame = 0;
             }
         }
 
-        if(!perso->anim[15].aura && perso->damage_bonus){
-            perso->anim[15].frame++;
-            perso->anim[16].frame++;
-            if(perso->anim[15].frame == 2){
-                perso->anim[15].aura = 1;
+        if(!perso->anim[17].aura && perso->damage_bonus){
+            perso->anim[17].frame++;
+            perso->anim[18].frame++;
+            if(perso->anim[17].frame == 2){
+                perso->anim[17].aura = 1;
             }
         }
 
-        if(perso->damage_bonus && perso->anim[15].aura){
-            if(perso->anim[15].frame == 4){
-                perso->anim[15].frame = 2;
-                perso->anim[16].frame = 2;
+        if(perso->damage_bonus && perso->anim[17].aura){
+            if(perso->anim[17].frame == 4){
+                perso->anim[17].frame = 2;
+                perso->anim[18].frame = 2;
             }
             else{
-                perso->anim[15].frame++;
-                perso->anim[16].frame++;
+                perso->anim[17].frame++;
+                perso->anim[18].frame++;
             }
         }
-        perso->anim[15].counter = 0;
+        perso->anim[17].counter = 0;
     }
     else{
-        perso->anim[15].counter++;
+        perso->anim[17].counter++;
     }
 }
 
@@ -1433,6 +1465,9 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                     case 1:
                         world->choosed_map = forest;
                         break;
+                    case 2: 
+                        world->choosed_map = japan;
+                        break;
                     }
 
                     init_map(world, renderer);
@@ -1987,7 +2022,7 @@ void apply_bonus(lootbox *lootbox, sprite_perso *player)
         player->life += x;
     }
 
-    if(!player->damage_bonus && lootbox->bonus == damage_bonus && !player->anim[15].aura ){
+    if(!player->damage_bonus && lootbox->bonus == damage_bonus && !player->anim[17].aura ){
         player->damage_bonus = true;
         player->dmg_bonus_timer.start = true;
         player->dmg_bonus_timer.startTime = SDL_GetTicks();
@@ -2184,30 +2219,52 @@ void compute_game(jeu *world)
     {
         if (world->timer.timer == 0)
         {
+            world->timer.startTime = SDL_GetTicks();
+            world->timer.timer = 10;
+
             if (world->p1.life > world->p2.life)
             {
-                // save_victory(1);
+                save_victory(1);
+                world->state = endgame;
                 world->game_over = true;
+                world->p1.chara_state = winner;
+                world->p2.chara_state = looser;
+                world->p2.y += 40;
             }
             if (world->p1.life < world->p2.life)
             {
-                // save_victory(2);
+                save_victory(2);
+                world->state = endgame;
                 world->game_over = true;
+                world->p1.chara_state = looser;
+                world->p2.chara_state = winner;
+                world->p1.y += 40;
+                
             }
         }
         else
         {
+            world->timer.startTime = SDL_GetTicks();
+            world->timer.timer = 10;
 
             if (world->p1.life <= 0)
             {
                 save_victory(2);
+                world->state = endgame;
                 world->game_over = true;
+                world->p1.chara_state = looser;
+                world->p2.chara_state = winner;
+                world->p1.y += 40;
             }
 
             if (world->p2.life <= 0)
             {
                 save_victory(1);
+                world->state = endgame;
                 world->game_over = true;
+                world->p1.chara_state = winner;
+                world->p2.chara_state = looser;
+                world->p2.y += 40;
             }
         }
     }
@@ -2362,4 +2419,37 @@ void update_data(jeu *world)
     height_factor = CELL_HEIGHT;
     width_factor = CELL_WIDTH;
     
+}
+
+void endgame_data(jeu * world){
+    
+    if((SDL_GetTicks()-world->timer.startTime) / 1000 >= 1){
+        world->timer.timer--;
+        world->timer.startTime = SDL_GetTicks();
+    }
+    if(world->timer.timer == 0){
+        world->state = main_menu;
+    }
+
+    if(world->p1.chara_state == winner){
+        world->p1.anim[winner].frame++;
+        if(world->p1.anim[winner].frame == world->p1.anim[winner].nbFrame ){
+            world->p1.anim[winner].frame = 5;
+        }
+        world->p2.anim[looser].frame++;
+        if(world->p2.anim[looser].frame == world->p2.anim[looser].nbFrame ){
+            world->p2.anim[looser].frame = world->p2.anim[looser].nbFrame -1;
+        }
+    }
+    
+    else{
+        world->p2.anim[winner].frame++;
+        if(world->p2.anim[winner].frame == world->p2.anim[winner].nbFrame ){
+            world->p2.anim[winner].frame = 5;
+        }
+        world->p1.anim[looser].frame++;
+        if(world->p1.anim[looser].frame == world->p1.anim[looser].nbFrame ){
+            world->p1.anim[looser].frame = world->p1.anim[looser].nbFrame -1;
+        }
+    }
 }

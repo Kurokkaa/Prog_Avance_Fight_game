@@ -105,7 +105,7 @@ struct sprite_p{
     bool double_jump;
     int life;
     hit_set hits;
-    anim_t anim[17];
+    anim_t anim[21];
     inputs *buffer;
     int pos_tab_combo;
     combo tab_combo[NB_COMBOS];
