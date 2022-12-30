@@ -100,6 +100,7 @@ struct sprite_p{
     int jump_height;
     int jump_origin;
     bool mirror;
+    bool double_jump;
     int life;
     hit_set hits;
     anim_t anim[17];
@@ -118,6 +119,7 @@ struct sprite_p{
     compteur chrono_special;
     compteur dmg_bonus_timer;
     throwable fireball;
+    throwable gravityball;
 };
 typedef struct sprite_p sprite_perso;
 

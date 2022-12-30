@@ -27,6 +27,7 @@ void render_aura(SDL_Renderer *renderer, sprite_perso* sprite, int numaura){
     dst.w = sprite->anim[numaura].width;
     dst.h = 250;
 
+    
     int width;
     SDL_QueryTexture(sprite->anim[numaura].anim_text, NULL, NULL, &width, &src.h);
     src.h -=10;
@@ -47,7 +48,7 @@ void play_animations(SDL_Renderer *renderer, sprite_perso* sprite, int chara_sta
     int width;
     SDL_QueryTexture(sprite->anim[chara_state].anim_text, NULL, NULL, &width, &src.h);
     src.h -=10;
-    src.x = sprite->anim[chara_state].frame * 500;
+    src.x = 40+sprite->anim[chara_state].frame * 500;
     src.y = 0;
     src.w = sprite->anim[chara_state].width;
  if(!sprite->mirror){
@@ -55,7 +56,7 @@ void play_animations(SDL_Renderer *renderer, sprite_perso* sprite, int chara_sta
  }
  else{
     SDL_RendererFlip flip = SDL_FLIP_VERTICAL;
-        SDL_Point center = {150/2,250/2};
+        SDL_Point center = {118/2,250/2};
         SDL_RenderCopyEx(renderer,  sprite->anim[chara_state].anim_text, &src, &dst,180, &center, flip);
  }
 }
@@ -85,8 +86,10 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
                 render_aura(renderer, &(world->p2),16);
             }
             display_life(renderer, world);
-            display_fireball(renderer,world->p1);
-            display_fireball(renderer,world->p2);
+            display_throwable(renderer,world->p1.fireball);
+            display_throwable(renderer,world->p2.fireball);
+            display_throwable(renderer,world->p1.gravityball);
+            display_throwable(renderer,world->p2.gravityball);
             display_timer(world,renderer);
             display_special(renderer,world);
             if(world->p1.guard){
@@ -170,11 +173,12 @@ void display_timer(jeu* world,SDL_Renderer* renderer){
             free(surface_compteur);
            
 }
-void display_fireball(SDL_Renderer* renderer,sprite_perso perso){
-   if(perso.fireball.launched_fireball){
-        apply_textures(perso.fireball.fireball,renderer,perso.fireball.x,perso.fireball.y);
+void display_throwable(SDL_Renderer* renderer,throwable projectile){
+   if(projectile.launched_fireball){
+        apply_textures(projectile.fireball,renderer,projectile.x,projectile.y);
     }
 }
+
 char* barlvl(sprite_perso perso){
      char* lvl;
      if(perso.special_bar>=0){
@@ -317,6 +321,7 @@ void apply_textures(SDL_Texture * texture, SDL_Renderer *renderer, int x , int y
     SDL_Rect dst = {0, 0, 0, 0};
 
     SDL_QueryTexture(texture, NULL, NULL, &dst.w, &dst.h);
+
     dst.x = x; dst.y=y;
 
     SDL_RenderCopy(renderer, texture, NULL, &dst);
@@ -343,15 +348,16 @@ void display_dynamic_texture(SDL_Renderer* renderer, char** map_struct, SDL_Text
     if(map_struct == NULL){
         printf("Probleme de la map_struct");
     }
+    
     int width_factor,height_factor;
     width_factor = CELL_WIDTH;
     height_factor = CELL_HEIGHT;
-    for(int i = 1; i<40 ; i++){
-        for(int j = 1 ; j<20 ; j++){
+
+    for(int i = 0; i<40 ; i++){
+        for(int j = 0 ; j<20 ; j++){
             
             if(map_struct[i][j] == '5'){
-                printf("i: %d j:%d \n",i*height_factor,j*width_factor);
-                apply_textures(texture, renderer, (j+1) * width_factor, i * height_factor);
+                apply_textures(texture, renderer, j * width_factor, i * height_factor);
             }
         }
        

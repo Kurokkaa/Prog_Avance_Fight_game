@@ -89,6 +89,7 @@ void init_jeu(jeu *world, SDL_Renderer *renderer)
     world->menu_set.index_menu = 0;
     world->font.police_compteur = TTF_OpenFont("build/ressources/Polices/Reach_Story.ttf", 40);
     init_music(world);
+    //init_miniature(world, renderer);
 }
 
 void init_perso(SDL_Renderer *renderer, sprite_perso *perso, int x, int y, int w, int h, int speed, bool mirror,int choice)
@@ -114,9 +115,13 @@ void init_perso(SDL_Renderer *renderer, sprite_perso *perso, int x, int y, int w
     init_combos(perso);
     perso->pos_tab_combo = 0;
     perso->special_bar = 300;
-    perso->fireball.fireball = load_image("./build/ressources/Characters/Chara1/fireball.bmp", renderer);
+    perso->fireball.fireball = load_image("./build/ressources/Characters/Powers/fireball.bmp", renderer);
+    perso->gravityball.fireball = load_image("./build/ressources/Characters/Powers/BlackHole1.bmp", renderer);
+    
     perso->fireball.launched_fireball = false;
+    perso->gravityball.launched_fireball = false;
     perso->buffer = malloc(sizeof(inputs) * BUFFER_SIZE);
+    perso->double_jump = true;
     for (int i = 0; i < BUFFER_SIZE; i++)
     {
         perso->buffer[i].input = 0;
@@ -148,16 +153,16 @@ void init_hits(sprite_perso *perso)
     perso->hits.heavy_punch->range_y = 0;
     perso->hits.heavy_punch->effective_frame = 11;
     perso->hits.heavy_punch->launch = false;
-    perso->hits.heavy_punch->timer = 0;
+
     perso->hits.heavy_punch->delay = 5;
     perso->hits.heavy_punch->launch = 0;
 
     perso->hits.kick->dmg = 30;
     perso->hits.kick->speed = 0;
-    perso->hits.kick->range_x = 400;
+    perso->hits.kick->range_x = 30;
     perso->hits.kick->range_y = 0;
     perso->hits.kick->effective_frame = 7;
-    perso->hits.kick->timer = 0;
+ 
     perso->hits.kick->delay = 20;
     perso->hits.kick->launch = 0;
 
@@ -166,7 +171,7 @@ void init_hits(sprite_perso *perso)
     perso->hits.special_attack->range_x = 400;
     perso->hits.special_attack->range_y = 0;
     perso->hits.special_attack->effective_frame = 0;
-    perso->hits.special_attack->timer = 0;
+  
     perso->hits.special_attack->delay = 20;
 }
 
@@ -273,21 +278,21 @@ void init_chara_state(SDL_Renderer *renderer, sprite_perso *perso)
     switch (perso->perso_choisi)
     {
     case 0:
-        init_state_animation(renderer, perso, idle, "build/ressources/Characters/Chara1/Idle.bmp", 15, 150);
-        init_state_animation(renderer, perso, walk, "build/ressources/Characters/Chara1/Walking.bmp", 15, 150);
-        init_state_animation(renderer, perso, jump, "build/ressources/Characters/Chara1/Jump.bmp", 10, 150);
-        init_state_animation(renderer, perso, crouch, "build/ressources/Characters/Chara1/Idle.bmp", 15, 150);
-        init_state_animation(renderer, perso, fall, "build/ressources/Characters/Chara1/Falling.bmp", 10, 150);
-        init_state_animation(renderer, perso, backwards, "build/ressources/Characters/Chara1/Walking.bmp", 15, 150);
-        init_state_animation(renderer, perso, flight, "build/ressources/Characters/Chara1/Jump.bmp", 10, 150);
-        init_state_animation(renderer, perso, flight_control, "build/ressources/Characters/Chara1/Jump.bmp", 10, 150);
-        init_state_animation(renderer, perso, fall_control, "build/ressources/Characters/Chara1/Falling.bmp", 10, 150);
-        init_state_animation(renderer, perso, landing, "build/ressources/Characters/Chara1/Landing.bmp", 5, 150);
-        init_state_animation(renderer, perso, knockback, "build/ressources/Characters/Chara1/KnockBack.bmp", 5, 150);
-        init_state_animation(renderer, perso, lpunch, "build/ressources/Characters/Chara1/LightPunch.bmp", 16, 150);
-        init_state_animation(renderer, perso, kickstate, "build/ressources/Characters/Chara1/Kick.bmp", 14, 150);
-        init_state_animation(renderer, perso, hpunch, "build/ressources/Characters/Chara1/HeavyPunch.bmp", 15, 150);
-        init_state_animation(renderer, perso, stun, "build/ressources/Characters/Chara1/Knocked.bmp", 5, 150);
+        init_state_animation(renderer, perso, idle, "build/ressources/Characters/Chara1/Idle.bmp", 15, 118);
+        init_state_animation(renderer, perso, walk, "build/ressources/Characters/Chara1/Walking.bmp", 15, 118);
+        init_state_animation(renderer, perso, jump, "build/ressources/Characters/Chara1/Jump.bmp", 10, 118);
+        init_state_animation(renderer, perso, crouch, "build/ressources/Characters/Chara1/Idle.bmp", 15, 118);
+        init_state_animation(renderer, perso, fall, "build/ressources/Characters/Chara1/Falling.bmp", 10, 118);
+        init_state_animation(renderer, perso, backwards, "build/ressources/Characters/Chara1/Walking.bmp", 15, 118);
+        init_state_animation(renderer, perso, flight, "build/ressources/Characters/Chara1/Jump.bmp", 10, 118);
+        init_state_animation(renderer, perso, flight_control, "build/ressources/Characters/Chara1/Jump.bmp", 10, 118);
+        init_state_animation(renderer, perso, fall_control, "build/ressources/Characters/Chara1/Falling.bmp", 10, 118);
+        init_state_animation(renderer, perso, landing, "build/ressources/Characters/Chara1/Landing.bmp", 5, 118);
+        init_state_animation(renderer, perso, knockback, "build/ressources/Characters/Chara1/KnockBack.bmp", 5, 118);
+        init_state_animation(renderer, perso, lpunch, "build/ressources/Characters/Chara1/LightPunch.bmp", 16, 118);
+        init_state_animation(renderer, perso, kickstate, "build/ressources/Characters/Chara1/Kick.bmp", 14, 118);
+        init_state_animation(renderer, perso, hpunch, "build/ressources/Characters/Chara1/HeavyPunch.bmp", 15, 118);
+        init_state_animation(renderer, perso, stun, "build/ressources/Characters/Chara1/Knocked.bmp", 5, 118);
         init_state_animation(renderer, perso, 15, "build/ressources/Characters/Powers/Aura_Spritesheet.Bmp", 8, 190);
         init_state_animation(renderer, perso, 16, "build/ressources/Characters/Powers/Transparent_Aura_Spritesheet.Bmp", 8, 190);
         perso->anim[15].aura = 0;
@@ -388,7 +393,7 @@ bool read_combo(sprite_perso *player, int val)
     }
     if (found)
     {
-        printf("trouvé");
+        
         for (int i = 0; i < player->pos_tab_combo; i++)
         {
             player->buffer[i].input = 0;
@@ -406,7 +411,8 @@ bool read_combo(sprite_perso *player, int val)
                 break;
             case 1:
                 
-                player->x = 1000;
+                player->chara_state = gravityball;
+                player->gravityball.multiplicateur = player->mirror ? -1 : 1;
                 break;
             case 2:
                 player->berserk = true;
@@ -676,7 +682,7 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
         }
         else
         {
-            if (equals(x, y + perso->h + perso->jump_height * 0.025, world->map.map_structure, ' '))
+            if (equals(x, y + perso->h + perso->jump_height * 0.025, world->map.map_structure, ' ') && equals(x+ perso->w, y + perso->h + perso->jump_height * 0.025, world->map.map_structure, ' ') )
             {
                 perso->y += perso->jump_height * 0.025;
             }
@@ -691,7 +697,7 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
     x = perso->x;
     y = perso->y;
 
-    if (perso->chara_state != flight && equals(x, y + perso->h + perso->jump_height * 0.025, world->map.map_structure, ' '))
+    if (perso->chara_state != flight && equals(x, y + perso->h + perso->jump_height * 0.025, world->map.map_structure, ' ') && equals(x+ perso->w, y + perso->h + perso->jump_height * 0.025, world->map.map_structure, ' ') )
     {
         perso->chara_state = fall;
     }
@@ -705,6 +711,7 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
             if (perso->anim[landing].frame >= perso->anim[landing].nbFrame)
             {
                 perso->chara_state = idle;
+                perso->double_jump = true;
                 perso->anim[landing].frame = 0;
             }
             perso->anim[landing].counter = 0;
@@ -819,6 +826,11 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
     if (perso->chara_state == fireball)
     {
         perso->fireball.launched_fireball = true;
+        perso->chara_state = idle;
+    }
+    if (perso->chara_state == gravityball)
+    {
+        perso->gravityball.launched_fireball = true;
         perso->chara_state = idle;
     }
 }
@@ -1044,7 +1056,7 @@ bool canMove(sprite_perso *perso, sprite_perso *adversaire)
     {
         if (yAxis[0] >= adversaire->y && yAxis[1] <= adversaire->y - adversaire->h)
         {
-            if (perso->x + perso->speed >= adversaire->x - adversaire->w && perso->backwards != 1)
+            if (perso->x + perso->w + perso->speed >= adversaire->x  && perso->backwards != 1)
             {
                 canMove = false;
             }
@@ -1075,7 +1087,7 @@ void sprites_collision(sprite_perso *p1, sprite_perso *p2, jeu *world)
             {
                 if (p1->x + p1->w >= p2->x && p1->backwards != 1)
                 {
-                    if (!equals(p1->x - p1->speed, p1->y + p1->h, world->map.map_structure, '0'))
+                    if (!equals(p1->x + p1->speed, p1->y + p1->h, world->map.map_structure, '0'))
                     {
                         p1->chara_state = knockback;
                     }
@@ -1365,7 +1377,7 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                         world->menu_set.index_menu = 0;
                         world->menu_set.menu_fond = load_image("build/ressources/menu/selection_map.png", renderer);
                         world->state = selection_map;
-                        init_miniature(world, renderer);
+                       
                         break;
                     case 1:
                         world->state = options;
@@ -1393,8 +1405,8 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                     }
 
                     init_map(world, renderer);
-                    init_perso(renderer, &world->p1, 65, 465, 100, 230, CHARA_SPEED, false,0);
-                    init_perso(renderer, &world->p2, 950, 465, 100, 230, CHARA_SPEED, true,1);
+                    init_perso(renderer, &world->p1, 65, 465, 55, 230, CHARA_SPEED, false,0);
+                    init_perso(renderer, &world->p2, 950, 465, 55, 230, CHARA_SPEED, true,1);
                     init_controller(world);
                     world->game_over = false;
                     world->state = combat;
@@ -1550,20 +1562,43 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
             if (world->p1.chara_state == idle || world->p1.chara_state == walk)
             {
                 world->p1.chara_state = crouch;
+            }
+            if(world->p1.chara_state == jump || world->p1.chara_state == flight || world->p1.chara_state == flight_control){
+                world->p1.chara_state = fall;
+               
+
+            }
                 if (keystates[SDL_SCANCODE_S] != world->keystates_pre[SDL_SCANCODE_S])
                 {
                     add_input_buffer(&world->p1, down, world->timestamp_w);
                 }
-            }
+            
         }
 
         // sauts
-        if ((keystates[SDL_SCANCODE_W] /*|| SDL_GameControllerGetAxis(world->joysticks[0],1)< (-10000)*/) && (world->p1.chara_state == idle || world->p1.chara_state == walk))
+        if ((keystates[SDL_SCANCODE_W] /*|| SDL_GameControllerGetAxis(world->joysticks[0],1)< (-10000)*/))
         {
-            world->p1.chara_state = jump;
+            if (world->p1.chara_state == idle || world->p1.chara_state == walk)
+                {
+                    world->p1.chara_state = jump;
+                }
+                else 
+                {
+                   if(( world->p1.chara_state == jump ||world->p1.chara_state == flight || world->p1.chara_state == flight_control || world->p1.chara_state == fall_control|| world->p1.chara_state == fall))
+                       if(keystates[SDL_SCANCODE_W] != world->keystates_pre[SDL_SCANCODE_W] && world->p1.double_jump)
+                        {
+                        
+                        world->p1.jump_origin = world->p1.y;
+                        world->p1.anim[flight].frame = 0;
+                        world->p1.anim[flight_control].frame = 0;
+                        world->p1.chara_state = flight;
+                        
+                        world->p1.double_jump = false;
+                        }
             if (keystates[SDL_SCANCODE_W] != world->keystates_pre[SDL_SCANCODE_W])
             {
                 add_input_buffer(&world->p1, up, world->timestamp_w);
+            }
             }
         }
 
@@ -1722,14 +1757,42 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
             }
         }
 
-        if (keystates[SDL_SCANCODE_UP] && (world->p2.chara_state == idle || world->p2.chara_state == walk))
+        if (keystates[SDL_SCANCODE_UP])
         {
-            world->p2.chara_state = jump;
-            if (keystates[SDL_SCANCODE_UP] != world->keystates_pre[SDL_SCANCODE_UP])
-            {
-                add_input_buffer(&world->p2, up, world->timestamp_w);
+           
+               
+                
+                if (world->p2.chara_state == idle || world->p2.chara_state == walk)
+                {
+                    world->p2.chara_state = jump;
+                }
+                else 
+                {
+                   if(( world->p2.chara_state == jump ||world->p2.chara_state == flight || world->p2.chara_state == flight_control || world->p2.chara_state == fall_control|| world->p2.chara_state == fall))
+                       if(keystates[SDL_SCANCODE_UP] != world->keystates_pre[SDL_SCANCODE_UP] && world->p2.double_jump)
+                        {
+
+                        world->p2.jump_origin = world->p2.y;
+                        world->p2.anim[flight].frame = 0;
+                        world->p2.anim[flight_control].frame = 0;
+                        world->p2.chara_state = flight;
+                        
+                        world->p2.double_jump = false;
+                        }
+                      
+                }
+                if (keystates[SDL_SCANCODE_UP] != world->keystates_pre[SDL_SCANCODE_UP])
+                {add_input_buffer(&world->p2, up, world->timestamp_w);  }
             }
-        }
+        
+    
+      
+            /* code */
+        
+        
+         
+
+
 
         // coups
         if (keystates[SDL_SCANCODE_KP_4] && !keystates[SDL_SCANCODE_KP_8] && !keystates[SDL_SCANCODE_KP_9])
@@ -1842,7 +1905,7 @@ void update_lootbox(jeu *world)
     {
         if ((equals(world->lootbox.x, world->lootbox.y + world->lootbox.h + world->lootbox.fallspeed, world->map.map_structure, ' ') || (equals(world->lootbox.x + world->lootbox.w, world->lootbox.y + world->lootbox.h + world->lootbox.fallspeed, world->map.map_structure, ' ') || world->lootbox.y < CELL_HEIGHT + 20) && world->lootbox.y < 667))
         {
-            printf("%d\n",world->lootbox.x);
+     
             world->lootbox.y += world->lootbox.fallspeed;
         }
         else
@@ -2041,7 +2104,7 @@ void save_victory(int player)
             }
         }
     }
-    printf("nb1 : %d, nb2 : %d", nb1, nb2);
+   
     if (player == 1)
     {
         nb1 += 1;
@@ -2122,6 +2185,18 @@ void move_fireball(sprite_perso *perso)
         perso->fireball.y = perso->y + perso->h / 2;
     }
 }
+void move_gravityball(sprite_perso *perso)
+{
+    if (perso->gravityball.launched_fireball)
+    {
+        perso->gravityball.x += 3 * perso->gravityball.multiplicateur;
+    }
+    else
+    {
+        perso->gravityball.x = perso->mirror ? perso->x : perso->x + perso->w;
+        perso->gravityball.y = perso->y;
+    }
+}
 
 void check_fireball(sprite_perso *attacker, sprite_perso *receiver)
 {
@@ -2141,6 +2216,45 @@ void check_fireball(sprite_perso *attacker, sprite_perso *receiver)
     if (attacker->fireball.x > SCREEN_WIDTH || attacker->fireball.x < 0)
     {
         attacker->fireball.launched_fireball = false;
+    }
+}
+
+void check_gravityball(sprite_perso *attacker, sprite_perso *receiver)
+{
+    int distance = 100*(sqrt(pow(receiver->x-attacker->gravityball.x+100,2)+pow(receiver->y-attacker->gravityball.y+25,2)))/DISTANCE_MAX*50/100;
+    
+    if (attacker->gravityball.launched_fireball){
+        if(receiver->x>attacker->gravityball.x+100){
+            
+            receiver->x -=(100*distance/DISTANCE_MAX)*5/100;
+        }
+        else if(receiver->x<attacker->gravityball.x+100){
+            receiver->x+=(100*distance/DISTANCE_MAX)*5/100;
+        }
+        if(receiver->y+receiver->h<attacker->gravityball.y +100){
+               receiver->y+=(100*distance/DISTANCE_MAX)*5/100;
+        }
+        else if(receiver->y>attacker->gravityball.y +100){
+            receiver->y-=(100*distance/DISTANCE_MAX)*5/100;
+        }
+
+    }
+
+    if (attacker->gravityball.x >= receiver->x && attacker->gravityball.x <= receiver->x + receiver->w && attacker->gravityball.launched_fireball && attacker->gravityball.y >= receiver->y && attacker->gravityball.y >= receiver->y && attacker->gravityball.y <= receiver->y + receiver->h)
+    {
+        if (receiver->guard)
+        {
+            receiver->life_guard -= attacker->hits.special_attack->dmg;
+        }
+        else
+        {
+            receiver->life -= attacker->hits.special_attack->dmg;
+        }
+        attacker->gravityball.launched_fireball = false;
+    }
+    if (attacker->gravityball.x > SCREEN_WIDTH || attacker->gravityball.x < 0)
+    {
+        attacker->gravityball.launched_fireball = false;
     }
 }
 
@@ -2165,8 +2279,12 @@ void update_data(jeu *world)
     increase_special(&world->p2);
     move_fireball(&world->p1);
     move_fireball(&world->p2);
+    move_gravityball(&world->p1);
+    move_gravityball(&world->p2);
     check_fireball(&world->p1, &world->p2);
     check_fireball(&world->p2, &world->p1);
+    check_gravityball(&world->p1,&world->p2);
+    check_gravityball(&world->p2,&world->p1);
     lootbox_loop(world);
     check_bonus(&world->p1);
     check_bonus(&world->p2);
@@ -2182,9 +2300,9 @@ void update_data(jeu *world)
     check_stats(&world->p1);
     check_stats(&world->p2);
     compute_game(world);
-    
+ 
     int height_factor, width_factor;
     height_factor = CELL_HEIGHT;
     width_factor = CELL_WIDTH;
-    printf("p1 x : %d platforme: %c \n",world->p1.x, world->map.map_structure[22][6]);
+    
 }
