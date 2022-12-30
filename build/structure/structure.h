@@ -82,6 +82,7 @@ struct throwable_s
     int x;
     int y;
     int multiplicateur;
+    compteur timer_throw;
 };
 typedef struct throwable_s throwable;
 
@@ -128,6 +129,7 @@ struct menu_p
     int index_menu;
     SDL_Texture *menu_fond;
     SDL_Texture *tab_map[3];
+    SDL_Texture *cadreVie;
 };
 typedef struct menu_p menu;
 

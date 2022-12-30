@@ -23,7 +23,7 @@ void render_aura(SDL_Renderer *renderer, sprite_perso* sprite, int numaura){
     SDL_Rect dst = {0, 0, 0, 0};
     SDL_Rect src = {0, 0, 0, 0};
 
-    dst.x = sprite->x;
+    dst.x = sprite->x-sprite->w;
     dst.y = sprite->y;
     dst.w = sprite->anim[numaura].width;
     dst.h = 250;
@@ -58,7 +58,7 @@ void play_animations(SDL_Renderer *renderer, sprite_perso* sprite, int chara_sta
  }
  else{
     SDL_RendererFlip flip = SDL_FLIP_VERTICAL;
-        SDL_Point center = {118/2,250/2};
+        SDL_Point center = {sprite->anim[chara_state].width/2,250/2};
         SDL_RenderCopyEx(renderer,  sprite->anim[chara_state].anim_text, &src, &dst,180, &center, flip);
  }
 }
@@ -71,7 +71,7 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
         case combat:
             case pause:
             display_map(renderer,world);
-            apply_textures(load_image("./build/ressources/cadres.bmp", renderer), renderer, 0 , 0); //Cadres contenant les vies et spécials
+            apply_textures(world->menu_set.cadreVie, renderer, 0 , 0); //Cadres contenant les vies et spécials
             display_dynamic_texture(renderer, world->map.map_structure, world->map.plateformes);
             render_bonuses(renderer, &world->lootbox);
              if(world->p1.anim[15].aura || world->p1.damage_bonus){

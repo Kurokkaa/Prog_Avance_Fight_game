@@ -18,7 +18,7 @@
     #define DMG_DURATION 5
     #define BROKEN_GUARD_STUN 400
     #define MAX_GUARD 150
-    #define DISTANCE_MAX 300
+    #define DISTANCE_MAX 1280
 
     enum game_state{combat, main_menu, pause, options, selection_perso, selection_map};
     enum character_state{idle, walk, jump, crouch, fall, backwards, flight, flight_control, fall_control, landing, knockback, lpunch , kickstate,hpunch,stun,fireball,gravityball};
