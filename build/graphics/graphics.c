@@ -343,12 +343,18 @@ void display_dynamic_texture(SDL_Renderer* renderer, char** map_struct, SDL_Text
     if(map_struct == NULL){
         printf("Probleme de la map_struct");
     }
-    for(int i = 0 ; i<40 ; i++){
-        for(int j = 0 ; j<20 ; j++){
+    int width_factor,height_factor;
+    width_factor = CELL_WIDTH;
+    height_factor = CELL_HEIGHT;
+    for(int i = 1; i<40 ; i++){
+        for(int j = 1 ; j<20 ; j++){
+            
             if(map_struct[i][j] == '5'){
-                apply_textures(texture, renderer, j * CELL_WIDTH+64, i * CELL_HEIGHT);
+                printf("i: %d j:%d \n",i*height_factor,j*width_factor);
+                apply_textures(texture, renderer, (j+1) * width_factor, i * height_factor);
             }
         }
+       
     }
 }
 

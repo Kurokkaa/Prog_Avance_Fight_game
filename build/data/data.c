@@ -189,12 +189,12 @@ void init_combos(sprite_perso *player)
     init_combo(1, 3, 50, 200, player);
     player->tab_combo[1].input[0] = right;
     player->tab_combo[1].input[1] = left;
-    player->tab_combo[1].input[2] = kick;
+    player->tab_combo[1].input[2] = heavy_p;
 
-    init_combo(2, 3, 50, 299, player);
+    init_combo(2, 3, 50, 200, player);
     player->tab_combo[2].input[0] = right;
     player->tab_combo[2].input[1] = left;
-    player->tab_combo[2].input[2] = heavy_p;
+    player->tab_combo[2].input[2] = kick;
 }
 
 void init_lootbox(lootbox *lootbox, SDL_Renderer *renderer)
@@ -204,7 +204,7 @@ void init_lootbox(lootbox *lootbox, SDL_Renderer *renderer)
     lootbox->texture[special_bonus] = load_image("build/ressources/Bonuses/Special_bonus.bmp", renderer);
     lootbox->x = generate_number(65, 950);
     lootbox->y = 0 - lootbox->h;
-    lootbox->h = 28;
+    lootbox->h = 25;
     lootbox->w = 18;
     lootbox->fallspeed = 3;
     lootbox->active = false;
@@ -388,6 +388,7 @@ bool read_combo(sprite_perso *player, int val)
     }
     if (found)
     {
+        printf("trouvé");
         for (int i = 0; i < player->pos_tab_combo; i++)
         {
             player->buffer[i].input = 0;
@@ -403,11 +404,12 @@ bool read_combo(sprite_perso *player, int val)
                 player->chara_state = fireball;
                 player->fireball.multiplicateur = player->mirror ? -1 : 1;
                 break;
-            case 2:
+            case 1:
+                
                 player->x = 1000;
                 break;
-            case 1:
-                //player->berserk = true;
+            case 2:
+                player->berserk = true;
                 player->damage_bonus = true;
                 player->dmg_bonus_timer.start = true;
                 player->dmg_bonus_timer.startTime = SDL_GetTicks();
@@ -887,7 +889,7 @@ void light_punch(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
             {
                 receiver->special_bar += 10;
                 attacker->special_bar += 5;
-                receiver->life -= attacker->damage_bonus ? attacker->hits.light_punch->dmg * 1.5 : attacker->hits.light_punch->dmg;
+                receiver->life -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.light_punch->dmg * 100 : attacker->hits.light_punch->dmg * 1.5  ) : attacker->hits.light_punch->dmg;
 
                 if (!receiver->broken_guard)
                 {
@@ -904,13 +906,13 @@ void light_punch(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
             if (receiver->guard)
             {
                 Mix_PlayChannel(0, world->music.guard, 1);
-                receiver->life_guard -= attacker->damage_bonus ? attacker->hits.light_punch->dmg * 1.5 : attacker->hits.light_punch->dmg;
+                receiver->life_guard -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.light_punch->dmg * 100 : attacker->hits.light_punch->dmg * 1.5  ) : attacker->hits.light_punch->dmg;
             }
             else
             {
                 receiver->special_bar += 10;
                 attacker->special_bar += 5;
-                receiver->life -= attacker->damage_bonus ? attacker->hits.light_punch->dmg * 1.5 : attacker->hits.light_punch->dmg;
+                receiver->life -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.light_punch->dmg * 100 : attacker->hits.light_punch->dmg * 1.5  ) : attacker->hits.light_punch->dmg;
                 if (!receiver->broken_guard)
                 {
                     receiver->chara_state = stun;
@@ -931,13 +933,13 @@ void heavy_punch(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
             if (receiver->guard)
             {
                 Mix_PlayChannel(0, world->music.guard, 1);
-                receiver->life_guard -= attacker->damage_bonus ? attacker->hits.heavy_punch->dmg * 1.5 : attacker->hits.heavy_punch->dmg;
+                receiver->life_guard -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.heavy_punch->dmg * 100 : attacker->hits.heavy_punch->dmg * 1.5  ) : attacker->hits.heavy_punch->dmg;
             }
             else
             {
                 receiver->special_bar += 20;
                 attacker->special_bar += 10;
-                receiver->life -= attacker->damage_bonus ? attacker->hits.heavy_punch->dmg * 1.5 : attacker->hits.heavy_punch->dmg;
+                receiver->life -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.heavy_punch->dmg * 100 : attacker->hits.heavy_punch->dmg * 1.5  ) : attacker->hits.heavy_punch->dmg;
                 if (!receiver->broken_guard)
                 {
                     receiver->chara_state = stun;
@@ -953,13 +955,13 @@ void heavy_punch(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
             if (receiver->guard)
             {
                 Mix_PlayChannel(0, world->music.guard, 1);
-                receiver->life_guard -= attacker->damage_bonus ? attacker->hits.heavy_punch->dmg * 1.5 : attacker->hits.heavy_punch->dmg;
+                receiver->life_guard -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.heavy_punch->dmg * 100 : attacker->hits.heavy_punch->dmg * 1.5  ) : attacker->hits.heavy_punch->dmg;
             }
             else
             {
                 receiver->special_bar += 20;
                 attacker->special_bar += 10;
-                receiver->life -= attacker->damage_bonus ? attacker->hits.heavy_punch->dmg * 1.5 : attacker->hits.heavy_punch->dmg;
+                receiver->life -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.heavy_punch->dmg * 100 : attacker->hits.heavy_punch->dmg * 1.5  ) : attacker->hits.heavy_punch->dmg;
                 if (!receiver->broken_guard)
                 {
                     receiver->chara_state = stun;
@@ -980,12 +982,12 @@ void kick_hit(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
             if (receiver->guard)
             {
                 Mix_PlayChannel(0, world->music.guard, 1);
-                receiver->life_guard -= attacker->damage_bonus ? attacker->hits.kick->dmg * 1.5 : attacker->hits.kick->dmg;
+                receiver->life_guard -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.kick->dmg * 100 : attacker->hits.kick->dmg * 1.5  ) : attacker->hits.kick->dmg;
             }
             else
             {
                 receiver->special_bar += 20;
-                receiver->life -= attacker->damage_bonus ? attacker->hits.kick->dmg * 1.5 : attacker->hits.kick->dmg;
+                receiver->life -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.kick->dmg * 100 : attacker->hits.kick->dmg * 1.5  ) : attacker->hits.kick->dmg;
                 if (!receiver->broken_guard)
                 {
                     receiver->chara_state = stun;
@@ -1001,12 +1003,12 @@ void kick_hit(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
             if (receiver->guard)
             {
                 Mix_PlayChannel(0, world->music.guard, 1);
-                receiver->life_guard -= attacker->damage_bonus ? attacker->hits.kick->dmg * 1.5 : attacker->hits.kick->dmg;
+                receiver->life_guard -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.kick->dmg * 100 : attacker->hits.kick->dmg * 1.5  ) : attacker->hits.kick->dmg;
             }
             else
             {
                 receiver->special_bar += 20;
-                receiver->life -= attacker->damage_bonus ? attacker->hits.kick->dmg * 1.5 : attacker->hits.kick->dmg;
+                receiver->life -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.kick->dmg * 100 : attacker->hits.kick->dmg * 1.5  ) : attacker->hits.kick->dmg;
                 if (!receiver->broken_guard)
                 {
                     receiver->chara_state = stun;
@@ -1840,6 +1842,7 @@ void update_lootbox(jeu *world)
     {
         if ((equals(world->lootbox.x, world->lootbox.y + world->lootbox.h + world->lootbox.fallspeed, world->map.map_structure, ' ') || (equals(world->lootbox.x + world->lootbox.w, world->lootbox.y + world->lootbox.h + world->lootbox.fallspeed, world->map.map_structure, ' ') || world->lootbox.y < CELL_HEIGHT + 20) && world->lootbox.y < 667))
         {
+            printf("%d\n",world->lootbox.x);
             world->lootbox.y += world->lootbox.fallspeed;
         }
         else
@@ -2179,4 +2182,9 @@ void update_data(jeu *world)
     check_stats(&world->p1);
     check_stats(&world->p2);
     compute_game(world);
+    
+    int height_factor, width_factor;
+    height_factor = CELL_HEIGHT;
+    width_factor = CELL_WIDTH;
+    printf("p1 x : %d platforme: %c \n",world->p1.x, world->map.map_structure[22][6]);
 }

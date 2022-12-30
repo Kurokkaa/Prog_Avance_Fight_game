@@ -105,7 +105,7 @@ struct sprite_p{
     anim_t anim[17];
     inputs *buffer;
     int pos_tab_combo;
-    combo tab_combo[2];
+    combo tab_combo[NB_COMBOS];
     bool attack_launched;
     bool guard;
     int life_guard;
