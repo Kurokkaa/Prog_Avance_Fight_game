@@ -23,7 +23,7 @@ void render_aura(SDL_Renderer *renderer, sprite_perso* sprite, int numaura){
     SDL_Rect dst = {0, 0, 0, 0};
     SDL_Rect src = {0, 0, 0, 0};
 
-    dst.x = sprite->x - 10;
+    dst.x = sprite->x;
     dst.y = sprite->y;
     dst.w = sprite->anim[numaura].width;
     dst.h = 250;
@@ -71,6 +71,7 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
         case combat:
             case pause:
             display_map(renderer,world);
+            apply_textures(load_image("./build/ressources/cadres.bmp", renderer), renderer, 0 , 0); //Cadres contenant les vies et spécials
             display_dynamic_texture(renderer, world->map.map_structure, world->map.plateformes);
             render_bonuses(renderer, &world->lootbox);
              if(world->p1.anim[15].aura || world->p1.damage_bonus){
@@ -209,12 +210,12 @@ void display_special(SDL_Renderer* renderer, jeu* world){
     SDL_Rect rect;
     SDL_Rect rect_fond;
     rect.x = 500 ;
-    rect.y = 80;
-    rect.h = 30;
+    rect.y = 30;
+    rect.h = 20;
 
     rect_fond.x = 500 ;
-    rect_fond.h = 30;
-    rect_fond.y = 80;
+    rect_fond.h = 20;
+    rect_fond.y = 30;
     rect_fond.w = -500;
 
     if(world->p1.special_bar < 300){
@@ -223,25 +224,25 @@ void display_special(SDL_Renderer* renderer, jeu* world){
     else{
         rect.w = -500;
     }
-    SDL_Color color = {255,0,0};
+    SDL_Color color = {192,191,201};
     SDL_Surface* lvl1 = TTF_RenderText_Solid(world->font.police_compteur,lvlP1 , color);
     SDL_Texture* texture_lvl1 = SDL_CreateTextureFromSurface(renderer,lvl1);
-    apply_textures(texture_lvl1,renderer,520, 75);
+    apply_textures(texture_lvl1,renderer,520, 25);
     SDL_Surface* lvl2 = TTF_RenderText_Solid(world->font.police_compteur,lvlP2 , color);
     SDL_Texture* texture_lvl2 = SDL_CreateTextureFromSurface(renderer,lvl2);
-    apply_textures(texture_lvl2,renderer,750, 75);
+    apply_textures(texture_lvl2,renderer,750, 25);
     
     //free(surface_compteur);
     SDL_Rect rect2;
     SDL_Rect rect_fond2;
     rect2.x = SCREEN_WIDTH - 500 ;
-    rect2.y = 80;
-    rect2.h = 30;
+    rect2.y = 30;
+    rect2.h = 20;
     
     
     rect_fond2.x = SCREEN_WIDTH - 500;
-    rect_fond2.h = 30;
-    rect_fond2.y = 80;
+    rect_fond2.h = 20;
+    rect_fond2.y = 30;
     rect_fond2.w =  500 ;
 
     if(world->p2.special_bar <300){
@@ -251,12 +252,11 @@ void display_special(SDL_Renderer* renderer, jeu* world){
         rect2.w = 500;
     }
      /*RENDERING*/
-    SDL_SetRenderDrawColor(renderer, 255, 20 , 15, 1);
+    SDL_SetRenderDrawColor(renderer, 113, 116 , 128, 1);
     SDL_RenderFillRect(renderer, &rect_fond);
     SDL_RenderFillRect(renderer, &rect_fond2);
 
-    SDL_SetRenderDrawColor(renderer, 255, 179 , 92, 1);
-    SDL_SetRenderDrawColor(renderer, 0, 190, 25, 0);
+    SDL_SetRenderDrawColor(renderer, 26, 4, 229, 0);
     SDL_RenderFillRect(renderer, &rect);
     SDL_RenderFillRect(renderer, &rect2);
 }
