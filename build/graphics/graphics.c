@@ -18,6 +18,7 @@ void apply_sprite(SDL_Renderer *renderer, SDL_Texture *texture, sprite_perso* sp
     }
     
 }
+
 void render_aura(SDL_Renderer *renderer, sprite_perso* sprite, int numaura){
     SDL_Rect dst = {0, 0, 0, 0};
     SDL_Rect src = {0, 0, 0, 0};
@@ -36,6 +37,7 @@ void render_aura(SDL_Renderer *renderer, sprite_perso* sprite, int numaura){
     src.w = sprite->anim[numaura].width;
     SDL_RenderCopy(renderer, sprite->anim[numaura].anim_text, &src, &dst);
 }
+
 void play_animations(SDL_Renderer *renderer, sprite_perso* sprite, int chara_state){
     SDL_Rect dst = {0, 0, 0, 0};
     SDL_Rect src = {0, 0, 0, 0};
@@ -130,10 +132,12 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
             SDL_SetRenderDrawColor(renderer, 255, 255 , 0, 1);
             SDL_RenderDrawRect(renderer, &rect);
             break;
+
         case selection_map:
             apply_textures(world->menu_set.menu_fond, renderer, 0, 0);
             apply_textures(world->menu_set.tab_map[world->menu_set.index_menu],renderer,240, 135);
             break;
+
         case options:
             apply_textures(world->menu_set.menu_fond,renderer,0,0);
         
@@ -147,6 +151,7 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
         //apply_texture(world->p1.texture_perso, renderer, world->p1.x , world->p1.y);
         SDL_RenderPresent(renderer);
 }
+
 void display_timer(jeu* world,SDL_Renderer* renderer){
             char* timer;
             if(world->timer.inf){
@@ -173,6 +178,7 @@ void display_timer(jeu* world,SDL_Renderer* renderer){
             free(surface_compteur);
            
 }
+
 void display_throwable(SDL_Renderer* renderer,throwable projectile){
    if(projectile.launched_fireball){
         apply_textures(projectile.fireball,renderer,projectile.x,projectile.y);
@@ -195,6 +201,7 @@ char* barlvl(sprite_perso perso){
     }
     return lvl;
 }
+
 void display_special(SDL_Renderer* renderer, jeu* world){
     char* lvlP1 = barlvl(world->p1);
     char* lvlP2 = barlvl(world->p2);
@@ -253,6 +260,7 @@ void display_special(SDL_Renderer* renderer, jeu* world){
     SDL_RenderFillRect(renderer, &rect);
     SDL_RenderFillRect(renderer, &rect2);
 }
+
 void display_guard(SDL_Renderer* renderer,sprite_perso perso){
    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
     if(perso.life_guard >0){
@@ -266,6 +274,7 @@ void display_guard(SDL_Renderer* renderer,sprite_perso perso){
     }
     disque(perso.x+perso.w - 20 ,perso.y+perso.h/2,perso.life_guard*1.5,renderer);
 }
+
 void display_life(SDL_Renderer* renderer, jeu* world){
     /*VIE JOUEUR 1*/
     SDL_Rect rect;
@@ -333,11 +342,10 @@ void display_map(SDL_Renderer* renderer,jeu* world){
             apply_textures(world->map.image_fond,renderer,0,0);
             //read_structure(world->map.map_russia.map_structure);
         break;
+
         case forest:
             apply_textures(world->map.image_fond,renderer,0,0);
         break;
-        case street_art:
-            apply_textures(world->map.image_fond,renderer,0,0);
     }
 }
 

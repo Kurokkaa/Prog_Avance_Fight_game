@@ -46,15 +46,9 @@ void init_map(jeu *world, SDL_Renderer *renderer)
         break;
 
     case forest:
-        world->map.image_fond = load_image("build/ressources/map/forest/forest.png", renderer);
+        world->map.image_fond = load_image("build/ressources/map/forest/forest.bmp", renderer);
         world->map.map_structure = read_file_map("build/ressources/map/forest/forest_structure");
-        world->map.plateformes = load_image("build/ressources/map/forest/plateforme.png", renderer);
-        break;
-
-    case street_art:
-        world->map.image_fond = load_image("build/ressources/map/street_art/street.png", renderer);
-        world->map.map_structure = read_file_map("build/ressources/map/street_art/street_structure");
-        world->map.plateformes = load_image("build/ressources/map/street_art/plateforme.png", renderer);
+        world->map.plateformes = load_image("build/ressources/map/forest/plateforme.bmp", renderer);
         break;
     }
 }
@@ -63,8 +57,7 @@ void init_map(jeu *world, SDL_Renderer *renderer)
 void init_miniature(jeu *world, SDL_Renderer *renderer)
 {
     world->menu_set.tab_map[0] = load_image("build/ressources/map/city_night/city_mini.bmp", renderer);
-    world->menu_set.tab_map[1] = load_image("build/ressources/map/forest/forest_mini.png", renderer);
-    world->menu_set.tab_map[2] = load_image("build/ressources/map/street_art/street_mini.png", renderer);
+    world->menu_set.tab_map[1] = load_image("build/ressources/map/forest/forest_mini.bmp", renderer);
 }
 
 void init_music(jeu *world)
@@ -89,7 +82,7 @@ void init_jeu(jeu *world, SDL_Renderer *renderer)
     world->menu_set.index_menu = 0;
     world->font.police_compteur = TTF_OpenFont("build/ressources/Polices/Reach_Story.ttf", 40);
     init_music(world);
-    //init_miniature(world, renderer);
+    init_miniature(world, renderer);
 }
 
 void init_perso(SDL_Renderer *renderer, sprite_perso *perso, int x, int y, int w, int h, int speed, bool mirror,int choice)
@@ -1399,14 +1392,17 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                     case 1:
                         world->choosed_map = forest;
                         break;
-                    case 2:
-                        world->choosed_map = street_art;
-                        break;
                     }
 
                     init_map(world, renderer);
-                    init_perso(renderer, &world->p1, 65, 465, 55, 230, CHARA_SPEED, false,0);
-                    init_perso(renderer, &world->p2, 950, 465, 55, 230, CHARA_SPEED, true,1);
+                    if(world->choosed_map == forest){
+                        init_perso(renderer, &world->p1, 256, 465, 55, 230, CHARA_SPEED, false,0);
+                        init_perso(renderer, &world->p2, 950, 465, 55, 230, CHARA_SPEED, true,1);
+                    }
+                    else{
+                        init_perso(renderer, &world->p1, 65, 465, 55, 230, CHARA_SPEED, false,0);
+                        init_perso(renderer, &world->p2, 950, 465, 55, 230, CHARA_SPEED, true,1);
+                    }
                     init_controller(world);
                     world->game_over = false;
                     world->state = combat;

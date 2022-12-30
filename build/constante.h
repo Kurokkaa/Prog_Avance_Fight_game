@@ -22,7 +22,7 @@
 
     enum game_state{combat, main_menu, pause, options, selection_perso, selection_map};
     enum character_state{idle, walk, jump, crouch, fall, backwards, flight, flight_control, fall_control, landing, knockback, lpunch , kickstate,hpunch,stun,fireball,gravityball};
-    enum game_map{city_night, forest, street_art};
+    enum game_map{city_night, forest};
     enum combos_inputs{up, down, left, right, kick, light_p, heavy_p, special};
     enum bonus_type{health_bonus, damage_bonus, special_bonus};
 
