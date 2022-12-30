@@ -45,6 +45,7 @@ struct hit_set_s
     hit *heavy_punch;
     hit *kick;
     hit *special_attack;
+    hit *special_attack2;
 };
 typedef struct hit_set_s hit_set;
 

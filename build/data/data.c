@@ -131,6 +131,7 @@ void init_hits(sprite_perso *perso)
     perso->hits.heavy_punch = malloc(sizeof(hit));
     perso->hits.kick = malloc(sizeof(hit));
     perso->hits.special_attack = malloc(sizeof(hit));
+    perso->hits.special_attack2 = malloc(sizeof(hit));
 
     perso->hits.light_punch->dmg = 10;
     perso->hits.light_punch->speed = 0;
@@ -161,12 +162,18 @@ void init_hits(sprite_perso *perso)
     perso->hits.kick->launch = 0;
 
     perso->hits.special_attack->dmg = 50;
-    perso->hits.special_attack->speed = 0;
+    perso->hits.special_attack->speed = 10;
     perso->hits.special_attack->range_x = 400;
     perso->hits.special_attack->range_y = 0;
     perso->hits.special_attack->effective_frame = 0;
-  
     perso->hits.special_attack->delay = 20;
+
+    perso->hits.special_attack2->dmg = 10;
+    perso->hits.special_attack2->speed = 3;
+    perso->hits.special_attack2->range_x = 400;
+    perso->hits.special_attack2->range_y = 0;
+    perso->hits.special_attack2->effective_frame = 0;
+    perso->hits.special_attack2->delay = 20;
 }
 
 void init_combo(int pos, int nb_coups, int frame_between, int required, sprite_perso *player)
@@ -275,12 +282,12 @@ void init_chara_state(SDL_Renderer *renderer, sprite_perso *perso)
         init_state_animation(renderer, perso, idle, "build/ressources/Characters/Chara1/Idle.bmp", 15, 115);
         init_state_animation(renderer, perso, walk, "build/ressources/Characters/Chara1/Walking.bmp", 15, 90);
         init_state_animation(renderer, perso, jump, "build/ressources/Characters/Chara1/Jump.bmp", 10, 71);
-        init_state_animation(renderer, perso, crouch, "build/ressources/Characters/Chara1/Idle.bmp", 15, 74);
-        init_state_animation(renderer, perso, fall, "build/ressources/Characters/Chara1/Falling.bmp", 10, 71);
+        init_state_animation(renderer, perso, crouch, "build/ressources/Characters/Chara1/Idle.bmp", 15, 115);
+        init_state_animation(renderer, perso, fall, "build/ressources/Characters/Chara1/Falling.bmp", 10, 95);
         init_state_animation(renderer, perso, backwards, "build/ressources/Characters/Chara1/Walking.bmp", 15, 90);
-        init_state_animation(renderer, perso, flight, "build/ressources/Characters/Chara1/Jump.bmp", 10, 71);
-        init_state_animation(renderer, perso, flight_control, "build/ressources/Characters/Chara1/Jump.bmp", 10, 71);
-        init_state_animation(renderer, perso, fall_control, "build/ressources/Characters/Chara1/Falling.bmp", 10, 71);
+        init_state_animation(renderer, perso, flight, "build/ressources/Characters/Chara1/Jump.bmp", 10, 80);
+        init_state_animation(renderer, perso, flight_control, "build/ressources/Characters/Chara1/Jump.bmp", 10, 80);
+        init_state_animation(renderer, perso, fall_control, "build/ressources/Characters/Chara1/Falling.bmp", 10, 95);
         init_state_animation(renderer, perso, landing, "build/ressources/Characters/Chara1/Landing.bmp", 5, 71);
         init_state_animation(renderer, perso, knockback, "build/ressources/Characters/Chara1/KnockBack.bmp", 5, 100);
         init_state_animation(renderer, perso, lpunch, "build/ressources/Characters/Chara1/LightPunch.bmp", 16, 90);
@@ -888,23 +895,28 @@ void light_punch(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
     if (!attacker->mirror)
     {
         if ((attacker->x + attacker->w + attacker->hits.light_punch->range_x >= receiver->x) && (attacker->y + attacker->jump_height / 2 >= receiver->y && attacker->y + attacker->jump_height / 2 <= receiver->y + receiver->h))
-        {
+        {   
+            
             if (receiver->guard)
             {
-
-                receiver->life_guard -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.light_punch->dmg * 100 : attacker->hits.light_punch->dmg * 1.5  ) : attacker->hits.light_punch->dmg;
-                Mix_PlayChannel(0, world->music.guard, 1);
+                if(!receiver->berserk)
+                {
+                    receiver->life_guard -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.light_punch->dmg * 100 : attacker->hits.light_punch->dmg * 1.5  ) : attacker->hits.light_punch->dmg;
+                    Mix_PlayChannel(0, world->music.guard, 1);
+                }
             }
             else
             {
                 receiver->special_bar += 10;
                 attacker->special_bar += 5;
-                receiver->life -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.light_punch->dmg * 100 : attacker->hits.light_punch->dmg * 1.5  ) : attacker->hits.light_punch->dmg;
-
-                if (!receiver->broken_guard)
-                {
-                    receiver->chara_state = stun;
-                    receiver->stun_time = attacker->hits.light_punch->delay;
+                if(!receiver->berserk){
+                    receiver->life -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.light_punch->dmg * 100 : attacker->hits.light_punch->dmg * 1.5  ) : attacker->hits.light_punch->dmg;
+                
+                    if (!receiver->broken_guard)
+                    {
+                        receiver->chara_state = stun;
+                        receiver->stun_time = attacker->hits.light_punch->delay;
+                    }
                 }
             }
         }
@@ -915,18 +927,22 @@ void light_punch(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
         {
             if (receiver->guard)
             {
-                Mix_PlayChannel(0, world->music.guard, 1);
-                receiver->life_guard -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.light_punch->dmg * 100 : attacker->hits.light_punch->dmg * 1.5  ) : attacker->hits.light_punch->dmg;
+                if(!receiver->berserk){
+                    Mix_PlayChannel(0, world->music.guard, 1);
+                    receiver->life_guard -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.light_punch->dmg * 100 : attacker->hits.light_punch->dmg * 1.5  ) : attacker->hits.light_punch->dmg;
+                }
             }
             else
             {
                 receiver->special_bar += 10;
                 attacker->special_bar += 5;
-                receiver->life -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.light_punch->dmg * 100 : attacker->hits.light_punch->dmg * 1.5  ) : attacker->hits.light_punch->dmg;
-                if (!receiver->broken_guard)
-                {
-                    receiver->chara_state = stun;
-                    receiver->stun_time = attacker->hits.light_punch->delay;
+                if(!receiver->berserk){
+                    receiver->life -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.light_punch->dmg * 100 : attacker->hits.light_punch->dmg * 1.5  ) : attacker->hits.light_punch->dmg;
+                    if (!receiver->broken_guard)
+                    {
+                        receiver->chara_state = stun;
+                        receiver->stun_time = attacker->hits.light_punch->delay;
+                    }
                 }
             }
         }
@@ -942,18 +958,22 @@ void heavy_punch(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
         {
             if (receiver->guard)
             {
+                if(!receiver->berserk){
                 Mix_PlayChannel(0, world->music.guard, 1);
                 receiver->life_guard -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.heavy_punch->dmg * 100 : attacker->hits.heavy_punch->dmg * 1.5  ) : attacker->hits.heavy_punch->dmg;
+                }
             }
             else
             {
                 receiver->special_bar += 20;
                 attacker->special_bar += 10;
-                receiver->life -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.heavy_punch->dmg * 100 : attacker->hits.heavy_punch->dmg * 1.5  ) : attacker->hits.heavy_punch->dmg;
-                if (!receiver->broken_guard)
-                {
-                    receiver->chara_state = stun;
-                    receiver->stun_time = attacker->hits.heavy_punch->delay;
+                if(!receiver->berserk){
+                    receiver->life -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.heavy_punch->dmg * 100 : attacker->hits.heavy_punch->dmg * 1.5  ) : attacker->hits.heavy_punch->dmg;
+                    if (!receiver->broken_guard)
+                    {
+                        receiver->chara_state = stun;
+                        receiver->stun_time = attacker->hits.heavy_punch->delay;
+                    }
                 }
             }
         }
@@ -964,18 +984,22 @@ void heavy_punch(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
         {
             if (receiver->guard)
             {
-                Mix_PlayChannel(0, world->music.guard, 1);
-                receiver->life_guard -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.heavy_punch->dmg * 100 : attacker->hits.heavy_punch->dmg * 1.5  ) : attacker->hits.heavy_punch->dmg;
+                if(!receiver->berserk){
+                    Mix_PlayChannel(0, world->music.guard, 1);
+                    receiver->life_guard -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.heavy_punch->dmg * 100 : attacker->hits.heavy_punch->dmg * 1.5  ) : attacker->hits.heavy_punch->dmg;
+                }
             }
             else
             {
                 receiver->special_bar += 20;
                 attacker->special_bar += 10;
-                receiver->life -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.heavy_punch->dmg * 100 : attacker->hits.heavy_punch->dmg * 1.5  ) : attacker->hits.heavy_punch->dmg;
-                if (!receiver->broken_guard)
-                {
-                    receiver->chara_state = stun;
-                    receiver->stun_time = attacker->hits.heavy_punch->delay;
+                if(!receiver->berserk){
+                    receiver->life -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.heavy_punch->dmg * 100 : attacker->hits.heavy_punch->dmg * 1.5  ) : attacker->hits.heavy_punch->dmg;
+                    if (!receiver->broken_guard)
+                    {
+                        receiver->chara_state = stun;
+                        receiver->stun_time = attacker->hits.heavy_punch->delay;
+                    }
                 }
             }
         }
@@ -991,17 +1015,21 @@ void kick_hit(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
         {
             if (receiver->guard)
             {
-                Mix_PlayChannel(0, world->music.guard, 1);
-                receiver->life_guard -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.kick->dmg * 100 : attacker->hits.kick->dmg * 1.5  ) : attacker->hits.kick->dmg;
+                if(!receiver->berserk){
+                    Mix_PlayChannel(0, world->music.guard, 1);
+                    receiver->life_guard -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.kick->dmg * 100 : attacker->hits.kick->dmg * 1.5  ) : attacker->hits.kick->dmg;
+                }
             }
             else
             {
                 receiver->special_bar += 20;
                 receiver->life -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.kick->dmg * 100 : attacker->hits.kick->dmg * 1.5  ) : attacker->hits.kick->dmg;
-                if (!receiver->broken_guard)
-                {
-                    receiver->chara_state = stun;
-                    receiver->stun_time = attacker->hits.kick->delay;
+                if(!receiver->berserk){
+                    if (!receiver->broken_guard)
+                    {
+                        receiver->chara_state = stun;
+                        receiver->stun_time = attacker->hits.kick->delay;
+                    }
                 }
             }
         }
@@ -1012,17 +1040,21 @@ void kick_hit(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
         {
             if (receiver->guard)
             {
-                Mix_PlayChannel(0, world->music.guard, 1);
-                receiver->life_guard -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.kick->dmg * 100 : attacker->hits.kick->dmg * 1.5  ) : attacker->hits.kick->dmg;
+                if(!receiver->berserk){
+                    Mix_PlayChannel(0, world->music.guard, 1);
+                    receiver->life_guard -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.kick->dmg * 100 : attacker->hits.kick->dmg * 1.5  ) : attacker->hits.kick->dmg;
+                }           
             }
             else
-            {
+            {   
                 receiver->special_bar += 20;
                 receiver->life -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.kick->dmg * 100 : attacker->hits.kick->dmg * 1.5  ) : attacker->hits.kick->dmg;
-                if (!receiver->broken_guard)
-                {
-                    receiver->chara_state = stun;
-                    receiver->stun_time = attacker->hits.kick->delay;
+                if(!receiver->berserk){
+                    if (!receiver->broken_guard)
+                    {
+                        receiver->chara_state = stun;
+                        receiver->stun_time = attacker->hits.kick->delay;
+                    }
                 }
             }
         }
@@ -2185,7 +2217,7 @@ void move_fireball(sprite_perso *perso)
 {
     if (perso->fireball.launched_fireball)
     {
-        perso->fireball.x += 10 * perso->fireball.multiplicateur;
+        perso->fireball.x += perso->hits.special_attack->speed * perso->fireball.multiplicateur;
     }
     else
     {
@@ -2202,7 +2234,7 @@ void move_gravityball(sprite_perso *perso)
             perso->gravityball.x = 540;
           }
           else{
-             perso->gravityball.x += 3;
+             perso->gravityball.x += perso->hits.special_attack2->speed;
           }
         }
         else{
@@ -2211,7 +2243,7 @@ void move_gravityball(sprite_perso *perso)
             perso->gravityball.x = 540;
           }
           else{
-             perso->gravityball.x -= 3;
+             perso->gravityball.x -= perso->hits.special_attack2->speed;
           }
         }
         
@@ -2272,11 +2304,11 @@ void check_gravityball(sprite_perso *attacker, sprite_perso *receiver)
         if(receiver->x >= attacker->gravityball.x && receiver->x <=attacker->gravityball.x+200 && attacker->fireball.y >= receiver->y && attacker->fireball.y <= receiver->y+receiver->h){
           if (receiver->guard)
             {
-                receiver->life_guard -= attacker->hits.special_attack->dmg;
+                receiver->life_guard -= attacker->hits.special_attack2->dmg;
             }
          else
             {
-                receiver->life -= attacker->hits.special_attack->dmg;
+                receiver->life -= attacker->hits.special_attack2->dmg;
             }
                 
         }
