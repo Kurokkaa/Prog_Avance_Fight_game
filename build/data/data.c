@@ -51,14 +51,12 @@ void init_map(jeu *world, SDL_Renderer *renderer)
         world->map.plateformes = load_image("build/ressources/map/forest/plateforme.bmp", renderer);
         break;
 
-    case japan :
+    case japan:
         world->map.image_fond = load_image("build/ressources/map/Japan/Japan.bmp", renderer);
         world->map.map_structure = read_file_map("build/ressources/map/Japan/Japan_structure");
         world->map.plateformes = load_image("build/ressources/map/Japan/plateforme.bmp", renderer);
         break;
     }
-
-    
 }
 
 // fonction pour les miniatures de maps
@@ -93,9 +91,10 @@ void init_jeu(jeu *world, SDL_Renderer *renderer)
     init_music(world);
     init_miniature(world, renderer);
     world->menu_set.cadreVie = load_image("./build/ressources/cadres.bmp", renderer);
+    world->game_over = false;
 }
 
-void init_perso(SDL_Renderer *renderer, sprite_perso *perso, int x, int y, int w, int h, int speed, bool mirror,int choice)
+void init_perso(SDL_Renderer *renderer, sprite_perso *perso, int x, int y, int w, int h, int speed, bool mirror, int choice)
 {
     perso->perso_choisi = choice;
     perso->x = x;
@@ -117,10 +116,10 @@ void init_perso(SDL_Renderer *renderer, sprite_perso *perso, int x, int y, int w
     init_hits(perso);
     init_combos(perso);
     perso->pos_tab_combo = 0;
-    perso->special_bar = 300;
+    perso->special_bar = 0;
     perso->fireball.fireball = load_image("./build/ressources/Characters/Powers/fireball.bmp", renderer);
     perso->gravityball.fireball = load_image("./build/ressources/Characters/Powers/BlackHole1.bmp", renderer);
-    
+
     perso->fireball.launched_fireball = false;
     perso->gravityball.launched_fireball = false;
     perso->buffer = malloc(sizeof(inputs) * BUFFER_SIZE);
@@ -166,7 +165,7 @@ void init_hits(sprite_perso *perso)
     perso->hits.kick->range_x = 30;
     perso->hits.kick->range_y = 0;
     perso->hits.kick->effective_frame = 7;
- 
+
     perso->hits.kick->delay = 20;
     perso->hits.kick->launch = 0;
 
@@ -200,7 +199,7 @@ void init_combos(sprite_perso *player)
     player->tab_combo[0].input[1] = left;
     player->tab_combo[0].input[2] = light_p;
 
-    //2eme combos
+    // 2eme combos
     init_combo(1, 3, 50, 200, player);
     player->tab_combo[1].input[0] = right;
     player->tab_combo[1].input[1] = left;
@@ -309,13 +308,13 @@ void init_chara_state(SDL_Renderer *renderer, sprite_perso *perso)
         init_state_animation(renderer, perso, looser, "build/ressources/Characters/Chara1/Defeat.bmp", 28, 90);
         init_state_animation(renderer, perso, winner, "build/ressources/Characters/Chara1/Victory.bmp", 30, 100);
 
-        init_state_animation(renderer, perso, 17, "build/ressources/Characters/Powers/Aura_Spritesheet.Bmp", 8, 190);
-        init_state_animation(renderer, perso, 18, "build/ressources/Characters/Powers/Transparent_Aura_Spritesheet.Bmp", 8, 190);
-        perso->anim[17].aura = 0;
+        init_state_animation(renderer, perso, 19, "build/ressources/Characters/Powers/Aura_Spritesheet.Bmp", 8, 190);
+        init_state_animation(renderer, perso, 20, "build/ressources/Characters/Powers/Transparent_Aura_Spritesheet.Bmp", 8, 190);
+        perso->anim[19].aura = 0;
         break;
 
     case 1:
-         init_state_animation(renderer, perso, idle, "build/ressources/Characters/Chara2/Idle.bmp", 15, 90);
+        init_state_animation(renderer, perso, idle, "build/ressources/Characters/Chara2/Idle.bmp", 15, 90);
         init_state_animation(renderer, perso, walk, "build/ressources/Characters/Chara2/Walking.bmp", 15, 90);
         init_state_animation(renderer, perso, jump, "build/ressources/Characters/Chara2/Jump.bmp", 10, 85);
         init_state_animation(renderer, perso, crouch, "build/ressources/Characters/Chara2/Idle.bmp", 15, 85);
@@ -336,9 +335,9 @@ void init_chara_state(SDL_Renderer *renderer, sprite_perso *perso)
         init_state_animation(renderer, perso, looser, "build/ressources/Characters/Chara1/Defeat.bmp", 28, 90);
         init_state_animation(renderer, perso, winner, "build/ressources/Characters/Chara1/Victory.bmp", 30, 100);
 
-        init_state_animation(renderer, perso, 17, "build/ressources/Characters/Powers/Aura_Spritesheet.Bmp", 8, 190);
-        init_state_animation(renderer, perso, 18, "build/ressources/Characters/Powers/Transparent_Aura_Spritesheet.Bmp", 8, 190);
-        perso->anim[17].aura = 0;
+        init_state_animation(renderer, perso, 19, "build/ressources/Characters/Powers/Aura_Spritesheet.Bmp", 8, 190);
+        init_state_animation(renderer, perso, 20, "build/ressources/Characters/Powers/Transparent_Aura_Spritesheet.Bmp", 8, 190);
+        perso->anim[19].aura = 0;
         break;
     }
 }
@@ -416,7 +415,7 @@ bool read_combo(sprite_perso *player, int val)
     }
     if (found)
     {
-        
+
         for (int i = 0; i < player->pos_tab_combo; i++)
         {
             player->buffer[i].input = 0;
@@ -433,9 +432,9 @@ bool read_combo(sprite_perso *player, int val)
                 player->fireball.multiplicateur = player->mirror ? -1 : 1;
                 break;
             case 1:
-                
+
                 player->chara_state = gravityball;
-                player->gravityball.multiplicateur = player->mirror || player-> x >630 ? -1 : 1;
+                player->gravityball.multiplicateur = player->mirror || player->x > 630 ? -1 : 1;
                 break;
             case 2:
                 player->berserk = true;
@@ -482,13 +481,15 @@ void check_timer(jeu *world)
     }
 }
 
-void save_counter(char* select){
-     FILE *file = fopen("build/counter.txt", "w");
+void save_counter(char *select)
+{
+    FILE *file = fopen("build/counter.txt", "w");
     fwrite(select, strlen(select), 1, file);
     fclose(file);
 }
-void read_counter(jeu* world){
-     char *File_name = "build/counter.txt";
+void read_counter(jeu *world)
+{
+    char *File_name = "build/counter.txt";
     struct stat stat_file;
     FILE *file = fopen(File_name, "r"); // ouverture en mode lecture
     stat(File_name, &stat_file);
@@ -496,22 +497,23 @@ void read_counter(jeu* world){
     char text_file[sz + 1];
     fread(text_file, 1, sz, file);
     text_file[sz] = '\0';
-    if(strcmp(text_file,"inf") == 0){
+    if (strcmp(text_file, "inf") == 0)
+    {
         world->timer.inf = true;
     }
-    else{
+    else
+    {
         world->timer.inf = false;
         world->timer.timer = atoi(text_file);
     }
 }
-
 
 /**
  * FONCTIONS MOUVEMENTS + COUPS
  */
 void reset_state(sprite_perso *perso, enum character_state state)
 {
-    for (int i = 0; i < stun; i++)
+    for (int i = 0; i <= gravityball; i++)
     {
         if (i != state)
         {
@@ -705,7 +707,7 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
         }
         else
         {
-            if (equals(x, y + perso->h + perso->jump_height * 0.025, world->map.map_structure, ' ') && equals(x+ perso->w, y + perso->h + perso->jump_height * 0.025, world->map.map_structure, ' ') )
+            if (equals(x, y + perso->h + perso->jump_height * 0.025, world->map.map_structure, ' ') && equals(x + perso->w, y + perso->h + perso->jump_height * 0.025, world->map.map_structure, ' '))
             {
                 perso->y += perso->jump_height * 0.025;
             }
@@ -720,7 +722,7 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
     x = perso->x;
     y = perso->y;
 
-    if (perso->chara_state != flight && equals(x, y + perso->h + perso->jump_height * 0.025, world->map.map_structure, ' ') && equals(x+ perso->w, y + perso->h + perso->jump_height * 0.025, world->map.map_structure, ' ') )
+    if (perso->chara_state != flight && equals(x, y + perso->h + perso->jump_height * 0.025, world->map.map_structure, ' ') && equals(x + perso->w, y + perso->h + perso->jump_height * 0.025, world->map.map_structure, ' '))
     {
         perso->chara_state = fall;
     }
@@ -842,7 +844,7 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
                 perso->life_guard = 100;
             }
             perso->attack_launched = 0;
-            
+
             perso->chara_state = idle;
         }
     }
@@ -851,64 +853,77 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
     if (perso->chara_state == fireball)
     {
         perso->anim[fireball].frame++;
-        if(perso->anim[fireball].frame == perso->anim[fireball].nbFrame){
+        if (perso->anim[fireball].frame == perso->anim[fireball].nbFrame)
+        {
             perso->fireball.launched_fireball = true;
             perso->chara_state = idle;
         }
-        
     }
     if (perso->chara_state == gravityball)
+    
     {
-        if(!perso->gravityball.launched_fireball){
+        
+        if (!perso->gravityball.launched_fireball)
+        {
             perso->gravityball.timer_throw.startTime = SDL_GetTicks();
             perso->gravityball.timer_throw.pause = false;
         }
         perso->anim[gravityball].frame++;
-        if(perso->anim[gravityball].frame == perso->anim[gravityball].nbFrame){
+        if (perso->anim[gravityball].frame == perso->anim[gravityball].nbFrame)
+        {
             perso->gravityball.launched_fireball = true;
             perso->chara_state = idle;
         }
     }
-
 }
 
-void manage_aura(sprite_perso * perso)
+void manage_aura(sprite_perso *perso)
 {
-    if(perso->anim[17].counter >= 5){
-        if(perso->anim[17].aura && !perso->damage_bonus ){
-            if(perso->anim[17].frame != perso->anim[17].nbFrame){
-                perso->anim[17].frame++;
-                perso->anim[18].frame++;
+    if (perso->anim[19].counter >= 5)
+    {
+        if (perso->anim[19].aura && !perso->damage_bonus)
+        {
+            if (perso->anim[19].frame != perso->anim[19].nbFrame)
+            {
+                perso->anim[19].frame++;
+                perso->anim[20].frame++;
             }
-            else{
-                perso->anim[17].aura = 0;
-                perso->anim[17].frame = 0;
-                perso->anim[18].frame = 0;
-            }
-        }
-
-        if(!perso->anim[17].aura && perso->damage_bonus){
-            perso->anim[17].frame++;
-            perso->anim[18].frame++;
-            if(perso->anim[17].frame == 2){
-                perso->anim[17].aura = 1;
+            else
+            {
+                perso->anim[19].aura = 0;
+                perso->anim[19].frame = 0;
+                perso->anim[20].frame = 0;
             }
         }
 
-        if(perso->damage_bonus && perso->anim[17].aura){
-            if(perso->anim[17].frame == 4){
-                perso->anim[17].frame = 2;
-                perso->anim[18].frame = 2;
-            }
-            else{
-                perso->anim[17].frame++;
-                perso->anim[18].frame++;
+        if (!perso->anim[19].aura && perso->damage_bonus)
+        {
+            perso->anim[19].frame++;
+            perso->anim[20].frame++;
+            if (perso->anim[19].frame == 2)
+            {
+                perso->anim[19].aura = 1;
             }
         }
-        perso->anim[17].counter = 0;
+
+        if (perso->damage_bonus && perso->anim[19].aura)
+        {
+            if (perso->anim[19].frame == 4)
+            {
+                perso->anim[19].frame = 2;
+                perso->anim[20].frame = 2;
+            }
+            else
+            {
+                perso->anim[19].frame++;
+                perso->anim[20].frame++;
+            }
+        }
+        perso->anim[19].counter = 0;
     }
-    else{
-        perso->anim[17].counter++;
+    else
+    {
+        perso->anim[19].counter++;
     }
 }
 
@@ -920,20 +935,19 @@ bool equals(int x, int y, char **map_point, char test)
     return (map_point[y / height_factor][x / width_factor] == test);
 }
 
-
 void light_punch(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
 {
 
     if (!attacker->mirror)
     {
         if ((attacker->x + attacker->w + attacker->hits.light_punch->range_x >= receiver->x) && (attacker->y + attacker->jump_height / 2 >= receiver->y && attacker->y + attacker->jump_height / 2 <= receiver->y + receiver->h))
-        {   
-            
+        {
+
             if (receiver->guard)
             {
-                if(!receiver->berserk)
+                if (!receiver->berserk)
                 {
-                    receiver->life_guard -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.light_punch->dmg * 100 : attacker->hits.light_punch->dmg * 1.5  ) : attacker->hits.light_punch->dmg;
+                    receiver->life_guard -= attacker->damage_bonus ? (attacker->berserk ? attacker->hits.light_punch->dmg * 100 : attacker->hits.light_punch->dmg * 1.5) : attacker->hits.light_punch->dmg;
                     Mix_PlayChannel(0, world->music.guard, 1);
                 }
             }
@@ -941,9 +955,10 @@ void light_punch(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
             {
                 receiver->special_bar += 10;
                 attacker->special_bar += 5;
-                if(!receiver->berserk){
-                    receiver->life -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.light_punch->dmg * 100 : attacker->hits.light_punch->dmg * 1.5  ) : attacker->hits.light_punch->dmg;
-                
+                if (!receiver->berserk)
+                {
+                    receiver->life -= attacker->damage_bonus ? (attacker->berserk ? attacker->hits.light_punch->dmg * 100 : attacker->hits.light_punch->dmg * 1.5) : attacker->hits.light_punch->dmg;
+
                     if (!receiver->broken_guard)
                     {
                         receiver->chara_state = stun;
@@ -959,17 +974,19 @@ void light_punch(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
         {
             if (receiver->guard)
             {
-                if(!receiver->berserk){
+                if (!receiver->berserk)
+                {
                     Mix_PlayChannel(0, world->music.guard, 1);
-                    receiver->life_guard -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.light_punch->dmg * 100 : attacker->hits.light_punch->dmg * 1.5  ) : attacker->hits.light_punch->dmg;
+                    receiver->life_guard -= attacker->damage_bonus ? (attacker->berserk ? attacker->hits.light_punch->dmg * 100 : attacker->hits.light_punch->dmg * 1.5) : attacker->hits.light_punch->dmg;
                 }
             }
             else
             {
                 receiver->special_bar += 10;
                 attacker->special_bar += 5;
-                if(!receiver->berserk){
-                    receiver->life -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.light_punch->dmg * 100 : attacker->hits.light_punch->dmg * 1.5  ) : attacker->hits.light_punch->dmg;
+                if (!receiver->berserk)
+                {
+                    receiver->life -= attacker->damage_bonus ? (attacker->berserk ? attacker->hits.light_punch->dmg * 100 : attacker->hits.light_punch->dmg * 1.5) : attacker->hits.light_punch->dmg;
                     if (!receiver->broken_guard)
                     {
                         receiver->chara_state = stun;
@@ -990,17 +1007,19 @@ void heavy_punch(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
         {
             if (receiver->guard)
             {
-                if(!receiver->berserk){
-                Mix_PlayChannel(0, world->music.guard, 1);
-                receiver->life_guard -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.heavy_punch->dmg * 100 : attacker->hits.heavy_punch->dmg * 1.5  ) : attacker->hits.heavy_punch->dmg;
+                if (!receiver->berserk)
+                {
+                    Mix_PlayChannel(0, world->music.guard, 1);
+                    receiver->life_guard -= attacker->damage_bonus ? (attacker->berserk ? attacker->hits.heavy_punch->dmg * 100 : attacker->hits.heavy_punch->dmg * 1.5) : attacker->hits.heavy_punch->dmg;
                 }
             }
             else
             {
                 receiver->special_bar += 20;
                 attacker->special_bar += 10;
-                if(!receiver->berserk){
-                    receiver->life -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.heavy_punch->dmg * 100 : attacker->hits.heavy_punch->dmg * 1.5  ) : attacker->hits.heavy_punch->dmg;
+                if (!receiver->berserk)
+                {
+                    receiver->life -= attacker->damage_bonus ? (attacker->berserk ? attacker->hits.heavy_punch->dmg * 100 : attacker->hits.heavy_punch->dmg * 1.5) : attacker->hits.heavy_punch->dmg;
                     if (!receiver->broken_guard)
                     {
                         receiver->chara_state = stun;
@@ -1016,17 +1035,19 @@ void heavy_punch(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
         {
             if (receiver->guard)
             {
-                if(!receiver->berserk){
+                if (!receiver->berserk)
+                {
                     Mix_PlayChannel(0, world->music.guard, 1);
-                    receiver->life_guard -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.heavy_punch->dmg * 100 : attacker->hits.heavy_punch->dmg * 1.5  ) : attacker->hits.heavy_punch->dmg;
+                    receiver->life_guard -= attacker->damage_bonus ? (attacker->berserk ? attacker->hits.heavy_punch->dmg * 100 : attacker->hits.heavy_punch->dmg * 1.5) : attacker->hits.heavy_punch->dmg;
                 }
             }
             else
             {
                 receiver->special_bar += 20;
                 attacker->special_bar += 10;
-                if(!receiver->berserk){
-                    receiver->life -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.heavy_punch->dmg * 100 : attacker->hits.heavy_punch->dmg * 1.5  ) : attacker->hits.heavy_punch->dmg;
+                if (!receiver->berserk)
+                {
+                    receiver->life -= attacker->damage_bonus ? (attacker->berserk ? attacker->hits.heavy_punch->dmg * 100 : attacker->hits.heavy_punch->dmg * 1.5) : attacker->hits.heavy_punch->dmg;
                     if (!receiver->broken_guard)
                     {
                         receiver->chara_state = stun;
@@ -1047,16 +1068,18 @@ void kick_hit(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
         {
             if (receiver->guard)
             {
-                if(!receiver->berserk){
+                if (!receiver->berserk)
+                {
                     Mix_PlayChannel(0, world->music.guard, 1);
-                    receiver->life_guard -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.kick->dmg * 100 : attacker->hits.kick->dmg * 1.5  ) : attacker->hits.kick->dmg;
+                    receiver->life_guard -= attacker->damage_bonus ? (attacker->berserk ? attacker->hits.kick->dmg * 100 : attacker->hits.kick->dmg * 1.5) : attacker->hits.kick->dmg;
                 }
             }
             else
             {
                 receiver->special_bar += 20;
-                receiver->life -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.kick->dmg * 100 : attacker->hits.kick->dmg * 1.5  ) : attacker->hits.kick->dmg;
-                if(!receiver->berserk){
+                receiver->life -= attacker->damage_bonus ? (attacker->berserk ? attacker->hits.kick->dmg * 100 : attacker->hits.kick->dmg * 1.5) : attacker->hits.kick->dmg;
+                if (!receiver->berserk)
+                {
                     if (!receiver->broken_guard)
                     {
                         receiver->chara_state = stun;
@@ -1072,16 +1095,18 @@ void kick_hit(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
         {
             if (receiver->guard)
             {
-                if(!receiver->berserk){
+                if (!receiver->berserk)
+                {
                     Mix_PlayChannel(0, world->music.guard, 1);
-                    receiver->life_guard -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.kick->dmg * 100 : attacker->hits.kick->dmg * 1.5  ) : attacker->hits.kick->dmg;
-                }           
+                    receiver->life_guard -= attacker->damage_bonus ? (attacker->berserk ? attacker->hits.kick->dmg * 100 : attacker->hits.kick->dmg * 1.5) : attacker->hits.kick->dmg;
+                }
             }
             else
-            {   
+            {
                 receiver->special_bar += 20;
-                receiver->life -= attacker->damage_bonus ? (attacker->berserk? attacker->hits.kick->dmg * 100 : attacker->hits.kick->dmg * 1.5  ) : attacker->hits.kick->dmg;
-                if(!receiver->berserk){
+                receiver->life -= attacker->damage_bonus ? (attacker->berserk ? attacker->hits.kick->dmg * 100 : attacker->hits.kick->dmg * 1.5) : attacker->hits.kick->dmg;
+                if (!receiver->berserk)
+                {
                     if (!receiver->broken_guard)
                     {
                         receiver->chara_state = stun;
@@ -1118,7 +1143,7 @@ bool canMove(sprite_perso *perso, sprite_perso *adversaire)
     {
         if (yAxis[0] >= adversaire->y && yAxis[1] <= adversaire->y - adversaire->h)
         {
-            if (perso->x + perso->w + perso->speed >= adversaire->x  && perso->backwards != 1)
+            if (perso->x + perso->w + perso->speed >= adversaire->x && perso->backwards != 1)
             {
                 canMove = false;
             }
@@ -1298,9 +1323,10 @@ void destroy_textures(jeu *world)
 
 void unpause(compteur *chrono)
 {
-    if(chrono->start){
-    chrono->startTime = SDL_GetTicks() - chrono->pauseTime;
-    chrono->pause = false;
+    if (chrono->start)
+    {
+        chrono->startTime = SDL_GetTicks() - chrono->pauseTime;
+        chrono->pause = false;
     }
 }
 /*INPUTS GAMEPLAY*/
@@ -1327,12 +1353,12 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
         if (event->type == SDL_KEYDOWN)
         {
             if (event->key.keysym.sym == SDLK_ESCAPE)
-            {   
+            {
 
                 if (world->state == pause)
                 {
                     world->state = combat;
-                    Mix_Volume(1,0);
+                    Mix_Volume(1, 0);
                     unpause(&world->timer);
                     unpause(&world->p1.chrono_guard);
                     unpause(&world->p2.chrono_guard);
@@ -1346,15 +1372,15 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                 else if (world->state == options)
                 {
                     world->state = main_menu;
-                    world->menu_set.menu_fond = load_image("build/ressources/menu/menu.bmp",renderer);
-                    world->menu_set.index_menu =0;
-                }
-                else if (world->state == selection_map){
-                    world->state = main_menu;
-                    world->menu_set.menu_fond = load_image("build/ressources/menu/menu.bmp",renderer);
+                    world->menu_set.menu_fond = load_image("build/ressources/menu/menu.bmp", renderer);
                     world->menu_set.index_menu = 0;
                 }
-                
+                else if (world->state == selection_map)
+                {
+                    world->state = main_menu;
+                    world->menu_set.menu_fond = load_image("build/ressources/menu/menu.bmp", renderer);
+                    world->menu_set.index_menu = 0;
+                }
             }
 
             if (event->key.keysym.sym == SDLK_z)
@@ -1370,9 +1396,10 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                         world->menu_set.index_menu = 2;
                     }
                 }
-                if(world->state == pause){
+                if (world->state == pause)
+                {
                     world->menu_set.index_menu--;
-                     if (world->menu_set.index_menu < 0)
+                    if (world->menu_set.index_menu < 0)
                     {
                         world->menu_set.index_menu = 1;
                     }
@@ -1381,27 +1408,29 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
 
             if (event->key.keysym.sym == SDLK_s)
             {
-                
-                    Mix_PlayChannel(0, world->music.change, 1);
-                    if(world->state == main_menu){
-                        world->menu_set.index_menu++;
-                        if (world->menu_set.index_menu > 2)
-                        {
-                            world->menu_set.index_menu = 0;
-                        }
+
+                Mix_PlayChannel(0, world->music.change, 1);
+                if (world->state == main_menu)
+                {
+                    world->menu_set.index_menu++;
+                    if (world->menu_set.index_menu > 2)
+                    {
+                        world->menu_set.index_menu = 0;
                     }
-                    if(world->state == pause){
-                        world->menu_set.index_menu++;
-                       if(world->menu_set.index_menu >1){
-                        world->menu_set.index_menu =0;
-                       }
+                }
+                if (world->state == pause)
+                {
+                    world->menu_set.index_menu++;
+                    if (world->menu_set.index_menu > 1)
+                    {
+                        world->menu_set.index_menu = 0;
                     }
-                
+                }
             }
 
             if (event->key.keysym.sym == SDLK_d)
             {
-                if (world->state == selection_map )
+                if (world->state == selection_map)
                 {
                     Mix_PlayChannel(0, world->music.change, 1);
                     world->menu_set.index_menu++;
@@ -1410,9 +1439,9 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                         world->menu_set.index_menu = 0;
                     }
                 }
-                if(world->state == options)
+                if (world->state == options)
                 {
-                    world->menu_set.index_menu == 3 ? world->menu_set.index_menu = 0 : world->menu_set.index_menu++;  
+                    world->menu_set.index_menu == 3 ? world->menu_set.index_menu = 0 : world->menu_set.index_menu++;
                 }
             }
 
@@ -1428,8 +1457,9 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                         world->menu_set.index_menu = NB_MAPS - 1;
                     }
                 }
-                if (world->state == options){
-                     world->menu_set.index_menu == 0 ? world->menu_set.index_menu = 3 : world->menu_set.index_menu--;
+                if (world->state == options)
+                {
+                    world->menu_set.index_menu == 0 ? world->menu_set.index_menu = 3 : world->menu_set.index_menu--;
                 }
             }
 
@@ -1443,11 +1473,11 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                         world->menu_set.index_menu = 0;
                         world->menu_set.menu_fond = load_image("build/ressources/menu/selection_map.png", renderer);
                         world->state = selection_map;
-                       
+
                         break;
                     case 1:
                         world->state = options;
-                        world->menu_set.menu_fond = load_image("build/ressources/menu/Timer_menu.bmp",renderer);
+                        world->menu_set.menu_fond = load_image("build/ressources/menu/Timer_menu.bmp", renderer);
                         world->menu_set.index_menu = 0;
                         break;
                     case 2:
@@ -1465,19 +1495,21 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                     case 1:
                         world->choosed_map = forest;
                         break;
-                    case 2: 
+                    case 2:
                         world->choosed_map = japan;
                         break;
                     }
 
                     init_map(world, renderer);
-                    if(world->choosed_map == forest){
-                        init_perso(renderer, &world->p1, 256, 465, 55, 230, CHARA_SPEED, false,0);
-                        init_perso(renderer, &world->p2, 950, 465, 55, 230, CHARA_SPEED, true,1);
+                    if (world->choosed_map == forest)
+                    {
+                        init_perso(renderer, &world->p1, 256, 465, 55, 230, CHARA_SPEED, false, 0);
+                        init_perso(renderer, &world->p2, 950, 465, 55, 230, CHARA_SPEED, true, 1);
                     }
-                    else{
-                        init_perso(renderer, &world->p1, 65, 465, 55, 230, CHARA_SPEED, false,0);
-                        init_perso(renderer, &world->p2, 950, 465, 55, 230, CHARA_SPEED, true,1);
+                    else
+                    {
+                        init_perso(renderer, &world->p1, 65, 465, 55, 230, CHARA_SPEED, false, 0);
+                        init_perso(renderer, &world->p2, 950, 465, 55, 230, CHARA_SPEED, true, 1);
                     }
                     init_controller(world);
                     world->game_over = false;
@@ -1494,8 +1526,9 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                     Mix_Volume(1, 0);
                     world->menu_set.index_menu = 0;
                 }
-                else if(world->state == options){
-                     switch (world->menu_set.index_menu)
+                else if (world->state == options)
+                {
+                    switch (world->menu_set.index_menu)
                     {
                     case 0:
                         save_counter("60");
@@ -1510,10 +1543,10 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                         save_counter("inf");
                         break;
                     }
-                    
                 }
-                else if(world->state == pause){
-                     switch (world->menu_set.index_menu)
+                else if (world->state == pause)
+                {
+                    switch (world->menu_set.index_menu)
                     {
                     case 0:
                         world->state = combat;
@@ -1522,8 +1555,6 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                         world->menu_set.menu_fond = load_image("build/ressources/menu/menu.bmp", renderer);
                         world->state = main_menu;
                         break;
-                 
-                   
                     }
                 }
             }
@@ -1539,9 +1570,11 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
 }
 void pauseChrono(compteur *chrono)
 {
-    if(chrono->start)
-{    chrono->pause = true;
-    chrono->pauseTime = SDL_GetTicks() - chrono->startTime;}
+    if (chrono->start)
+    {
+        chrono->pause = true;
+        chrono->pauseTime = SDL_GetTicks() - chrono->startTime;
+    }
 }
 /**
  * INPUTS GAMEPLAY COMBAT
@@ -1638,42 +1671,40 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
             {
                 world->p1.chara_state = crouch;
             }
-            if(world->p1.chara_state == jump || world->p1.chara_state == flight || world->p1.chara_state == flight_control){
+            if (world->p1.chara_state == jump || world->p1.chara_state == flight || world->p1.chara_state == flight_control)
+            {
                 world->p1.chara_state = fall;
-               
-
             }
-                if (keystates[SDL_SCANCODE_S] != world->keystates_pre[SDL_SCANCODE_S])
-                {
-                    add_input_buffer(&world->p1, down, world->timestamp_w);
-                }
-            
+            if (keystates[SDL_SCANCODE_S] != world->keystates_pre[SDL_SCANCODE_S])
+            {
+                add_input_buffer(&world->p1, down, world->timestamp_w);
+            }
         }
 
         // sauts
         if ((keystates[SDL_SCANCODE_W] /*|| SDL_GameControllerGetAxis(world->joysticks[0],1)< (-10000)*/))
         {
             if (world->p1.chara_state == idle || world->p1.chara_state == walk)
-                {
-                    world->p1.chara_state = jump;
-                }
-                else 
-                {
-                   if(( world->p1.chara_state == jump ||world->p1.chara_state == flight || world->p1.chara_state == flight_control || world->p1.chara_state == fall_control|| world->p1.chara_state == fall))
-                       if(keystates[SDL_SCANCODE_W] != world->keystates_pre[SDL_SCANCODE_W] && world->p1.double_jump)
-                        {
-                        
+            {
+                world->p1.chara_state = jump;
+            }
+            else
+            {
+                if ((world->p1.chara_state == jump || world->p1.chara_state == flight || world->p1.chara_state == flight_control || world->p1.chara_state == fall_control || world->p1.chara_state == fall))
+                    if (keystates[SDL_SCANCODE_W] != world->keystates_pre[SDL_SCANCODE_W] && world->p1.double_jump)
+                    {
+
                         world->p1.jump_origin = world->p1.y;
                         world->p1.anim[flight].frame = 0;
                         world->p1.anim[flight_control].frame = 0;
                         world->p1.chara_state = flight;
-                        
+
                         world->p1.double_jump = false;
-                        }
-            if (keystates[SDL_SCANCODE_W] != world->keystates_pre[SDL_SCANCODE_W])
-            {
-                add_input_buffer(&world->p1, up, world->timestamp_w);
-            }
+                    }
+                if (keystates[SDL_SCANCODE_W] != world->keystates_pre[SDL_SCANCODE_W])
+                {
+                    add_input_buffer(&world->p1, up, world->timestamp_w);
+                }
             }
         }
 
@@ -1689,13 +1720,14 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
                     for (int i = 0; i < NB_COMBOS && !combop1; i++)
                     {
                         combop1 = read_combo(&world->p1, i);
-                        if(combop1){
+                        if (combop1)
+                        {
                             switch (i)
                             {
                             case 1:
-                                Mix_PlayChannel(0,world->music.fireball,1);
+                                Mix_PlayChannel(0, world->music.fireball, 1);
                                 break;
-                            
+
                             default:
                                 break;
                             }
@@ -1834,40 +1866,32 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
 
         if (keystates[SDL_SCANCODE_UP])
         {
-           
-               
-                
-                if (world->p2.chara_state == idle || world->p2.chara_state == walk)
-                {
-                    world->p2.chara_state = jump;
-                }
-                else 
-                {
-                   if(( world->p2.chara_state == jump ||world->p2.chara_state == flight || world->p2.chara_state == flight_control || world->p2.chara_state == fall_control|| world->p2.chara_state == fall))
-                       if(keystates[SDL_SCANCODE_UP] != world->keystates_pre[SDL_SCANCODE_UP] && world->p2.double_jump)
-                        {
+
+            if (world->p2.chara_state == idle || world->p2.chara_state == walk)
+            {
+                world->p2.chara_state = jump;
+            }
+            else
+            {
+                if ((world->p2.chara_state == jump || world->p2.chara_state == flight || world->p2.chara_state == flight_control || world->p2.chara_state == fall_control || world->p2.chara_state == fall))
+                    if (keystates[SDL_SCANCODE_UP] != world->keystates_pre[SDL_SCANCODE_UP] && world->p2.double_jump)
+                    {
 
                         world->p2.jump_origin = world->p2.y;
                         world->p2.anim[flight].frame = 0;
                         world->p2.anim[flight_control].frame = 0;
                         world->p2.chara_state = flight;
-                        
+
                         world->p2.double_jump = false;
-                        }
-                      
-                }
-                if (keystates[SDL_SCANCODE_UP] != world->keystates_pre[SDL_SCANCODE_UP])
-                {add_input_buffer(&world->p2, up, world->timestamp_w);  }
+                    }
             }
-        
-    
-      
-            /* code */
-        
-        
-         
+            if (keystates[SDL_SCANCODE_UP] != world->keystates_pre[SDL_SCANCODE_UP])
+            {
+                add_input_buffer(&world->p2, up, world->timestamp_w);
+            }
+        }
 
-
+        /* code */
 
         // coups
         if (keystates[SDL_SCANCODE_KP_4] && !keystates[SDL_SCANCODE_KP_8] && !keystates[SDL_SCANCODE_KP_9])
@@ -1971,7 +1995,7 @@ void reset_activate_lootbox(lootbox *lootbox)
     lootbox->x = generate_number(65, 950);
     lootbox->y = 0 - lootbox->h;
     lootbox->collided = 0;
-    lootbox->bonus = generate_number(health_bonus, special_bonus+1);
+    lootbox->bonus = generate_number(health_bonus, special_bonus + 1);
 }
 
 void update_lootbox(jeu *world)
@@ -1980,7 +2004,7 @@ void update_lootbox(jeu *world)
     {
         if ((equals(world->lootbox.x, world->lootbox.y + world->lootbox.h + world->lootbox.fallspeed, world->map.map_structure, ' ') || (equals(world->lootbox.x + world->lootbox.w, world->lootbox.y + world->lootbox.h + world->lootbox.fallspeed, world->map.map_structure, ' ') || world->lootbox.y < CELL_HEIGHT + 20) && world->lootbox.y < 667))
         {
-     
+
             world->lootbox.y += world->lootbox.fallspeed;
         }
         else
@@ -2022,7 +2046,8 @@ void apply_bonus(lootbox *lootbox, sprite_perso *player)
         player->life += x;
     }
 
-    if(!player->damage_bonus && lootbox->bonus == damage_bonus && !player->anim[17].aura ){
+    if (!player->damage_bonus && lootbox->bonus == damage_bonus && !player->anim[19].aura)
+    {
         player->damage_bonus = true;
         player->dmg_bonus_timer.start = true;
         player->dmg_bonus_timer.startTime = SDL_GetTicks();
@@ -2179,7 +2204,7 @@ void save_victory(int player)
             }
         }
     }
-   
+
     if (player == 1)
     {
         nb1 += 1;
@@ -2239,16 +2264,15 @@ void compute_game(jeu *world)
                 world->p1.chara_state = looser;
                 world->p2.chara_state = winner;
                 world->p1.y += 40;
-                
             }
         }
         else
         {
-            world->timer.startTime = SDL_GetTicks();
-            world->timer.timer = 10;
 
             if (world->p1.life <= 0)
             {
+                world->timer.startTime = SDL_GetTicks();
+                world->timer.timer = 10;
                 save_victory(2);
                 world->state = endgame;
                 world->game_over = true;
@@ -2259,6 +2283,8 @@ void compute_game(jeu *world)
 
             if (world->p2.life <= 0)
             {
+                world->timer.startTime = SDL_GetTicks();
+                world->timer.timer = 10;
                 save_victory(1);
                 world->state = endgame;
                 world->game_over = true;
@@ -2285,26 +2311,29 @@ void move_fireball(sprite_perso *perso)
 void move_gravityball(sprite_perso *perso)
 {
     if (perso->gravityball.launched_fireball)
-    {   if(perso->gravityball.multiplicateur == 1){
-          if(perso->gravityball.x >= 540)
-          {
-            perso->gravityball.x = 540;
-          }
-          else{
-             perso->gravityball.x += perso->hits.special_attack2->speed;
-          }
+    {
+        if (perso->gravityball.multiplicateur == 1)
+        {
+            if (perso->gravityball.x >= 540)
+            {
+                perso->gravityball.x = 540;
+            }
+            else
+            {
+                perso->gravityball.x += perso->hits.special_attack2->speed;
+            }
         }
-        else{
-            if(perso->gravityball.x <= 540)
-          {
-            perso->gravityball.x = 540;
-          }
-          else{
-             perso->gravityball.x -= perso->hits.special_attack2->speed;
-          }
+        else
+        {
+            if (perso->gravityball.x <= 540)
+            {
+                perso->gravityball.x = 540;
+            }
+            else
+            {
+                perso->gravityball.x -= perso->hits.special_attack2->speed;
+            }
         }
-        
-        
     }
     else
     {
@@ -2315,63 +2344,78 @@ void move_gravityball(sprite_perso *perso)
 
 void check_fireball(sprite_perso *attacker, sprite_perso *receiver)
 {
+    if (!receiver->berserk)
 
-    if (attacker->fireball.x >= receiver->x && attacker->fireball.x <= receiver->x + receiver->w  && attacker->fireball.launched_fireball && attacker->fireball.y >= receiver->y && attacker->fireball.y <= receiver->y+receiver->h)
     {
-        if (receiver->guard)
+        if (attacker->fireball.x >= receiver->x && attacker->fireball.x <= receiver->x + receiver->w && attacker->fireball.launched_fireball && attacker->fireball.y >= receiver->y && attacker->fireball.y <= receiver->y + receiver->h)
         {
-            receiver->life_guard -= attacker->hits.special_attack->dmg;
+            if (receiver->guard)
+            {
+                receiver->life_guard -= attacker->hits.special_attack->dmg;
+            }
+            else
+            {
+                receiver->life -= attacker->hits.special_attack->dmg;
+            }
+            attacker->fireball.launched_fireball = false;
         }
-        else
+        if (attacker->fireball.x > SCREEN_WIDTH || attacker->fireball.x < 0)
         {
-            receiver->life -= attacker->hits.special_attack->dmg;
+            attacker->fireball.launched_fireball = false;
         }
-        attacker->fireball.launched_fireball = false;
-    }
-    if (attacker->fireball.x > SCREEN_WIDTH || attacker->fireball.x < 0)
-    {
-        attacker->fireball.launched_fireball = false;
     }
 }
 
 void check_gravityball(sprite_perso *attacker, sprite_perso *receiver)
 {
-    int distance = (sqrt(pow(receiver->x-attacker->gravityball.x,2)+pow(receiver->y-attacker->gravityball.y,2)));
-  
-    int coefficient = 100*(DISTANCE_MAX-distance)/DISTANCE_MAX;
-    
-    if (attacker->gravityball.launched_fireball){
-        if((SDL_GetTicks() - attacker->gravityball.timer_throw.startTime)/1000 >= 10 ){
-            attacker->gravityball.launched_fireball = false;
-        }
-        if(attacker->gravityball.x +100 <receiver->x){
-            
-            receiver->x-= coefficient*5/100;
-        }
-        if(attacker->gravityball.x +100 >= receiver->x){
-            receiver->x+=coefficient*5/100;
-        }
-        if(attacker->gravityball.y > receiver->y){
-               receiver->y+=coefficient*5/100;
-        }
-        if(receiver->y>attacker->gravityball.y  ){
-            receiver->y-=coefficient*5/100;
-        }
+    if (!receiver->berserk)
+    {
+        int distance = (sqrt(pow(receiver->x - attacker->gravityball.x, 2) + pow(receiver->y - attacker->gravityball.y, 2)));
+        if (distance <= DISTANCE_MAX)
+        {
 
-        if(receiver->x >= attacker->gravityball.x && receiver->x <=attacker->gravityball.x+200 && attacker->fireball.y >= receiver->y && attacker->fireball.y <= receiver->y+receiver->h){
-          if (receiver->guard)
+            int coefficient = 100 * (DISTANCE_MAX - distance) / DISTANCE_MAX;
+
+            if (attacker->gravityball.launched_fireball)
             {
-                receiver->life_guard -= attacker->hits.special_attack2->dmg;
+                if ((SDL_GetTicks() - attacker->gravityball.timer_throw.startTime) / 1000 >= 10)
+                {
+                    attacker->gravityball.launched_fireball = false;
+                }
+                if (attacker->gravityball.x + 100 < receiver->x)
+                {
+
+                    receiver->x -= coefficient * BLACK_HOLE_STRENGH / 100;
+                }
+                if (attacker->gravityball.x + 100 >= receiver->x)
+                {
+                    receiver->x += coefficient * BLACK_HOLE_STRENGH / 100;
+                }
+                if (attacker->gravityball.y > receiver->y)
+                {
+                    receiver->y += coefficient * BLACK_HOLE_STRENGH / 100;
+                }
+                if (receiver->y > attacker->gravityball.y)
+                {
+                    receiver->y -= coefficient * BLACK_HOLE_STRENGH / 100;
+                }
+
+                if (receiver->x >= attacker->gravityball.x && receiver->x <= attacker->gravityball.x + 200 && attacker->fireball.y >= receiver->y && attacker->fireball.y <= receiver->y + receiver->h)
+                {
+                    if (receiver->guard)
+                    {
+                        receiver->life_guard -= attacker->hits.special_attack2->dmg;
+                    }
+                    else
+                    {
+                        receiver->life -= attacker->hits.special_attack2->dmg;
+                    }
+                }
             }
-         else
-            {
-                receiver->life -= attacker->hits.special_attack2->dmg;
-            }
-                
         }
     }
 }
- 
+
 void check_bonus(sprite_perso *perso)
 {
     if (perso->damage_bonus && !perso->dmg_bonus_timer.pause && (SDL_GetTicks() - perso->dmg_bonus_timer.startTime) / 1000 >= DMG_DURATION)
@@ -2397,8 +2441,8 @@ void update_data(jeu *world)
     move_gravityball(&world->p2);
     check_fireball(&world->p1, &world->p2);
     check_fireball(&world->p2, &world->p1);
-    check_gravityball(&world->p1,&world->p2);
-    check_gravityball(&world->p2,&world->p1);
+    check_gravityball(&world->p1, &world->p2);
+    check_gravityball(&world->p2, &world->p1);
     lootbox_loop(world);
     check_bonus(&world->p1);
     check_bonus(&world->p2);
@@ -2414,42 +2458,50 @@ void update_data(jeu *world)
     check_stats(&world->p1);
     check_stats(&world->p2);
     compute_game(world);
- 
+
     int height_factor, width_factor;
     height_factor = CELL_HEIGHT;
     width_factor = CELL_WIDTH;
-    
 }
 
-void endgame_data(jeu * world){
-    
-    if((SDL_GetTicks()-world->timer.startTime) / 1000 >= 1){
+void endgame_data(jeu *world)
+{
+
+    if ((SDL_GetTicks() - world->timer.startTime) / 1000 >= 1)
+    {
         world->timer.timer--;
         world->timer.startTime = SDL_GetTicks();
     }
-    if(world->timer.timer == 0){
+    if (world->timer.timer == 0)
+    {
         world->state = main_menu;
     }
 
-    if(world->p1.chara_state == winner){
+    if (world->p1.chara_state == winner)
+    {
         world->p1.anim[winner].frame++;
-        if(world->p1.anim[winner].frame == world->p1.anim[winner].nbFrame ){
+        if (world->p1.anim[winner].frame == world->p1.anim[winner].nbFrame)
+        {
             world->p1.anim[winner].frame = 5;
         }
         world->p2.anim[looser].frame++;
-        if(world->p2.anim[looser].frame == world->p2.anim[looser].nbFrame ){
-            world->p2.anim[looser].frame = world->p2.anim[looser].nbFrame -1;
+        if (world->p2.anim[looser].frame == world->p2.anim[looser].nbFrame)
+        {
+            world->p2.anim[looser].frame = world->p2.anim[looser].nbFrame - 1;
         }
     }
-    
-    else{
+
+    else
+    {
         world->p2.anim[winner].frame++;
-        if(world->p2.anim[winner].frame == world->p2.anim[winner].nbFrame ){
+        if (world->p2.anim[winner].frame == world->p2.anim[winner].nbFrame)
+        {
             world->p2.anim[winner].frame = 5;
         }
         world->p1.anim[looser].frame++;
-        if(world->p1.anim[looser].frame == world->p1.anim[looser].nbFrame ){
-            world->p1.anim[looser].frame = world->p1.anim[looser].nbFrame -1;
+        if (world->p1.anim[looser].frame == world->p1.anim[looser].nbFrame)
+        {
+            world->p1.anim[looser].frame = world->p1.anim[looser].nbFrame - 1;
         }
     }
 }

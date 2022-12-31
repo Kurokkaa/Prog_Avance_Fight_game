@@ -75,19 +75,19 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
                 apply_textures(world->menu_set.cadreVie, renderer, 0 , 0); //Cadres contenant les vies et spécials
                 display_dynamic_texture(renderer, world->map.map_structure, world->map.plateformes);
                 render_bonuses(renderer, &world->lootbox);
-                if(world->p1.anim[17].aura || world->p1.damage_bonus){
-                    render_aura(renderer, &(world->p1),17);
+                if(world->p1.anim[19].aura || world->p1.damage_bonus){
+                    render_aura(renderer, &(world->p1),19);
                 }
-                if(world->p2.anim[17].aura || world->p2.damage_bonus){
-                    render_aura(renderer, &(world->p2),17);
+                if(world->p2.anim[19].aura || world->p2.damage_bonus){
+                    render_aura(renderer, &(world->p2),19);
                 }
                 play_animations(renderer, &(world->p1), world->p1.chara_state);
                 play_animations(renderer, &(world->p2), world->p2.chara_state);
-                if(world->p1.anim[17].aura || world->p1.damage_bonus){
-                    render_aura(renderer, &(world->p1),18);
+                if(world->p1.anim[19].aura || world->p1.damage_bonus){
+                    render_aura(renderer, &(world->p1),20);
                 }
-                if(world->p2.anim[17].aura || world->p2.damage_bonus){
-                    render_aura(renderer, &(world->p2),18);
+                if(world->p2.anim[19].aura || world->p2.damage_bonus){
+                    render_aura(renderer, &(world->p2),20);
                 }
                 display_life(renderer, world);
                 display_throwable(renderer,world->p1.fireball);
