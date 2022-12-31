@@ -1387,7 +1387,7 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                 else if (world->state == options)
                 {
                     world->state = main_menu;
-                    world->menu_set.menu_fond = world->menu_set.options_menu;
+                    world->menu_set.menu_fond = world->menu_set.menu;
                     world->menu_set.index_menu = 0;
                 }
                 else if (world->state == selection_map)
@@ -2497,6 +2497,7 @@ void endgame_data(jeu *world)
     }
     if (world->timer.timer == 0)
     {
+        world->menu_set.menu_fond = world->menu_set.menu;
         world->state = main_menu;
     }
 
