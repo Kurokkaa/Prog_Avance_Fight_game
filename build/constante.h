@@ -26,5 +26,6 @@
     enum game_map{city_night, forest, japan};
     enum combos_inputs{up, down, left, right, kick, light_p, heavy_p, special};
     enum bonus_type{health_bonus, damage_bonus, special_bonus};
+    enum son{music, selector};
 
 #endif

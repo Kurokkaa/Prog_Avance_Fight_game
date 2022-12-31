@@ -69,14 +69,22 @@ void init_miniature(jeu *world, SDL_Renderer *renderer)
 
 void init_music(jeu *world)
 {
-    world->music.menu = Mix_LoadWAV("build/ressources/Audio/Game_theme.wav");
-    world->music.light_punch = Mix_LoadWAV("build/ressources/Audio/missile_shot.wav");
-    world->music.heavy_punch = Mix_LoadWAV("build/ressources/Audio/missile_shot.wav");
-    world->music.kick = Mix_LoadWAV("build/ressources/Audio/missile_shot.wav");
-    world->music.fireball = Mix_LoadWAV("build/ressources/Audio/missile_shot.wav");
-    world->music.frappe = Mix_LoadWAV("build/ressources/Audio/missile_shot.wav");
-    world->music.change = Mix_LoadWAV("build/ressources/Audio/missile_shot.wav");
-    world->music.guard = Mix_LoadWAV("build/ressources/Audio/missile_shot.wav");
+    world->music.menu = Mix_LoadWAV("build/ressources/Audio/alex-productions-cyberpunk-gaming-electro-stardust.wav");
+    world->music.game_music = Mix_LoadWAV("build/ressources/Audio/twisterium-mad-power.wav"); 
+    world->music.aura = Mix_LoadWAV("build/ressources/Audio/Aura.wav");
+    world->music.berserk_scream = Mix_LoadWAV("build/ressources/Audio/Berserk_Scream.wav");
+    world->music.fireball_sound = Mix_LoadWAV("build/ressources/Audio/Fireball.wav");
+    world->music.fireball_explosion = Mix_LoadWAV("build/ressources/Audio/FireballExplosion.wav");
+    world->music.gravityball_sound = Mix_LoadWAV("build/ressources/Audio/GravityBall.wav");
+    world->music.grunt = Mix_LoadWAV("build/ressources/Audio/Grunt.wav");
+    world->music.heavy_punch = Mix_LoadWAV("build/ressources/Audio/HeavyPunch.wav");
+    world->music.hit_guard = Mix_LoadWAV("build/ressources/Audio/HitGuard.wav");
+    world->music.kick = Mix_LoadWAV("build/ressources/Audio/Kick.wav");
+    world->music.kick_air = Mix_LoadWAV("build/ressources/Audio/KickAir.wav");
+    world->music.light_punch = Mix_LoadWAV("build/ressources/Audio/LightPunch.wav");
+    world->music.menu_selector = Mix_LoadWAV("build/ressources/Audio/Menu_Selection.wav");
+    world->music.punch_air = Mix_LoadWAV("build/ressources/Audio/PunchAir.wav");
+    world->music.win_laugh = Mix_LoadWAV("build/ressources/Audio/Win_laugh.wav");
     world->music.menuPlayed = false;
 }
 
@@ -95,6 +103,12 @@ void init_jeu(jeu *world, SDL_Renderer *renderer)
     init_music(world);
     init_miniature(world, renderer);
     world->menu_set.cadreVie = load_image("./build/ressources/cadres.bmp", renderer);
+    world->p1.audiochan.action = 2;
+    world->p1.audiochan.aura = 3;
+    world->p1.audiochan.chara_voice = 4;
+    world->p2.audiochan.action = 5;
+    world->p2.audiochan.aura = 6;
+    world->p2.audiochan.chara_voice = 7;
     world->game_over = false;
 }
 
@@ -120,7 +134,7 @@ void init_perso(SDL_Renderer *renderer, sprite_perso *perso, int x, int y, int w
     init_hits(perso);
     init_combos(perso);
     perso->pos_tab_combo = 0;
-    perso->special_bar = 0;
+    perso->special_bar = 300;
     perso->fireball.fireball = load_image("./build/ressources/Characters/Powers/fireball.bmp", renderer);
     perso->gravityball.fireball = load_image("./build/ressources/Characters/Powers/BlackHole1.bmp", renderer);
 
@@ -270,9 +284,17 @@ void init(SDL_Window **window, SDL_Renderer **renderer, jeu *world)
     }
     else
     {
-        Mix_AllocateChannels(3);       // Allouer 2 cannaux
-        Mix_Volume(0, MIX_MAX_VOLUME); // Mets le son a 100% en volume pour le premier cannaux
-        Mix_Volume(1, 70);             // Mets le son a 50% en volume pour le deuxièmme cannaux
+        Mix_AllocateChannels(8);   
+        Mix_Volume(0, 30); 
+        Mix_Volume(1, 70);  
+        Mix_Volume(2, 70);
+        Mix_Volume(3, 70);
+        Mix_Volume(4, 70);
+        Mix_Volume(5, 70);
+        Mix_Volume(6, 70);
+        Mix_Volume(7, 70);
+        Mix_Volume(8, 70);
+
     }
     init_jeu(world, *renderer);
 }
@@ -334,10 +356,10 @@ void init_chara_state(SDL_Renderer *renderer, sprite_perso *perso)
         init_state_animation(renderer, perso, hpunch, "build/ressources/Characters/Chara2/HeavyPunch.bmp", 15, 85);
         init_state_animation(renderer, perso, stun, "build/ressources/Characters/Chara2/Knocked.bmp", 5, 85);
 
-        init_state_animation(renderer, perso, fireball, "build/ressources/Characters/Chara1/Fireball.bmp", 30, 90);
-        init_state_animation(renderer, perso, gravityball, "build/ressources/Characters/Chara1/Fireball.bmp", 30, 90);
-        init_state_animation(renderer, perso, looser, "build/ressources/Characters/Chara1/Defeat.bmp", 28, 90);
-        init_state_animation(renderer, perso, winner, "build/ressources/Characters/Chara1/Victory.bmp", 30, 100);
+        init_state_animation(renderer, perso, fireball, "build/ressources/Characters/Chara2/Fireball.bmp", 30, 90);
+        init_state_animation(renderer, perso, gravityball, "build/ressources/Characters/Chara2/Fireball.bmp", 30, 90);
+        init_state_animation(renderer, perso, looser, "build/ressources/Characters/Chara2/Defeat.bmp", 28, 90);
+        init_state_animation(renderer, perso, winner, "build/ressources/Characters/Chara2/Victory.bmp", 30, 100);
 
         init_state_animation(renderer, perso, 19, "build/ressources/Characters/Powers/Aura_Spritesheet.Bmp", 8, 190);
         init_state_animation(renderer, perso, 20, "build/ressources/Characters/Powers/Transparent_Aura_Spritesheet.Bmp", 8, 190);
@@ -957,13 +979,13 @@ void light_punch(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
     {
         if ((attacker->x + attacker->w + attacker->hits.light_punch->range_x >= receiver->x) && (attacker->y + attacker->jump_height / 2 >= receiver->y && attacker->y + attacker->jump_height / 2 <= receiver->y + receiver->h))
         {
-
+            Mix_PlayChannel(attacker->audiochan.action, world->music.light_punch, 0);
             if (receiver->guard)
             {
                 if (!receiver->berserk)
-                {
+                {   
+                    Mix_PlayChannel(receiver->audiochan.action, world->music.hit_guard, 0);
                     receiver->life_guard -= attacker->damage_bonus ? (attacker->berserk ? attacker->hits.light_punch->dmg * 100 : attacker->hits.light_punch->dmg * 1.5) : attacker->hits.light_punch->dmg;
-                    Mix_PlayChannel(0, world->music.guard, 1);
                 }
             }
             else
@@ -972,6 +994,7 @@ void light_punch(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
                 attacker->special_bar += 5;
                 if (!receiver->berserk)
                 {
+                    Mix_PlayChannel(receiver->audiochan.chara_voice, world->music.grunt, 0);
                     receiver->life -= attacker->damage_bonus ? (attacker->berserk ? attacker->hits.light_punch->dmg * 100 : attacker->hits.light_punch->dmg * 1.5) : attacker->hits.light_punch->dmg;
 
                     if (!receiver->broken_guard)
@@ -982,16 +1005,20 @@ void light_punch(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
                 }
             }
         }
+        else{
+            Mix_PlayChannel(attacker->audiochan.action, world->music.punch_air, 0);
+        }
     }
     else
     {
         if ((attacker->x - attacker->hits.light_punch->range_x <= receiver->x + receiver->w) && (attacker->y + attacker->jump_height / 2 >= receiver->y && attacker->y + attacker->jump_height / 2 <= receiver->y + receiver->h))
         {
+            Mix_PlayChannel(attacker->audiochan.action, world->music.light_punch, 0);
             if (receiver->guard)
             {
                 if (!receiver->berserk)
                 {
-                    Mix_PlayChannel(0, world->music.guard, 1);
+                    Mix_PlayChannel(receiver->audiochan.chara_voice, world->music.hit_guard, 0);
                     receiver->life_guard -= attacker->damage_bonus ? (attacker->berserk ? attacker->hits.light_punch->dmg * 100 : attacker->hits.light_punch->dmg * 1.5) : attacker->hits.light_punch->dmg;
                 }
             }
@@ -1001,6 +1028,7 @@ void light_punch(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
                 attacker->special_bar += 5;
                 if (!receiver->berserk)
                 {
+                    Mix_PlayChannel(receiver->audiochan.chara_voice, world->music.grunt, 0);
                     receiver->life -= attacker->damage_bonus ? (attacker->berserk ? attacker->hits.light_punch->dmg * 100 : attacker->hits.light_punch->dmg * 1.5) : attacker->hits.light_punch->dmg;
                     if (!receiver->broken_guard)
                     {
@@ -1009,6 +1037,9 @@ void light_punch(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
                     }
                 }
             }
+        }
+        else{
+            Mix_PlayChannel(attacker->audiochan.action, world->music.punch_air, 0);
         }
     }
 }
@@ -1020,11 +1051,13 @@ void heavy_punch(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
     {
         if ((attacker->x + attacker->w + attacker->hits.heavy_punch->range_x >= receiver->x) && (attacker->y + attacker->h / 2 >= receiver->y && attacker->y + attacker->h / 2 <= receiver->y + receiver->h))
         {
+            
+            Mix_PlayChannel(attacker->audiochan.action, world->music.heavy_punch, 0);
             if (receiver->guard)
             {
                 if (!receiver->berserk)
                 {
-                    Mix_PlayChannel(0, world->music.guard, 1);
+                    Mix_PlayChannel(receiver->audiochan.action, world->music.hit_guard, 0);
                     receiver->life_guard -= attacker->damage_bonus ? (attacker->berserk ? attacker->hits.heavy_punch->dmg * 100 : attacker->hits.heavy_punch->dmg * 1.5) : attacker->hits.heavy_punch->dmg;
                 }
             }
@@ -1034,6 +1067,7 @@ void heavy_punch(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
                 attacker->special_bar += 10;
                 if (!receiver->berserk)
                 {
+                    Mix_PlayChannel(receiver->audiochan.chara_voice, world->music.grunt, 0);
                     receiver->life -= attacker->damage_bonus ? (attacker->berserk ? attacker->hits.heavy_punch->dmg * 100 : attacker->hits.heavy_punch->dmg * 1.5) : attacker->hits.heavy_punch->dmg;
                     if (!receiver->broken_guard)
                     {
@@ -1043,16 +1077,20 @@ void heavy_punch(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
                 }
             }
         }
+        else{
+            Mix_PlayChannel(attacker->audiochan.action, world->music.punch_air, 0);
+        }
     }
     else
     {
         if ((attacker->x - attacker->hits.heavy_punch->range_x <= receiver->x + receiver->w) && (attacker->y + attacker->jump_height / 2 >= receiver->y && attacker->y + attacker->jump_height / 2 <= receiver->y + receiver->h))
         {
+            Mix_PlayChannel(attacker->audiochan.action, world->music.heavy_punch, 0);
             if (receiver->guard)
             {
                 if (!receiver->berserk)
                 {
-                    Mix_PlayChannel(0, world->music.guard, 1);
+                    Mix_PlayChannel(receiver->audiochan.action, world->music.hit_guard, 0);
                     receiver->life_guard -= attacker->damage_bonus ? (attacker->berserk ? attacker->hits.heavy_punch->dmg * 100 : attacker->hits.heavy_punch->dmg * 1.5) : attacker->hits.heavy_punch->dmg;
                 }
             }
@@ -1065,11 +1103,15 @@ void heavy_punch(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
                     receiver->life -= attacker->damage_bonus ? (attacker->berserk ? attacker->hits.heavy_punch->dmg * 100 : attacker->hits.heavy_punch->dmg * 1.5) : attacker->hits.heavy_punch->dmg;
                     if (!receiver->broken_guard)
                     {
+                        Mix_PlayChannel(receiver->audiochan.chara_voice, world->music.grunt, 0);
                         receiver->chara_state = stun;
                         receiver->stun_time = attacker->hits.heavy_punch->delay;
                     }
                 }
             }
+        }
+        else{
+            Mix_PlayChannel(attacker->audiochan.action, world->music.punch_air, 0);
         }
     }
 }
@@ -1081,11 +1123,12 @@ void kick_hit(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
     {
         if ((attacker->x + attacker->w + attacker->hits.kick->range_x >= receiver->x) && (attacker->y + attacker->h / 2 >= receiver->y && attacker->y + attacker->h / 2 <= receiver->y + receiver->h))
         {
+            Mix_PlayChannel(attacker->audiochan.action, world->music.kick, 0);
             if (receiver->guard)
             {
                 if (!receiver->berserk)
                 {
-                    Mix_PlayChannel(0, world->music.guard, 1);
+                    Mix_PlayChannel(receiver->audiochan.action, world->music.hit_guard, 0);
                     receiver->life_guard -= attacker->damage_bonus ? (attacker->berserk ? attacker->hits.kick->dmg * 100 : attacker->hits.kick->dmg * 1.5) : attacker->hits.kick->dmg;
                 }
             }
@@ -1095,6 +1138,7 @@ void kick_hit(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
                 receiver->life -= attacker->damage_bonus ? (attacker->berserk ? attacker->hits.kick->dmg * 100 : attacker->hits.kick->dmg * 1.5) : attacker->hits.kick->dmg;
                 if (!receiver->berserk)
                 {
+                    Mix_PlayChannel(receiver->audiochan.chara_voice, world->music.kick, 0);
                     if (!receiver->broken_guard)
                     {
                         receiver->chara_state = stun;
@@ -1103,16 +1147,20 @@ void kick_hit(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
                 }
             }
         }
+        else{
+            Mix_PlayChannel(attacker->audiochan.action, world->music.kick_air, 0);
+        }
     }
     else
     {
         if ((attacker->x - attacker->hits.heavy_punch->range_x <= receiver->x + receiver->w) && (attacker->y + attacker->jump_height / 2 >= receiver->y && attacker->y + attacker->jump_height / 2 <= receiver->y + receiver->h))
         {
+            Mix_PlayChannel(attacker->audiochan.action, world->music.kick, 0);
             if (receiver->guard)
             {
                 if (!receiver->berserk)
                 {
-                    Mix_PlayChannel(0, world->music.guard, 1);
+                    Mix_PlayChannel(receiver->audiochan.action, world->music.hit_guard, 0);
                     receiver->life_guard -= attacker->damage_bonus ? (attacker->berserk ? attacker->hits.kick->dmg * 100 : attacker->hits.kick->dmg * 1.5) : attacker->hits.kick->dmg;
                 }
             }
@@ -1122,6 +1170,7 @@ void kick_hit(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
                 receiver->life -= attacker->damage_bonus ? (attacker->berserk ? attacker->hits.kick->dmg * 100 : attacker->hits.kick->dmg * 1.5) : attacker->hits.kick->dmg;
                 if (!receiver->berserk)
                 {
+                    Mix_PlayChannel(receiver->audiochan.chara_voice, world->music.grunt, 0);
                     if (!receiver->broken_guard)
                     {
                         receiver->chara_state = stun;
@@ -1129,6 +1178,9 @@ void kick_hit(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
                     }
                 }
             }
+        }
+        else{
+            Mix_PlayChannel(attacker->audiochan.action, world->music.kick_air, 0);
         }
     }
 }
@@ -1245,13 +1297,21 @@ void free_hits(sprite_perso *perso)
 void free_music(jeu *world)
 {
     Mix_FreeChunk(world->music.menu);
-    Mix_FreeChunk(world->music.light_punch);
+    Mix_FreeChunk(world->music.game_music);
+    Mix_FreeChunk(world->music.aura);
+    Mix_FreeChunk(world->music.berserk_scream);
+    Mix_FreeChunk(world->music.fireball_sound);
+    Mix_FreeChunk(world->music.fireball_explosion);
+    Mix_FreeChunk(world->music.gravityball_sound);
+    Mix_FreeChunk(world->music.grunt);
     Mix_FreeChunk(world->music.heavy_punch);
+    Mix_FreeChunk(world->music.hit_guard);
     Mix_FreeChunk(world->music.kick);
-    Mix_FreeChunk(world->music.fireball);
-    Mix_FreeChunk(world->music.frappe);
-    Mix_FreeChunk(world->music.change);
-    Mix_FreeChunk(world->music.guard);
+    Mix_FreeChunk(world->music.kick_air);
+    Mix_FreeChunk(world->music.light_punch);
+    Mix_FreeChunk(world->music.menu_selector);
+    Mix_FreeChunk(world->music.punch_air);
+    Mix_FreeChunk(world->music.win_laugh);
 }
 
 /*FONCTIONS DE LIBERATION ESPACE*/
@@ -1357,7 +1417,8 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
     {
         if (!world->music.menuPlayed)
         {
-            Mix_PlayChannel(1, world->music.menu, -1);
+            
+            Mix_PlayChannel(music, world->music.menu, -1);
             world->music.menuPlayed = true;
         }
         if (event->type == SDL_QUIT)
@@ -1373,7 +1434,7 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                 if (world->state == pause)
                 {
                     world->state = combat;
-                    Mix_Volume(1, 0);
+                    Mix_Resume(music);
                     unpause(&world->timer);
                     unpause(&world->p1.chrono_guard);
                     unpause(&world->p2.chrono_guard);
@@ -1384,12 +1445,14 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                     unpause(&world->p1.gravityball.timer_throw);
                     unpause(&world->p2.gravityball.timer_throw);
                 }
+
                 else if (world->state == options)
                 {
                     world->state = main_menu;
                     world->menu_set.menu_fond = world->menu_set.menu;
                     world->menu_set.index_menu = 0;
                 }
+
                 else if (world->state == selection_map)
                 {
                     world->state = main_menu;
@@ -1400,11 +1463,10 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
 
             if (event->key.keysym.sym == SDLK_z)
             {
+                Mix_PlayChannel(selector,world->music.menu_selector,0);
                 if (world->state == main_menu)
 
                 {
-                    /* Mix_PlayChannel(1,world->music.menu,-1);
-                     Mix_PlayChannel(0,world->music.change,1);*/
                     world->menu_set.index_menu--;
                     if (world->menu_set.index_menu < 0)
                     {
@@ -1424,7 +1486,7 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
             if (event->key.keysym.sym == SDLK_s)
             {
 
-                Mix_PlayChannel(0, world->music.change, 1);
+                Mix_PlayChannel(selector, world->music.menu_selector, 0);
                 if (world->state == main_menu)
                 {
                     world->menu_set.index_menu++;
@@ -1445,9 +1507,10 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
 
             if (event->key.keysym.sym == SDLK_d)
             {
+                Mix_PlayChannel(selector, world->music.menu_selector, 0);
                 if (world->state == selection_map)
                 {
-                    Mix_PlayChannel(0, world->music.change, 1);
+                    
                     world->menu_set.index_menu++;
                     if (world->menu_set.index_menu > NB_MAPS - 1)
                     {
@@ -1462,9 +1525,9 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
 
             if (event->key.keysym.sym == SDLK_q)
             {
+                Mix_PlayChannel(selector, world->music.menu_selector, 0);
                 if (world->state == selection_map)
                 {
-                    Mix_PlayChannel(0, world->music.change, 1);
                     world->menu_set.index_menu--;
                     if (world->menu_set.index_menu < 0)
                     {
@@ -1502,6 +1565,7 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                 }
                 else if (world->state == selection_map)
                 {
+                    Mix_PlayChannel(music, world->music.menu, 0);
                     switch (world->menu_set.index_menu)
                     {
                     case 0:
@@ -1538,7 +1602,6 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                     }
 
                     init_lootbox(&world->lootbox, renderer);
-                    Mix_Volume(1, 0);
                     world->menu_set.index_menu = 0;
                 }
                 else if (world->state == options)
@@ -1583,6 +1646,7 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
         }
     }
 }
+
 void pauseChrono(compteur *chrono)
 {
     if (chrono->start)
@@ -1613,6 +1677,7 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
     if (keystates[SDL_SCANCODE_ESCAPE] && !world->keystates_pre[SDL_SCANCODE_ESCAPE])
     {
         world->state = pause;
+        Mix_Pause(music);
         pauseChrono(&world->timer);
         pauseChrono(&world->p1.chrono_guard);
         pauseChrono(&world->p2.chrono_guard);
@@ -1744,7 +1809,7 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
                             switch (i)
                             {
                             case 1:
-                                Mix_PlayChannel(0, world->music.fireball, 1);
+                                Mix_PlayChannel(world->p1.audiochan.action, world->music.fireball_sound, 0);
                                 break;
 
                             default:
@@ -1754,7 +1819,6 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
                     }
                     if (!combop1)
                     {
-                        Mix_PlayChannel(0, world->music.light_punch, 1);
                         world->p1.chara_state = lpunch;
                         world->p1.attack_launched = true;
                     }
@@ -1777,7 +1841,6 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
                     }
                     if (!combop1)
                     {
-                        Mix_PlayChannel(0, world->music.heavy_punch, 1);
                         world->p1.chara_state = hpunch;
                         world->p1.attack_launched = true;
                     }
@@ -1798,7 +1861,6 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
                     }
                     if (!combop1)
                     {
-                        Mix_PlayChannel(0, world->music.kick, 1);
                         world->p1.chara_state = kickstate;
                         world->p1.attack_launched = true;
                     }
@@ -1931,7 +1993,6 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
                     }
                     if (!combop2)
                     {
-                        Mix_PlayChannel(2, world->music.light_punch, 1);
                         world->p2.chara_state = lpunch;
                         world->p2.attack_launched = true;
                     }
@@ -1954,7 +2015,6 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
                     }
                     if (!combop2)
                     {
-                        Mix_PlayChannel(2, world->music.heavy_punch, 1);
                         world->p2.chara_state = hpunch;
                         world->p2.attack_launched = true;
                     }
@@ -1977,7 +2037,6 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
                     }
                     if (!combop2)
                     {
-                        Mix_PlayChannel(2, world->music.kick, 1);
                         world->p2.chara_state = kickstate;
                         world->p2.attack_launched = true;
                     }
@@ -2497,7 +2556,6 @@ void endgame_data(jeu *world)
     }
     if (world->timer.timer == 0)
     {
-        world->menu_set.menu_fond = world->menu_set.menu;
         world->state = main_menu;
     }
 

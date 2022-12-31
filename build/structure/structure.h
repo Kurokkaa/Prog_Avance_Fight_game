@@ -87,6 +87,13 @@ struct throwable_s
 };
 typedef struct throwable_s throwable;
 
+struct audio_chanel_s{
+    int action;
+    int aura;
+    int chara_voice;
+};
+typedef struct audio_chanel_s audiochannel;
+
 struct sprite_p{
     SDL_Texture * aura;
     int perso_choisi; 
@@ -122,6 +129,7 @@ struct sprite_p{
     compteur dmg_bonus_timer;
     throwable fireball;
     throwable gravityball;
+    audiochannel audiochan;
 };
 typedef struct sprite_p sprite_perso;
 
@@ -161,13 +169,22 @@ typedef struct lootbox_s lootbox;
 
 struct Sound_s{
     Mix_Chunk* menu;
-    Mix_Chunk* light_punch;
+    Mix_Chunk* game_music;
+    Mix_Chunk* aura;
+    Mix_Chunk* berserk_scream;
+    Mix_Chunk* fireball_sound;
+    Mix_Chunk* fireball_explosion;
+    Mix_Chunk* gravityball_sound;
+    Mix_Chunk* grunt;
     Mix_Chunk* heavy_punch;
+    Mix_Chunk* hit_guard;
     Mix_Chunk* kick;
-    Mix_Chunk* fireball;
-    Mix_Chunk* frappe;
-    Mix_Chunk* change;
-    Mix_Chunk* guard;
+    Mix_Chunk* kick_air;
+    Mix_Chunk* light_punch;
+    Mix_Chunk* menu_selector;
+    Mix_Chunk* punch_air;
+    Mix_Chunk * win_laugh;
+
     bool menuPlayed;
 };
 typedef struct Sound_s Sound;
