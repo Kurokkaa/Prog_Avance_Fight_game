@@ -131,7 +131,10 @@ struct menu_p
     SDL_Texture *menu_fond;
     SDL_Texture *tab_map[3];
     SDL_Texture *cadreVie;
-    
+    SDL_Texture *menu;
+    SDL_Texture *selection_maps_menu;
+    SDL_Texture *options_menu;
+  //  SDL_Texture *howto_menu;
 };
 typedef struct menu_p menu;
 

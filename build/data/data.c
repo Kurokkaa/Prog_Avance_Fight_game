@@ -83,7 +83,10 @@ void init_music(jeu *world)
 void init_jeu(jeu *world, SDL_Renderer *renderer)
 {
     srand(time(NULL));
-    world->menu_set.menu_fond = load_image("build/ressources/menu/menu.bmp", renderer);
+    world->menu_set.menu = load_image("build/ressources/menu/menu.bmp", renderer);
+    world->menu_set.options_menu = load_image("build/ressources/menu/options.bmp", renderer);
+    world->menu_set.selection_maps_menu = load_image("build/ressources/menu/Maps_selector.bmp", renderer);
+    world->menu_set.menu_fond = world->menu_set.menu;
     world->state = main_menu;
     world->terminer = false;
     world->menu_set.index_menu = 0;
@@ -849,30 +852,41 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
         }
     }
 
-    /*  THROWABLES */
-    if (perso->chara_state == fireball)
+/*THROWABLE*/
+if (perso->chara_state == fireball)
     {
-        perso->anim[fireball].frame++;
-        if (perso->anim[fireball].frame == perso->anim[fireball].nbFrame)
-        {
-            perso->fireball.launched_fireball = true;
-            perso->chara_state = idle;
+        if(perso->anim[fireball].counter>=1){
+            perso->anim[fireball].frame++;
+            perso->anim[fireball].counter =0;
+            if (perso->anim[fireball].frame == perso->anim[fireball].nbFrame)
+            {
+                perso->fireball.launched_fireball = true;
+                perso->chara_state = idle;
+            }
+        }
+        else{
+            perso->anim[fireball].counter++;
         }
     }
     if (perso->chara_state == gravityball)
     
-    {
-        
-        if (!perso->gravityball.launched_fireball)
-        {
-            perso->gravityball.timer_throw.startTime = SDL_GetTicks();
-            perso->gravityball.timer_throw.pause = false;
+    {   
+        if(perso->anim[gravityball].counter>=1){
+            if (!perso->gravityball.launched_fireball)
+            {
+                perso->gravityball.timer_throw.startTime = SDL_GetTicks();
+                perso->gravityball.timer_throw.pause = false;
+            }
+            perso->anim[gravityball].counter = 0;
+            perso->anim[gravityball].frame++;
+            if (perso->anim[gravityball].frame == perso->anim[gravityball].nbFrame)
+            {
+                perso->gravityball.launched_fireball = true;
+                perso->chara_state = idle;
+            }
         }
-        perso->anim[gravityball].frame++;
-        if (perso->anim[gravityball].frame == perso->anim[gravityball].nbFrame)
-        {
-            perso->gravityball.launched_fireball = true;
-            perso->chara_state = idle;
+        else{
+            perso->anim[gravityball].counter++;
         }
     }
 }
@@ -1372,13 +1386,13 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                 else if (world->state == options)
                 {
                     world->state = main_menu;
-                    world->menu_set.menu_fond = load_image("build/ressources/menu/menu.bmp", renderer);
+                    world->menu_set.menu_fond = world->menu_set.options_menu;
                     world->menu_set.index_menu = 0;
                 }
                 else if (world->state == selection_map)
                 {
                     world->state = main_menu;
-                    world->menu_set.menu_fond = load_image("build/ressources/menu/menu.bmp", renderer);
+                    world->menu_set.menu_fond = world->menu_set.menu;
                     world->menu_set.index_menu = 0;
                 }
             }
@@ -1471,13 +1485,13 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                     {
                     case 0:
                         world->menu_set.index_menu = 0;
-                        world->menu_set.menu_fond = load_image("build/ressources/menu/selection_map.png", renderer);
+                        world->menu_set.menu_fond = world->menu_set.selection_maps_menu;
                         world->state = selection_map;
 
                         break;
                     case 1:
                         world->state = options;
-                        world->menu_set.menu_fond = load_image("build/ressources/menu/Timer_menu.bmp", renderer);
+                        world->menu_set.menu_fond = world->menu_set.options_menu;
                         world->menu_set.index_menu = 0;
                         break;
                     case 2:
@@ -1552,7 +1566,7 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                         world->state = combat;
                         break;
                     case 1:
-                        world->menu_set.menu_fond = load_image("build/ressources/menu/menu.bmp", renderer);
+                        world->menu_set.menu_fond = world->menu_set.menu;
                         world->state = main_menu;
                         break;
                     }
@@ -1619,7 +1633,9 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
         if ((keystates[SDL_SCANCODE_A] && !keystates[SDL_SCANCODE_D]) /*|| SDL_GameControllerGetAxis(world->joysticks[0],0)<-(10000)*/)
         {
             // world->p1.speed = -CHARA_SPEED;
-
+            if (world->p1.chara_state == walk){
+                world->p1.backwards == true;
+            }
             if (world->p1.chara_state == idle)
             {
                 world->p1.chara_state = walk;
@@ -1644,7 +1660,9 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
         if (!keystates[SDL_SCANCODE_A] && keystates[SDL_SCANCODE_D] /*|| SDL_GameControllerGetAxis(world->joysticks[0],0)>10000*/)
         {
             // world->p1.speed = CHARA_SPEED;
-
+            if (world->p1.chara_state == walk){
+                world->p1.backwards == false;
+            }
             if (world->p1.chara_state == idle)
             {
                 world->p1.chara_state = walk;
@@ -1805,7 +1823,9 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
         if (keystates[SDL_SCANCODE_LEFT] && !keystates[SDL_SCANCODE_RIGHT])
         {
             // world->p1.speed = -CHARA_SPEED;
-
+            if (world->p2.chara_state == walk){
+                world->p2.backwards = true;
+            }
             if (world->p2.chara_state == idle)
             {
                 world->p2.chara_state = walk;
@@ -1830,7 +1850,9 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
         if (!keystates[SDL_SCANCODE_LEFT] && keystates[SDL_SCANCODE_RIGHT])
         {
             // world->p1.speed = CHARA_SPEED;
-
+            if(world->p2.chara_state == walk){
+                world->p2.backwards = false;
+            }
             if (world->p2.chara_state == idle)
             {
                 world->p2.chara_state = walk;
