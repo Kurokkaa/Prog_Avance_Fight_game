@@ -130,6 +130,18 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
             display_map(renderer,world);
             play_animations(renderer, &(world->p1), world->p1.chara_state);
             play_animations(renderer, &(world->p2), world->p2.chara_state);
+            SDL_Color color = {0,0,0};
+            char* WhoWin;
+            if(world->p1.chara_state == winner){
+                WhoWin = "Le joueur 1 a gagne";
+            }
+            else{
+                WhoWin = "Le joueur 2 a gagne";
+            }
+            SDL_Surface* surface_victoire = TTF_RenderText_Solid(world->font.police_victoire,WhoWin , color);
+            SDL_Texture* texture_victoire = SDL_CreateTextureFromSurface(renderer,surface_victoire);
+            apply_textures(texture_victoire,renderer,250, 200);
+            free(surface_victoire);
             break;
 
         case main_menu:

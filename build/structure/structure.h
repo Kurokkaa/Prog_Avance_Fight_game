@@ -141,6 +141,7 @@ typedef struct menu_p menu;
 struct ressources_s
 {
     TTF_Font *police_compteur;
+    TTF_Font *police_victoire;
 };
 typedef struct ressources_s ressources;
 

@@ -91,6 +91,7 @@ void init_jeu(jeu *world, SDL_Renderer *renderer)
     world->terminer = false;
     world->menu_set.index_menu = 0;
     world->font.police_compteur = TTF_OpenFont("build/ressources/Polices/Reach_Story.ttf", 40);
+    world->font.police_victoire = TTF_OpenFont("build/ressources/Polices/Reach_Story.ttf", 150);
     init_music(world);
     init_miniature(world, renderer);
     world->menu_set.cadreVie = load_image("./build/ressources/cadres.bmp", renderer);
