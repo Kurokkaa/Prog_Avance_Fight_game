@@ -37,7 +37,7 @@ struct animation_s{
     int counter;
     SDL_Texture *anim_text;
 };
-typedef struct animation_s anim_t;
+typedef struct animation_s anim;
 
 struct hit_set_s
 {
@@ -59,7 +59,7 @@ typedef struct inputs_s inputs;
 
 struct combos_s
 {
-    enum combos_inputs input[10];
+    enum combos_inputs* input;
     int frame_between;
     int nb_coups;
     int required;
@@ -67,8 +67,8 @@ struct combos_s
 typedef struct combos_s combo;
 
 struct compteur_s{
-    int startTime;
-    int pauseTime;
+    double startTime;
+    double pauseTime;
     bool pause;
     bool start;
     int timer; 
@@ -84,6 +84,8 @@ struct throwable_s
     int y;
     int multiplicateur;
     compteur timer_throw;
+    compteur dmg_timer;
+    bool ending;
 };
 typedef struct throwable_s throwable;
 
@@ -102,6 +104,7 @@ struct sprite_p{
     int w; /*!<largeur du sprite */
     int h; /*!<hauteur du sprite */
     int speed;
+    int air_speed;
     int perso;
     int stun_time;
     enum character_state chara_state;
@@ -112,10 +115,10 @@ struct sprite_p{
     bool double_jump;
     int life;
     hit_set hits;
-    anim_t anim[21];
+    anim* anim;
     inputs *buffer;
     int pos_tab_combo;
-    combo tab_combo[NB_COMBOS];
+    combo* tab_combo;
     bool attack_launched;
     bool guard;
     int life_guard;
@@ -137,7 +140,7 @@ struct menu_p
 {
     int index_menu;
     SDL_Texture *menu_fond;
-    SDL_Texture *tab_map[3];
+    SDL_Texture **tab_map;
     SDL_Texture *cadreVie;
     SDL_Texture *menu;
     SDL_Texture *selection_maps_menu;
@@ -154,7 +157,7 @@ struct ressources_s
 typedef struct ressources_s ressources;
 
 struct lootbox_s{
-    SDL_Texture * texture[3];
+    SDL_Texture ** texture;
     int x;
     int y;
     int w;
@@ -199,7 +202,7 @@ struct world_s{
     SDL_GameController **joysticks;
     menu menu_set;
     int timestamp_w;
-    int keystates_pre[123];
+    int* keystates_pre;
     ressources font;
     compteur timer;
     lootbox lootbox;

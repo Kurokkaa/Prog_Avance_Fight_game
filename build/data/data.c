@@ -33,6 +33,10 @@ void init_timer(jeu *world)
     world->p2.chrono_special.startTime = SDL_GetTicks();
     world->p2.chrono_special.pause = false;
     world->p2.chrono_special.start = true;
+    world->p1.gravityball.dmg_timer.pause = false;
+    world->p1.gravityball.dmg_timer.start = true;
+    world->p2.gravityball.dmg_timer.pause = false;
+    world->p2.gravityball.dmg_timer.start = true;
 }
 
 void init_map(jeu *world, SDL_Renderer *renderer)
@@ -62,6 +66,7 @@ void init_map(jeu *world, SDL_Renderer *renderer)
 // fonction pour les miniatures de maps
 void init_miniature(jeu *world, SDL_Renderer *renderer)
 {
+    world->menu_set.tab_map = malloc(sizeof(SDL_Texture*)*NB_MAPS);
     world->menu_set.tab_map[0] = load_image("build/ressources/map/city_night/city_mini.bmp", renderer);
     world->menu_set.tab_map[1] = load_image("build/ressources/map/forest/forest_mini.bmp", renderer);
     world->menu_set.tab_map[2] = load_image("build/ressources/map/Japan/Japan_mini.bmp", renderer);
@@ -110,6 +115,7 @@ void init_jeu(jeu *world, SDL_Renderer *renderer)
     world->p2.audiochan.aura = 6;
     world->p2.audiochan.chara_voice = 7;
     world->game_over = false;
+    world->keystates_pre = malloc(sizeof(int)*123);
 }
 
 void init_perso(SDL_Renderer *renderer, sprite_perso *perso, int x, int y, int w, int h, int speed, bool mirror, int choice)
@@ -120,6 +126,7 @@ void init_perso(SDL_Renderer *renderer, sprite_perso *perso, int x, int y, int w
     perso->w = w;
     perso->h = h;
     perso->speed = CHARA_SPEED;
+    perso->air_speed = AIR_CHARA_SPEED;
     perso->jump_height = 300;
     perso->chara_state = idle;
     perso->backwards = false;
@@ -131,23 +138,28 @@ void init_perso(SDL_Renderer *renderer, sprite_perso *perso, int x, int y, int w
     perso->life_guard = MAX_GUARD;
     perso->damage_bonus = false;
     perso->damage_bonus = false;
+    perso->tab_combo = malloc(sizeof(combo)*NB_COMBOS);
+    for(int i = 0;i<NB_COMBOS;i++){
+        perso->tab_combo[i].input = malloc(sizeof(enum combos_inputs)*MAX_SIZE_COMBO);
+    }
     init_hits(perso);
     init_combos(perso);
     perso->pos_tab_combo = 0;
     perso->special_bar = 300;
     perso->fireball.fireball = load_image("./build/ressources/Characters/Powers/fireball.bmp", renderer);
-    perso->gravityball.fireball = load_image("./build/ressources/Characters/Powers/BlackHole1.bmp", renderer);
-
     perso->fireball.launched_fireball = false;
     perso->gravityball.launched_fireball = false;
+    perso->gravityball.ending = false;
     perso->buffer = malloc(sizeof(inputs) * BUFFER_SIZE);
     perso->double_jump = true;
+    perso->berserk = false;
     for (int i = 0; i < BUFFER_SIZE; i++)
     {
         perso->buffer[i].input = 0;
         perso->buffer[i].timestamp = 0;
         perso->pos_tab_combo = 0;
     }
+    perso->anim = malloc(sizeof(anim)*NB_ANIM);
     init_chara_state(renderer, perso);
 }
 
@@ -231,6 +243,7 @@ void init_combos(sprite_perso *player)
 
 void init_lootbox(lootbox *lootbox, SDL_Renderer *renderer)
 {
+    lootbox->texture = malloc(sizeof(SDL_Texture*)*3);
     lootbox->texture[health_bonus] = load_image("build/ressources/Bonuses/Life_bonus.bmp", renderer);
     lootbox->texture[damage_bonus] = load_image("build/ressources/Bonuses/Damage_bonus.bmp", renderer);
     lootbox->texture[special_bonus] = load_image("build/ressources/Bonuses/Special_bonus.bmp", renderer);
@@ -331,11 +344,11 @@ void init_chara_state(SDL_Renderer *renderer, sprite_perso *perso)
 
         init_state_animation(renderer, perso, fireball, "build/ressources/Characters/Chara1/Fireball.bmp", 30, 90);
         init_state_animation(renderer, perso, gravityball, "build/ressources/Characters/Chara1/Fireball.bmp", 30, 90);
-        init_state_animation(renderer, perso, looser, "build/ressources/Characters/Chara1/Defeat.bmp", 28, 90);
         init_state_animation(renderer, perso, winner, "build/ressources/Characters/Chara1/Victory.bmp", 30, 100);
-
+        init_state_animation(renderer, perso, looser, "build/ressources/Characters/Chara1/Defeat.bmp", 28, 90);
         init_state_animation(renderer, perso, 19, "build/ressources/Characters/Powers/Aura_Spritesheet.Bmp", 8, 190);
         init_state_animation(renderer, perso, 20, "build/ressources/Characters/Powers/Transparent_Aura_Spritesheet.Bmp", 8, 190);
+        init_state_animation(renderer, perso, 21, "build/ressources/Characters/Powers/gravityBall.bmp", 4, 199);
         perso->anim[19].aura = 0;
         break;
 
@@ -363,6 +376,7 @@ void init_chara_state(SDL_Renderer *renderer, sprite_perso *perso)
 
         init_state_animation(renderer, perso, 19, "build/ressources/Characters/Powers/Aura_Spritesheet.Bmp", 8, 190);
         init_state_animation(renderer, perso, 20, "build/ressources/Characters/Powers/Transparent_Aura_Spritesheet.Bmp", 8, 190);
+       init_state_animation(renderer, perso, 21, "build/ressources/Characters/Powers/gravityBall.bmp", 4, 199);
         perso->anim[19].aura = 0;
         break;
     }
@@ -378,8 +392,8 @@ char **read_file_map(char *nom)
     char **map_struct = malloc(sizeof(char *) * 40);
     for (int i = 0; i < 40; i++)
     {
-        map_struct[i] = malloc(sizeof(char) * 20);
-        fread(map_struct[i], 20, 1, file);
+        map_struct[i] = malloc(sizeof(char) * 21);
+        fread(map_struct[i], 21, 1, file);
     }
     if (map_struct == NULL)
     {
@@ -589,7 +603,7 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
             }
             else
             {
-                if (!equals(x + perso->speed, y + perso->h, world->map.map_structure, '0'))
+                if (!equals(x + perso->speed, y + perso->h, world->map.map_structure, '0')&& !equals(x + perso->speed + perso->w, y + perso->h, world->map.map_structure, '0'))
                 {
                     perso->x += perso->speed;
                 }
@@ -616,16 +630,16 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
     {
         if (perso->backwards)
         {
-            if (equals(x - perso->speed, y + perso->h, world->map.map_structure, ' '))
+            if (equals(x - perso->air_speed, y + perso->h, world->map.map_structure, ' '))
             {
-                perso->x -= perso->speed * 0.2;
+                perso->x -= perso->air_speed;
             }
         }
         else
         {
-            if (equals(x + perso->speed, y + perso->h, world->map.map_structure, ' '))
+            if (equals(x + perso->speed, y + perso->h, world->map.map_structure, ' ') && equals(x + perso->speed+perso->w, y + perso->h, world->map.map_structure, ' '))
             {
-                perso->x += perso->speed * 0.2;
+                perso->x += perso->air_speed;
             }
         }
         perso->chara_state = flight;
@@ -643,7 +657,7 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
         }
         else
         {
-            if (equals(x + perso->speed, y + perso->h, world->map.map_structure, ' '))
+            if (equals(x + perso->speed, y + perso->h, world->map.map_structure, ' ') && equals(x + perso->speed+perso->w, y + perso->h, world->map.map_structure, ' '))
             {
                 perso->x += perso->speed * 0.4;
             }
@@ -845,8 +859,9 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
     {
         if (perso->stun_time >= 1)
         {
-
+            printf("stun time avant : %d\n",perso->stun_time);
             perso->stun_time--;
+            printf("stun time apres : %d\n",perso->stun_time);
 
             if (perso->anim[stun].counter == 10)
             {
@@ -860,6 +875,7 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
             else
             {
                 perso->anim[stun].counter++;
+                
             }
         }
         else
@@ -867,7 +883,11 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
             if (perso->broken_guard)
             {
                 perso->broken_guard = false;
-                perso->life_guard = 100;
+                //printf("%d",perso->life_guard);
+                perso->life_guard = MAX_GUARD;
+                //printf("%d",perso->life_guard);
+
+                
             }
             perso->attack_launched = 0;
 
@@ -895,17 +915,14 @@ if (perso->chara_state == fireball)
     
     {   
         if(perso->anim[gravityball].counter>=1){
-            if (!perso->gravityball.launched_fireball)
-            {
-                perso->gravityball.timer_throw.startTime = SDL_GetTicks();
-                perso->gravityball.timer_throw.pause = false;
-            }
+           
             perso->anim[gravityball].counter = 0;
             perso->anim[gravityball].frame++;
             if (perso->anim[gravityball].frame == perso->anim[gravityball].nbFrame)
             {
                 perso->gravityball.launched_fireball = true;
                 perso->chara_state = idle;
+                perso->gravityball.timer_throw.startTime = SDL_GetTicks();
             }
         }
         else{
@@ -986,6 +1003,7 @@ void light_punch(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
                 {   
                     Mix_PlayChannel(receiver->audiochan.action, world->music.hit_guard, 0);
                     receiver->life_guard -= attacker->damage_bonus ? (attacker->berserk ? attacker->hits.light_punch->dmg * 100 : attacker->hits.light_punch->dmg * 1.5) : attacker->hits.light_punch->dmg;
+
                 }
             }
             else
@@ -1444,6 +1462,8 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                     unpause(&world->p2.dmg_bonus_timer);
                     unpause(&world->p1.gravityball.timer_throw);
                     unpause(&world->p2.gravityball.timer_throw);
+                    unpause(&world->p1.gravityball.dmg_timer);
+                    unpause(&world->p2.gravityball.dmg_timer);
                 }
 
                 else if (world->state == options)
@@ -1596,6 +1616,7 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                     world->timestamp_w = 0;
 
                     init_timer(world);
+                    
                     for (int i = 0; i < 123; i++)
                     {
                         world->keystates_pre[i] = 0;
@@ -1685,6 +1706,8 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
         pauseChrono(&world->p2.dmg_bonus_timer);
         pauseChrono(&world->p1.gravityball.timer_throw);
         pauseChrono(&world->p2.gravityball.timer_throw);
+        pauseChrono(&world->p1.gravityball.dmg_timer);
+        pauseChrono(&world->p2.gravityball.dmg_timer);
     }
 
     if (world->p1.chara_state != stun && !world->p1.attack_launched && !world->p1.guard)
@@ -2311,12 +2334,12 @@ void check_stats(sprite_perso *perso)
         perso->special_bar = MAX_SPECIAL;
     }
 
-    if (perso->life_guard <= 0)
+    if (perso->life_guard <= 0 && !perso->broken_guard)
     {
         perso->broken_guard = true;
         perso->chara_state = stun;
         perso->guard = false;
-        perso->stun_time = BROKEN_GUARD_STUN;
+        perso->stun_time = 10;
     }
 }
 
@@ -2450,20 +2473,14 @@ void check_fireball(sprite_perso *attacker, sprite_perso *receiver)
 
 void check_gravityball(sprite_perso *attacker, sprite_perso *receiver)
 {
-    if (!receiver->berserk)
+    if ((attacker->gravityball.launched_fireball && !attacker->gravityball.ending))
     {
         int distance = (sqrt(pow(receiver->x - attacker->gravityball.x, 2) + pow(receiver->y - attacker->gravityball.y, 2)));
-        if (distance <= DISTANCE_MAX)
+        if (distance <= DISTANCE_MAX && !receiver->berserk)
         {
-
             int coefficient = 100 * (DISTANCE_MAX - distance) / DISTANCE_MAX;
 
-            if (attacker->gravityball.launched_fireball)
-            {
-                if ((SDL_GetTicks() - attacker->gravityball.timer_throw.startTime) / 1000 >= 10)
-                {
-                    attacker->gravityball.launched_fireball = false;
-                }
+         
                 if (attacker->gravityball.x + 100 < receiver->x)
                 {
 
@@ -2481,21 +2498,45 @@ void check_gravityball(sprite_perso *attacker, sprite_perso *receiver)
                 {
                     receiver->y -= coefficient * BLACK_HOLE_STRENGH / 100;
                 }
-
-                if (receiver->x >= attacker->gravityball.x && receiver->x <= attacker->gravityball.x + 200 && attacker->fireball.y >= receiver->y && attacker->fireball.y <= receiver->y + receiver->h)
+              
+                if(!attacker->gravityball.dmg_timer.pause && (SDL_GetTicks()-attacker->gravityball.dmg_timer.startTime)/1000>=0.5)
                 {
-                    if (receiver->guard)
+                    if (receiver->x >= attacker->gravityball.x && receiver->x <= attacker->gravityball.x + 200 && attacker->fireball.y >= receiver->y && attacker->fireball.y <= receiver->y + receiver->h)
                     {
-                        receiver->life_guard -= attacker->hits.special_attack2->dmg;
+                        if (receiver->guard)
+                        {
+                            receiver->life_guard -= attacker->hits.special_attack2->dmg;
+                        }
+                        else
+                        {
+                            receiver->life -= attacker->hits.special_attack2->dmg;
+                        }
                     }
-                    else
-                    {
-                        receiver->life -= attacker->hits.special_attack2->dmg;
-                    }
+                    attacker->gravityball.dmg_timer.startTime = SDL_GetTicks();
                 }
+        }
+         if ((SDL_GetTicks() - attacker->gravityball.timer_throw.startTime) / 1000 >= 10)
+            {
+                attacker->gravityball.ending = true;
+            }
+    }
+    else if(attacker->gravityball.ending){
+
+        if(attacker->anim[21].counter>=15){
+            attacker->anim[21].frame++;
+            attacker->anim[21].counter = 0;
+            if(attacker->anim[21].frame == attacker->anim[21].nbFrame){
+               attacker->anim[21].frame = 0;
+               attacker->gravityball.ending = false;
+               attacker->gravityball.launched_fireball = false;
             }
         }
+        else{
+            attacker->anim[21].counter++;
+        }
+        
     }
+    
 }
 
 void check_bonus(sprite_perso *perso)

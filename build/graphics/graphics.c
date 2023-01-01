@@ -63,6 +63,8 @@ void play_animations(SDL_Renderer *renderer, sprite_perso* sprite, int chara_sta
  }
 }
 
+
+
 void refresh_graphics(SDL_Renderer *renderer, jeu *world){
     SDL_RenderClear(renderer);
     SDL_SetRenderDrawBlendMode(renderer,SDL_BLENDMODE_NONE);
@@ -90,10 +92,10 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
                     render_aura(renderer, &(world->p2),20);
                 }
                 display_life(renderer, world);
-                display_throwable(renderer,world->p1.fireball);
-                display_throwable(renderer,world->p2.fireball);
-                display_throwable(renderer,world->p1.gravityball);
-                display_throwable(renderer,world->p2.gravityball);
+                display_fireball(renderer,world->p1.fireball);
+                display_fireball(renderer,world->p2.fireball);
+                display_gravityball(renderer,world->p1);
+                display_gravityball(renderer,world->p2);
                 display_timer(world,renderer);
                 display_special(renderer,world);
                 if(world->p1.guard){
@@ -201,9 +203,29 @@ void display_timer(jeu* world,SDL_Renderer* renderer){
            
 }
 
-void display_throwable(SDL_Renderer* renderer,throwable projectile){
+void display_fireball(SDL_Renderer* renderer,throwable projectile){
    if(projectile.launched_fireball){
         apply_textures(projectile.fireball,renderer,projectile.x,projectile.y);
+    }
+}
+
+void display_gravityball(SDL_Renderer* renderer,sprite_perso perso){
+    if(perso.gravityball.launched_fireball){
+        SDL_Rect dst = {0, 0, 0, 0};
+        SDL_Rect src = {0, 0, 0, 0};
+        dst.x = perso.gravityball.x;
+        dst.y = perso.gravityball.y;
+        dst.w = perso.anim[21].width;
+        dst.h = 250;
+
+        int width;
+        SDL_QueryTexture(perso.anim[21].anim_text, NULL, NULL, &width, &src.h);
+        src.h -=10;
+        src.x = perso.anim[21].frame * 214;
+        src.y = 0;
+        src.w = perso.anim[21].width;
+    
+        SDL_RenderCopy(renderer, perso.anim[21].anim_text, &src, &dst);
     }
 }
 

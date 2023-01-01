@@ -7,6 +7,7 @@
         "structure.h": "c",
         "sdl_ttf.h": "c",
         "stdio.h": "c",
-        "data.h": "c"
+        "data.h": "c",
+        "cmath": "c"
     }
 }
