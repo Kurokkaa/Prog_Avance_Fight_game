@@ -33,7 +33,7 @@ void init_timer(jeu* world);
 /*FONCTIONS DE LECTURES*/
 char** read_file_map(char* nom);
 SDL_Texture* load_image( char path[],SDL_Renderer *renderer);
-bool read_combo(sprite_perso* player, int val);
+bool read_combo(sprite_perso* player, int val, jeu * world);
 void checkJoystick(SDL_Joystick** joysticks);
 
 /*FONCTIONS MOUVEMENTS ET ACTIONS*/

@@ -188,6 +188,7 @@ struct Sound_s{
     Mix_Chunk * win_laugh;
 
     bool menuPlayed;
+    bool gameMusicPlayed;
 };
 typedef struct Sound_s Sound;
 
@@ -207,6 +208,7 @@ struct world_s{
     lootbox lootbox;
     Sound music;
     bool game_over;
+    int gravityball_audio_chan;
 };
 typedef struct world_s jeu;
 

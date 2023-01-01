@@ -24,6 +24,7 @@
     #define BLACK_HOLE_STRENGH 4
     #define NB_ANIM 22
     #define MAX_SIZE_COMBO 10
+    #define ENDGAME_TIMER 3
 
     enum game_state{combat, main_menu, pause, options, selection_perso, selection_map, endgame};
     enum character_state{idle, walk, jump, crouch, fall, backwards, flight, flight_control, fall_control, landing, knockback, lpunch , kickstate,hpunch,stun,fireball,gravityball, winner , looser };

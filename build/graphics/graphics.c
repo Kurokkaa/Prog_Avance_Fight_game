@@ -132,17 +132,17 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
             display_map(renderer,world);
             play_animations(renderer, &(world->p1), world->p1.chara_state);
             play_animations(renderer, &(world->p2), world->p2.chara_state);
-            SDL_Color color = {0,0,0};
+            SDL_Color color = {150,151,162};
             char* WhoWin;
             if(world->p1.chara_state == winner){
-                WhoWin = "Le joueur 1 a gagne";
+                WhoWin = "LE JOUEUR 1 GAGNE";
             }
             else{
-                WhoWin = "Le joueur 2 a gagne";
+                WhoWin = "LE JOUEUR 2 GAGNE";
             }
             SDL_Surface* surface_victoire = TTF_RenderText_Solid(world->font.police_victoire,WhoWin , color);
             SDL_Texture* texture_victoire = SDL_CreateTextureFromSurface(renderer,surface_victoire);
-            apply_textures(texture_victoire,renderer,250, 200);
+            apply_textures(texture_victoire,renderer,235, 200);
             free(surface_victoire);
             break;
 
@@ -197,7 +197,7 @@ void display_timer(jeu* world,SDL_Renderer* renderer){
             SDL_Color color = {0,0,0};
             SDL_Surface* surface_compteur = TTF_RenderText_Solid(world->font.police_compteur, timer, color);
             SDL_Texture* texture_compteur = SDL_CreateTextureFromSurface(renderer,surface_compteur);
-            apply_textures(texture_compteur,renderer,620, -5);
+            apply_textures(texture_compteur,renderer,610, -5);
             SDL_DestroyTexture(texture_compteur);
             SDL_FreeSurface(surface_compteur);
             free(timer);
@@ -270,10 +270,10 @@ void display_special(SDL_Renderer* renderer, jeu* world){
     SDL_Color color = {192,191,201};
     SDL_Surface* lvl1 = TTF_RenderText_Solid(world->font.police_compteur,lvlP1 , color);
     SDL_Texture* texture_lvl1 = SDL_CreateTextureFromSurface(renderer,lvl1);
-    apply_textures(texture_lvl1,renderer,520, 25);
+    apply_textures(texture_lvl1,renderer,525, 25);
     SDL_Surface* lvl2 = TTF_RenderText_Solid(world->font.police_compteur,lvlP2 , color);
     SDL_Texture* texture_lvl2 = SDL_CreateTextureFromSurface(renderer,lvl2);
-    apply_textures(texture_lvl2,renderer,750, 25);
+    apply_textures(texture_lvl2,renderer,735, 25);
     
     //free(surface_compteur);
     SDL_Rect rect2;
