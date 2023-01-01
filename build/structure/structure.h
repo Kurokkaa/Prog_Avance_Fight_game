@@ -97,7 +97,6 @@ struct audio_chanel_s{
 typedef struct audio_chanel_s audiochannel;
 
 struct sprite_p{
-    SDL_Texture * aura;
     int perso_choisi; 
     int x;
     int y;

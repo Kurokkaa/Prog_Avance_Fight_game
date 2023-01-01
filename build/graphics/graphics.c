@@ -185,7 +185,7 @@ void display_timer(jeu* world,SDL_Renderer* renderer){
                  timer= malloc(sizeof(char)*3);
                 sprintf(timer, "%d",world->timer.timer);
             }
-     //Fond du timer
+            //Fond du timer
             SDL_Rect timer_background;
             timer_background.x = 500;
             timer_background.y = 0;
@@ -199,8 +199,9 @@ void display_timer(jeu* world,SDL_Renderer* renderer){
             SDL_Surface* surface_compteur = TTF_RenderText_Solid(world->font.police_compteur, timer, color);
             SDL_Texture* texture_compteur = SDL_CreateTextureFromSurface(renderer,surface_compteur);
             apply_textures(texture_compteur,renderer,620, -5);
-            free(surface_compteur);
-           
+            SDL_DestroyTexture(texture_compteur);
+            SDL_FreeSurface(surface_compteur);
+            free(timer);
 }
 
 void display_fireball(SDL_Renderer* renderer,throwable projectile){

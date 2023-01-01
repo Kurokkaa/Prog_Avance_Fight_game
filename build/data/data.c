@@ -859,9 +859,7 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
     {
         if (perso->stun_time >= 1)
         {
-            printf("stun time avant : %d\n",perso->stun_time);
             perso->stun_time--;
-            printf("stun time apres : %d\n",perso->stun_time);
 
             if (perso->anim[stun].counter == 10)
             {
@@ -1303,13 +1301,35 @@ void add_input_buffer(sprite_perso *player, enum combos_inputs touche_appui, int
     player->buffer[player->pos_tab_combo++].timestamp = timestamp;
 }
 
-void free_hits(sprite_perso *perso)
+void free_hits(jeu* world)
 {
+    for(int i = 0;i<NB_COMBOS;i++){
+        free(world->p1.tab_combo[i].input);
+    }
+    free(world->p1.tab_combo);
+    free(world->p1.buffer);
+    free(world->p1.hits.light_punch);
+    free(world->p1.hits.heavy_punch);
+    free(world->p1.hits.kick);
+    free(world->p1.hits.special_attack);
+    free(world->p1.hits.special_attack2);
+    
+    for(int i = 0;i<NB_COMBOS;i++){
+        free(world->p2.tab_combo[i].input);
+    }
+    free(world->p2.tab_combo);
+    free(world->p2.buffer);
+    free(world->p2.hits.light_punch);
+    free(world->p2.hits.heavy_punch);
+    free(world->p2.hits.kick);
+    free(world->p2.hits.special_attack);
+    free(world->p2.hits.special_attack2);
+    free(world->keystates_pre);
+}
 
-    free(perso->buffer);
-    free(perso->hits.light_punch);
-    free(perso->hits.heavy_punch);
-    free(perso->hits.kick);
+void TTF_free_police(jeu* world){
+    free(world->font.police_compteur);
+    free(world->font.police_victoire);
 }
 
 void free_music(jeu *world)
@@ -1335,12 +1355,12 @@ void free_music(jeu *world)
 /*FONCTIONS DE LIBERATION ESPACE*/
 void quit_game(jeu *world, SDL_Window **fenetre, SDL_Renderer **renderer)
 {
-    free_hits(&world->p1);
-    free_hits(&world->p2);
+    free_hits(world);
+    TTF_free_police(world);
+    free_menu(world);
     destroy_textures(world);
     free_map_structure(world->map.map_structure);
     free_music(world);
-    TTF_CloseFont(world->font.police_compteur);
     close_Joystick(world->joysticks);
     TTF_Quit();
     Mix_CloseAudio();
@@ -1363,7 +1383,12 @@ void close_Joystick(jeu *world)
         free(world->joysticks);
     }
 }
-
+void free_menu(jeu* world){
+    SDL_DestroyTexture(world->menu_set.cadreVie);
+    SDL_DestroyTexture(world->menu_set.menu);
+    SDL_DestroyTexture(world->menu_set.selection_maps_menu);
+    SDL_DestroyTexture(world->menu_set.options_menu);
+}
 void free_map_structure(char **map_structure)
 {
     for (int i = 0; i < 40; i++)
@@ -1375,29 +1400,18 @@ void free_map_structure(char **map_structure)
 
 void destroy_anim(sprite_perso *perso)
 {
-    SDL_DestroyTexture(perso->anim[idle].anim_text);
-    SDL_DestroyTexture(perso->anim[walk].anim_text);
-    SDL_DestroyTexture(perso->anim[jump].anim_text);
-    SDL_DestroyTexture(perso->anim[crouch].anim_text);
-    SDL_DestroyTexture(perso->anim[fall].anim_text);
-    SDL_DestroyTexture(perso->anim[backwards].anim_text);
-    SDL_DestroyTexture(perso->anim[flight].anim_text);
-    SDL_DestroyTexture(perso->anim[flight_control].anim_text);
-    SDL_DestroyTexture(perso->anim[fall_control].anim_text);
-    SDL_DestroyTexture(perso->anim[landing].anim_text);
-    SDL_DestroyTexture(perso->anim[knockback].anim_text);
-    SDL_DestroyTexture(perso->anim[lpunch].anim_text);
-    SDL_DestroyTexture(perso->anim[kickstate].anim_text);
-    SDL_DestroyTexture(perso->anim[hpunch].anim_text);
-    SDL_DestroyTexture(perso->anim[stun].anim_text);
+    for(int i = 0 ; i<NB_ANIM ; i++){
+        SDL_DestroyTexture(perso->anim[i].anim_text);
+    }
+    free(perso->anim);
     SDL_DestroyTexture(perso->fireball.fireball);
 }
 
 void destroy_map(jeu *world)
 {
-    SDL_DestroyTexture(world->menu_set.tab_map[0]);
-    SDL_DestroyTexture(world->menu_set.tab_map[1]);
-    SDL_DestroyTexture(world->menu_set.tab_map[2]);
+    for(int i = 0 ; i<NB_MAPS ; i++){
+        SDL_DestroyTexture(world->menu_set.tab_map[i]);
+    }
 }
 
 void destroy_textures(jeu *world)
@@ -2591,6 +2605,7 @@ void endgame_data(jeu *world)
     if (world->timer.timer == 0)
     {
         world->state = main_menu;
+        world->menu_set.menu_fond = world->menu_set.menu;
     }
 
     if (world->p1.chara_state == winner)
