@@ -637,7 +637,7 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
         }
         else
         {
-            if (equals(x + perso->speed, y + perso->h, world->map.map_structure, ' ') && equals(x + perso->speed+perso->w, y + perso->h, world->map.map_structure, ' '))
+            if (equals(x + perso->air_speed, y + perso->h, world->map.map_structure, ' ') && equals(x + perso->air_speed+perso->w, y + perso->h, world->map.map_structure, ' '))
             {
                 perso->x += perso->air_speed;
             }
@@ -650,16 +650,16 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
     {
         if (perso->backwards)
         {
-            if (equals(x - perso->speed, y + perso->h, world->map.map_structure, ' '))
+            if (equals(x - perso->air_speed, y + perso->h, world->map.map_structure, ' '))
             {
-                perso->x -= perso->speed * 0.4;
+                perso->x -= perso->air_speed;
             }
         }
         else
         {
-            if (equals(x + perso->speed, y + perso->h, world->map.map_structure, ' ') && equals(x + perso->speed+perso->w, y + perso->h, world->map.map_structure, ' '))
+            if (equals(x + perso->air_speed, y + perso->h, world->map.map_structure, ' ') && equals(x + perso->air_speed+perso->w, y + perso->h, world->map.map_structure, ' '))
             {
-                perso->x += perso->speed * 0.4;
+                perso->x += perso->air_speed;
             }
         }
         perso->chara_state = fall;
@@ -687,7 +687,7 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
         {
             if (!equals(x, y, world->map.map_structure, '0'))
             {
-                perso->y -= perso->jump_height * 0.025;
+                perso->y -= HEIGHT_PER_FRAME;
             }
             else
             {
@@ -747,9 +747,9 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
         }
         else
         {
-            if (equals(x, y + perso->h + perso->jump_height * 0.025, world->map.map_structure, ' ') && equals(x + perso->w, y + perso->h + perso->jump_height * 0.025, world->map.map_structure, ' '))
+            if (equals(x, y + perso->h + HEIGHT_PER_FRAME, world->map.map_structure, ' ') && equals(x + perso->w, y + perso->h + HEIGHT_PER_FRAME, world->map.map_structure, ' '))
             {
-                perso->y += perso->jump_height * 0.025;
+                perso->y += HEIGHT_PER_FRAME;
             }
             else
             {
@@ -762,7 +762,7 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
     x = perso->x;
     y = perso->y;
 
-    if (perso->chara_state != flight && equals(x, y + perso->h + perso->jump_height * 0.025, world->map.map_structure, ' ') && equals(x + perso->w, y + perso->h + perso->jump_height * 0.025, world->map.map_structure, ' '))
+    if (perso->chara_state != flight && equals(x, y + perso->h + HEIGHT_PER_FRAME, world->map.map_structure, ' ') && equals(x + perso->w, y + perso->h + HEIGHT_PER_FRAME, world->map.map_structure, ' '))
     {
         perso->chara_state = fall;
     }
@@ -1717,28 +1717,27 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
         if ((!keystates[SDL_SCANCODE_A] && !keystates[SDL_SCANCODE_D] && !keystates[SDL_SCANCODE_S] || keystates[SDL_SCANCODE_A] && keystates[SDL_SCANCODE_D]) && (world->p1.chara_state == walk || world->p1.chara_state == crouch))
         {
             world->p1.chara_state = idle;
+            world->p1.backwards = false;
         }
         // deplacement gauche
         if ((keystates[SDL_SCANCODE_A] && !keystates[SDL_SCANCODE_D]) /*|| SDL_GameControllerGetAxis(world->joysticks[0],0)<-(10000)*/)
         {
             // world->p1.speed = -CHARA_SPEED;
-            if (world->p1.chara_state == walk){
-                world->p1.backwards == true;
-            }
+            world->p1.backwards = true;
             if (world->p1.chara_state == idle)
             {
                 world->p1.chara_state = walk;
-                world->p1.backwards = true;
+                
             }
             if (world->p1.chara_state == flight)
             {
                 world->p1.chara_state = flight_control;
-                world->p1.backwards = true;
+                
             }
             if (world->p1.chara_state == fall)
             {
                 world->p1.chara_state = fall_control;
-                world->p1.backwards = true;
+              
             }
             if (keystates[SDL_SCANCODE_A] != world->keystates_pre[SDL_SCANCODE_A])
             {
@@ -1749,23 +1748,21 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
         if (!keystates[SDL_SCANCODE_A] && keystates[SDL_SCANCODE_D] /*|| SDL_GameControllerGetAxis(world->joysticks[0],0)>10000*/)
         {
             // world->p1.speed = CHARA_SPEED;
-            if (world->p1.chara_state == walk){
-                world->p1.backwards == false;
-            }
+            world->p1.backwards =false;
             if (world->p1.chara_state == idle)
             {
                 world->p1.chara_state = walk;
-                world->p1.backwards = false;
+              
             }
             if (world->p1.chara_state == flight)
             {
                 world->p1.chara_state = flight_control;
-                world->p1.backwards = false;
+               
             }
             if (world->p1.chara_state == fall)
             {
                 world->p1.chara_state = fall_control;
-                world->p1.backwards = false;
+               
             }
             if (keystates[SDL_SCANCODE_D] != world->keystates_pre[SDL_SCANCODE_D])
             {
@@ -1909,23 +1906,21 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
         if (keystates[SDL_SCANCODE_LEFT] && !keystates[SDL_SCANCODE_RIGHT])
         {
             // world->p1.speed = -CHARA_SPEED;
-            if (world->p2.chara_state == walk){
+            
                 world->p2.backwards = true;
-            }
+            
             if (world->p2.chara_state == idle)
             {
                 world->p2.chara_state = walk;
-                world->p2.backwards = true;
+                            
             }
             if (world->p2.chara_state == flight)
             {
                 world->p2.chara_state = flight_control;
-                world->p2.backwards = true;
             }
             if (world->p2.chara_state == fall)
             {
                 world->p2.chara_state = fall_control;
-                world->p2.backwards = true;
             }
             if (keystates[SDL_SCANCODE_LEFT] != world->keystates_pre[SDL_SCANCODE_LEFT])
             {
@@ -1935,24 +1930,22 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
 
         if (!keystates[SDL_SCANCODE_LEFT] && keystates[SDL_SCANCODE_RIGHT])
         {
-            // world->p1.speed = CHARA_SPEED;
-            if(world->p2.chara_state == walk){
-                world->p2.backwards = false;
-            }
+             world->p2.backwards = false;
+           
             if (world->p2.chara_state == idle)
             {
                 world->p2.chara_state = walk;
-                world->p2.backwards = false;
+                
             }
             if (world->p2.chara_state == flight)
             {
                 world->p2.chara_state = flight_control;
-                world->p2.backwards = false;
+                
             }
             if (world->p2.chara_state == fall)
             {
                 world->p2.chara_state = fall_control;
-                world->p2.backwards = false;
+                
             }
             if (keystates[SDL_SCANCODE_RIGHT] != world->keystates_pre[SDL_SCANCODE_RIGHT])
             {

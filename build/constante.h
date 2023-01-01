@@ -9,7 +9,7 @@
     #define CELL_WIDTH 64
     #define CHARA_SPEED 6
     #define AIR_CHARA_SPEED 4
-    #define HEIGHT_PER_FRAME 3
+    #define HEIGHT_PER_FRAME 8
     #define NB_MAPS 3
     #define KNOCKBACK_SPEED 6
     #define BUFFER_SIZE 60
