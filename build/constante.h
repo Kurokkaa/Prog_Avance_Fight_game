@@ -18,7 +18,7 @@
     #define MAX_LIFE 300
     #define MAX_SPECIAL 300
     #define DMG_DURATION 5
-    #define BROKEN_GUARD_STUN 10
+    #define BROKEN_GUARD_STUN 150
     #define MAX_GUARD 150
     #define DISTANCE_MAX 1280
     #define BLACK_HOLE_STRENGH 4

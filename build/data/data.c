@@ -388,7 +388,7 @@ void init_chara_state(SDL_Renderer *renderer, sprite_perso *perso)
 
 char **read_file_map(char *nom)
 {
-    FILE *file = fopen(nom, "r");
+    FILE *file = fopen(nom, "rb");
     char **map_struct = malloc(sizeof(char *) * 40);
     for (int i = 0; i < 40; i++)
     {
@@ -523,15 +523,15 @@ void check_timer(jeu *world)
 
 void save_counter(char *select)
 {
-    FILE *file = fopen("build/counter.txt", "w");
+    FILE *file = fopen("build/counter", "wb");
     fwrite(select, strlen(select), 1, file);
     fclose(file);
 }
 void read_counter(jeu *world)
 {
-    char *File_name = "build/counter.txt";
+    char *File_name = "build/counter";
     struct stat stat_file;
-    FILE *file = fopen(File_name, "r"); // ouverture en mode lecture
+    FILE *file = fopen(File_name, "rb"); // ouverture en mode lecture
     stat(File_name, &stat_file);
     int sz = stat_file.st_size;
     char text_file[sz + 1];
@@ -2256,7 +2256,7 @@ int numDigits(int n)
 void write_victory(int nb1, int nb2)
 {
     char new_score[8 + numDigits(nb1) + numDigits(nb2)];
-    FILE *file = fopen("build/victory.txt", "w");
+    FILE *file = fopen("build/victory", "wb");
     sprintf(new_score, "p1:%d\np2:%dn", nb1, nb2);
     fwrite(new_score, 7 + numDigits(nb1) + numDigits(nb2), 1, file);
     fclose(file);
@@ -2264,9 +2264,9 @@ void write_victory(int nb1, int nb2)
 
 void save_victory(int player)
 {
-    char *File_name = "build/victory.txt";
+    char *File_name = "build/victory";
     struct stat stat_file;
-    FILE *file = fopen(File_name, "r"); // ouverture en mode lecture
+    FILE *file = fopen(File_name, "rb"); // ouverture en mode lecture
     stat(File_name, &stat_file);
     int sz = stat_file.st_size;
     char text_file[sz + 1];
@@ -2346,7 +2346,7 @@ void check_stats(sprite_perso *perso)
         perso->broken_guard = true;
         perso->chara_state = stun;
         perso->guard = false;
-        perso->stun_time = 10;
+        perso->stun_time = BROKEN_GUARD_STUN ;
     }
 }
 
