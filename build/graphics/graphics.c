@@ -115,7 +115,7 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
                 SDL_Surface* surface_compteur = TTF_RenderText_Solid(world->font.police_compteur, "RESUME", color);
                 SDL_Texture* texture_compteur = SDL_CreateTextureFromSurface(renderer,surface_compteur);
                 apply_textures(texture_compteur,renderer,580, 300);
-                SDL_Surface* quit_surface = TTF_RenderText_Solid(world->font.police_compteur, "quit", color);
+                SDL_Surface* quit_surface = TTF_RenderText_Solid(world->font.police_compteur, "QUIT", color);
                 SDL_Texture* quit_texture = SDL_CreateTextureFromSurface(renderer,quit_surface);
                 SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
                 apply_textures(quit_texture,renderer,600,350 );
@@ -177,12 +177,11 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
 }
 
 void display_timer(jeu* world,SDL_Renderer* renderer){
-            char* timer;
+            char* timer = malloc(sizeof(char)*4);
             if(world->timer.inf){
-               timer = "inf";
+               sprintf(timer, "%s", "inf");
             } 
             else{
-                 timer= malloc(sizeof(char)*3);
                 sprintf(timer, "%d",world->timer.timer);
             }
             //Fond du timer

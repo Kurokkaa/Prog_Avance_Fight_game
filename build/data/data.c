@@ -388,7 +388,7 @@ void init_chara_state(SDL_Renderer *renderer, sprite_perso *perso)
 
 char **read_file_map(char *nom)
 {
-    FILE *file = fopen(nom, "rb");
+    FILE *file = fopen(nom, "r");
     char **map_struct = malloc(sizeof(char *) * 40);
     for (int i = 0; i < 40; i++)
     {
@@ -509,7 +509,6 @@ void checkJoystick(SDL_Joystick **joysticks)
 
 void check_timer(jeu *world)
 {
-
     if (world->timer.start && !world->timer.pause && !world->timer.inf)
     {
 
@@ -527,6 +526,7 @@ void save_counter(char *select)
     fwrite(select, strlen(select), 1, file);
     fclose(file);
 }
+
 void read_counter(jeu *world)
 {
     char *File_name = "build/counter";
@@ -537,15 +537,14 @@ void read_counter(jeu *world)
     char text_file[sz + 1];
     fread(text_file, 1, sz, file);
     text_file[sz] = '\0';
-    if (strcmp(text_file, "inf") == 0)
-    {
+    world->timer.timer = atoi(text_file);
+    if(world->timer.timer == 999){
         world->timer.inf = true;
     }
-    else
-    {
+    else{
         world->timer.inf = false;
-        world->timer.timer = atoi(text_file);
     }
+    
 }
 
 /**
@@ -1383,12 +1382,14 @@ void close_Joystick(jeu *world)
         free(world->joysticks);
     }
 }
+
 void free_menu(jeu* world){
     SDL_DestroyTexture(world->menu_set.cadreVie);
     SDL_DestroyTexture(world->menu_set.menu);
     SDL_DestroyTexture(world->menu_set.selection_maps_menu);
     SDL_DestroyTexture(world->menu_set.options_menu);
 }
+
 void free_map_structure(char **map_structure)
 {
     for (int i = 0; i < 40; i++)
@@ -1436,8 +1437,8 @@ void unpause(compteur *chrono)
         chrono->pause = false;
     }
 }
-/*INPUTS GAMEPLAY*/
 
+/*INPUTS GAMEPLAY*/
 /**
  * MENU INPUTS
  */
@@ -1596,10 +1597,11 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                         world->terminer = true;
                         break;
                     }
+
                 }
                 else if (world->state == selection_map)
                 {
-                    Mix_PlayChannel(music, world->music.menu, 0);
+                    //Mix_PlayChannel(music, world->music.menu, 0);
                     switch (world->menu_set.index_menu)
                     {
                     case 0:
@@ -1653,9 +1655,11 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                         save_counter("120");
                         break;
                     case 3:
-                        save_counter("inf");
+                        save_counter("999");
                         break;
                     }
+                    world->menu_set.menu_fond = world->menu_set.menu;
+                    world->state = main_menu;
                 }
                 else if (world->state == pause)
                 {
@@ -1670,6 +1674,7 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                         break;
                     }
                 }
+                world->menu_set.index_menu = 0;
             }
             if (world->state != combat)
             {
@@ -1690,12 +1695,12 @@ void pauseChrono(compteur *chrono)
         chrono->pauseTime = SDL_GetTicks() - chrono->startTime;
     }
 }
+
 /**
  * INPUTS GAMEPLAY COMBAT
  */
 void gameplay_inputs(SDL_Event *event, jeu *world)
 {
-
     const Uint8 *keystates = SDL_GetKeyboardState(NULL);
     SDL_JoystickUpdate();
     // checkJoystick(world->joysticks);
@@ -2005,8 +2010,6 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
                 add_input_buffer(&world->p2, up, world->timestamp_w);
             }
         }
-
-        /* code */
 
         // coups
         if (keystates[SDL_SCANCODE_KP_4] && !keystates[SDL_SCANCODE_KP_8] && !keystates[SDL_SCANCODE_KP_9])
@@ -2346,7 +2349,7 @@ void check_stats(sprite_perso *perso)
         perso->broken_guard = true;
         perso->chara_state = stun;
         perso->guard = false;
-        perso->stun_time = BROKEN_GUARD_STUN ;
+        perso->stun_time = BROKEN_GUARD_STUN;
     }
 }
 
@@ -2420,6 +2423,7 @@ void move_fireball(sprite_perso *perso)
         perso->fireball.y = perso->y + perso->h / 2;
     }
 }
+
 void move_gravityball(sprite_perso *perso)
 {
     if (perso->gravityball.launched_fireball)
@@ -2596,7 +2600,6 @@ void update_data(jeu *world)
 
 void endgame_data(jeu *world)
 {
-
     if ((SDL_GetTicks() - world->timer.startTime) / 1000 >= 1)
     {
         world->timer.timer--;
