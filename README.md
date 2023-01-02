@@ -35,6 +35,6 @@ https://www.youtube.com/watch?v=NZvCnpYdHqE&ab_channel=ClassicSounds
 Github : https://github.com/Kurokkaa/Prog_Avance_Fight_game.git
 
 Compilation : 
-cmake build
-make 
+cmake build -->
+make -->
 ./main
