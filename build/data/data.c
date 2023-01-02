@@ -690,6 +690,7 @@ void update_data(jeu *world)
 
 void endgame_data(jeu *world)
 {
+    anim * animation;
     Mix_Pause(world->p1.audiochan.aura);
     Mix_Pause(world->p2.audiochan.aura);
     Mix_Pause(world->gravityball_audio_chan);
@@ -710,13 +711,14 @@ void endgame_data(jeu *world)
 
     if (world->p1.chara_state == winner)
     {
-        setFrame(world->p1.anim, winner, getAnimation(world->p1.anim, winner) + 1);
-        
+        printf("TEST\n");
+        setFrame(world->p1.anim, winner, getAnimation(world->p1.anim, winner)->frame + 1);
+
         if (getAnimation(world->p1.anim, winner)->frame == getAnimation(world->p1.anim, winner)->nbFrame)
         {
             setFrame(world->p1.anim, winner, 5);
         }
-        setFrame(world->p2.anim, looser, getAnimation(world->p1.anim, winner) + 1);
+        setFrame(world->p2.anim, looser, getAnimation(world->p2.anim, looser)->frame + 1);
         if (getAnimation(world->p2.anim, looser)->frame == getAnimation(world->p2.anim, looser)->nbFrame)
         {
             setFrame(world->p2.anim, looser, getAnimation(world->p2.anim, looser)->nbFrame - 1);
@@ -725,13 +727,13 @@ void endgame_data(jeu *world)
 
     else
     {
-        setFrame(world->p2.anim, winner, getAnimation(world->p2.anim, winner) + 1);
+        setFrame(world->p2.anim, winner, getAnimation(world->p2.anim, winner)->frame + 1);
 
         if (getAnimation(world->p2.anim, winner)->frame == getAnimation(world->p2.anim, winner)->nbFrame)
         {
             setFrame(world->p2.anim, winner, 5);
         }
-        setFrame(world->p1.anim, looser, getAnimation(world->p2.anim, winner)->frame + 1);
+        setFrame(world->p1.anim, looser, getAnimation(world->p1.anim, looser)->frame + 1);
         
         if (getAnimation(world->p1.anim, looser)->frame == getAnimation(world->p1.anim, looser)->nbFrame)
         {

@@ -26,7 +26,7 @@
     #define MAX_SIZE_COMBO 10
     #define ENDGAME_TIMER 3
     #define BERSERK_DMG 3
-    #define SPECIAL_START 0
+    #define SPECIAL_START 300
 
     enum game_state{combat, main_menu, pause, options, selection_perso, selection_map, endgame};
     enum character_state{idle, walk, jump, crouch, fall, backwards, flight, flight_control, fall_control, landing, knockback, lpunch , kickstate,hpunch,stun,fireball,gravityball, winner , looser };
