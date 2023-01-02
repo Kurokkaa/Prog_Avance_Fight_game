@@ -35,6 +35,7 @@ char** read_file_map(char* nom);
 SDL_Texture* load_image( char path[],SDL_Renderer *renderer);
 bool read_combo(sprite_perso* player, int val, jeu * world);
 void checkJoystick(SDL_Joystick** joysticks);
+void read_counter(jeu *world);
 
 /*FONCTIONS MOUVEMENTS ET ACTIONS*/
 void update_data(jeu* world);
@@ -43,7 +44,6 @@ bool equals(int x, int y, char** map_point, char test);
 void light_punch(sprite_perso* attacker, sprite_perso* receiver,jeu* world);
 void heavy_punch(sprite_perso *attacker, sprite_perso *receiver,jeu* world);
 void kick_hit(sprite_perso *attacker, sprite_perso *receiver,jeu* world);
-//void reset_hit(sprite_perso* perso); /* A ENLEVER???*/
 void change_directions(sprite_perso * p1, sprite_perso * p2);
 bool canMove(sprite_perso * perso, sprite_perso * adversaire);
 void sprites_collision(sprite_perso * p1, sprite_perso * p2, jeu * world);
@@ -54,6 +54,7 @@ void quit_game(jeu* world,SDL_Window** fenetre,SDL_Renderer** renderer);
 void close_Joystick(jeu* world);
 void free_map_structure(char** map_structure);
 void destroy_textures(jeu* world);
+void free_menu(jeu* world);
 
 /*FONCTIONS INPUTS USERS*/
 void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer* renderer);

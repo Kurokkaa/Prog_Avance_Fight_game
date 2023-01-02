@@ -162,6 +162,7 @@ void init_perso(SDL_Renderer *renderer, sprite_perso *perso, int x, int y, int w
         perso->pos_tab_combo = 0;
     }
     perso->anim = malloc(sizeof(anim)*NB_ANIM);
+    perso->broken_guard = false;
     init_chara_state(renderer, perso);
 }
 
@@ -863,11 +864,11 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
         {
             perso->stun_time--;
 
-            if (perso->anim[stun].counter == 10)
+            if (perso->anim[stun].counter == 5)
             {
                 perso->anim[stun].frame++;
                 perso->anim[stun].counter = 0;
-                if (perso->anim[stun].frame = perso->anim[stun].nbFrame)
+                if (perso->anim[stun].frame == perso->anim[stun].nbFrame)
                 {
                     perso->anim[stun].frame = 4;
                 }
@@ -2285,7 +2286,7 @@ void save_victory(int player)
     int size;
     int nb1 = 0;
     int nb2 = 0;
-    int i, j;
+    int i;
     for (i = 0; i < sz; i++)
     {
 
@@ -2547,7 +2548,7 @@ void check_gravityball(sprite_perso *attacker, sprite_perso *receiver, jeu * wor
     }
     else if(attacker->gravityball.ending){
 
-        if(attacker->anim[21].counter>=15){
+        if(attacker->anim[21].counter>=5){
             attacker->anim[21].frame++;
             attacker->anim[21].counter = 0;
             if(attacker->anim[21].frame == attacker->anim[21].nbFrame){
@@ -2608,10 +2609,6 @@ void update_data(jeu *world)
     check_stats(&world->p1);
     check_stats(&world->p2);
     compute_game(world);
-
-    int height_factor, width_factor;
-    height_factor = CELL_HEIGHT;
-    width_factor = CELL_WIDTH;
 }
 
 void endgame_data(jeu *world)

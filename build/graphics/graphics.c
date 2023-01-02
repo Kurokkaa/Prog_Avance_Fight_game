@@ -111,7 +111,7 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
                 //Couleur noire avec une opacité de 50%
                 SDL_SetRenderDrawColor(renderer, 0, 0, 0, 150);
                 SDL_RenderFillRect(renderer,NULL);
-                 SDL_Color color = {180,180,180};
+                 SDL_Color color = {180,180,180,0};
                 SDL_Surface* surface_compteur = TTF_RenderText_Solid(world->font.police_compteur, "RESUME", color);
                 SDL_Texture* texture_compteur = SDL_CreateTextureFromSurface(renderer,surface_compteur);
                 apply_textures(texture_compteur,renderer,580, 300);
@@ -132,7 +132,7 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
             display_map(renderer,world);
             play_animations(renderer, &(world->p1), world->p1.chara_state);
             play_animations(renderer, &(world->p2), world->p2.chara_state);
-            SDL_Color color = {150,151,162};
+            SDL_Color color = {150,151,162,0};
             char* WhoWin;
             if(world->p1.chara_state == winner){
                 WhoWin = "LE JOUEUR 1 GAGNE";
@@ -194,7 +194,7 @@ void display_timer(jeu* world,SDL_Renderer* renderer){
             SDL_RenderFillRect(renderer, &timer_background);
             
             //Affichage du timer
-            SDL_Color color = {0,0,0};
+            SDL_Color color = {0,0,0,0};
             SDL_Surface* surface_compteur = TTF_RenderText_Solid(world->font.police_compteur, timer, color);
             SDL_Texture* texture_compteur = SDL_CreateTextureFromSurface(renderer,surface_compteur);
             apply_textures(texture_compteur,renderer,610, -5);
@@ -218,12 +218,10 @@ void display_gravityball(SDL_Renderer* renderer,sprite_perso perso){
         dst.w = perso.anim[21].width;
         dst.h = 250;
 
-        int width;
-        SDL_QueryTexture(perso.anim[21].anim_text, NULL, NULL, &width, &src.h);
-        src.h -=10;
-        src.x = perso.anim[21].frame * 214;
+        SDL_QueryTexture(perso.anim[21].anim_text, NULL, NULL, &src.w, &src.h);
+        src.x = perso.anim[21].frame * 207;
         src.y = 0;
-        src.w = perso.anim[21].width;
+        src.w = 207;
     
         SDL_RenderCopy(renderer, perso.anim[21].anim_text, &src, &dst);
     }
@@ -267,7 +265,7 @@ void display_special(SDL_Renderer* renderer, jeu* world){
     else{
         rect.w = -500;
     }
-    SDL_Color color = {192,191,201};
+    SDL_Color color = {192,191,201,0};
     SDL_Surface* lvl1 = TTF_RenderText_Solid(world->font.police_compteur,lvlP1 , color);
     SDL_Texture* texture_lvl1 = SDL_CreateTextureFromSurface(renderer,lvl1);
     apply_textures(texture_lvl1,renderer,525, 25);
@@ -315,7 +313,7 @@ void display_guard(SDL_Renderer* renderer,sprite_perso perso){
     if(perso.life_guard >=50){
         SDL_SetRenderDrawColor(renderer,0,255,0,50);
     }
-    disque(perso.x+perso.w - 20 ,perso.y+perso.h/2,perso.life_guard*1.5,renderer);
+    disque(perso.x+perso.w - 20 ,perso.y+perso.h/2,perso.life_guard*0.75,renderer);
 }
 
 void display_life(SDL_Renderer* renderer, jeu* world){
