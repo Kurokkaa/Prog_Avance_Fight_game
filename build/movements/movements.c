@@ -331,7 +331,7 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
             }
         }
         else{
-            setCounter(perso->anim, gravityball, getAnimation(perso->anim, gravityball));
+            setCounter(perso->anim, gravityball, getAnimation(perso->anim, gravityball)->counter +1);
         }
     }
 }
