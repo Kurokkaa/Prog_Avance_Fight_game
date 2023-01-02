@@ -230,6 +230,13 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
     reset_state(perso, perso->chara_state);
     if (perso->chara_state == idle)
     {
+        if((equals(x + perso->speed, y + perso->h+HEIGHT_PER_FRAME, world->map.map_structure, '0')&& equals(x + perso->speed + perso->w, y+HEIGHT_PER_FRAME + perso->h, world->map.map_structure, '0'))){
+            perso->permibility = false;
+        }
+
+        else if(perso->permibility){
+            perso->chara_state = fall;
+        }
 
         if (perso->anim[idle].counter < 3)
         {
@@ -250,6 +257,12 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
     // Contrôle en marche
     if (perso->chara_state == walk)
     {
+        if((equals(x + perso->speed, y + perso->h, world->map.map_structure, '0')&& equals(x + perso->speed + perso->w, y + perso->h, world->map.map_structure, '0'))){
+            perso->permibility = false;
+        }
+        else if(perso->permibility){
+            perso->chara_state = fall;
+        }
 
         if (canMove(perso, adversaire))
         {
@@ -397,22 +410,31 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
     // Automatisation de la chute
     if ((perso->chara_state == fall))
     {
+        if((equals(x + perso->speed, y + perso->h+HEIGHT_PER_FRAME, world->map.map_structure, '0')&& equals(x + perso->speed + perso->w, y + perso->h+HEIGHT_PER_FRAME, world->map.map_structure, '0')) ||  (equals(x + perso->speed, y + perso->h+19, world->map.map_structure, ' ')&& equals(x + perso->speed + perso->w, y + perso->h+19, world->map.map_structure, ' '))){
+            perso->permibility = false;
+            perso->chara_state = idle;
+          
+        }
         x = perso->x;
         y = perso->y;
         if (y > 465)
         { // replace correctement perso sur le sol
             perso->y = 465;
+           
             perso->chara_state = landing;
+            perso->permibility = false;
         }
         else
         {
-            if (equals(x, y + perso->h + HEIGHT_PER_FRAME, world->map.map_structure, ' ') && equals(x + perso->w, y + perso->h + HEIGHT_PER_FRAME, world->map.map_structure, ' ') )
+            if (equals(x, y + perso->h + HEIGHT_PER_FRAME, world->map.map_structure, ' ') && equals(x + perso->w, y + perso->h + HEIGHT_PER_FRAME, world->map.map_structure, ' ')||perso->permibility)
             {
                 perso->y += HEIGHT_PER_FRAME;
+               
             }
             else
             {
                 perso->chara_state = landing;
+                perso->permibility = false;
             }
         }
     }
@@ -1417,6 +1439,7 @@ void check_gravityball(sprite_perso *attacker, sprite_perso *receiver, jeu * wor
                 }
                 if (attacker->gravityball.y > receiver->y)
                 {
+                    
                     receiver->y += coefficient * BLACK_HOLE_STRENGH / 100;
                 }
                 if (receiver->y > attacker->gravityball.y)

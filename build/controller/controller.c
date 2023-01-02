@@ -313,7 +313,7 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
     {
          
         // aucune touche de déplacement appuyé
-        if ((!keystates[SDL_SCANCODE_A] && !keystates[SDL_SCANCODE_D] && !keystates[SDL_SCANCODE_S] || keystates[SDL_SCANCODE_A] && keystates[SDL_SCANCODE_D]) && (world->p1.chara_state == walk || world->p1.chara_state == crouch))
+        if ((!keystates[SDL_SCANCODE_A] && !keystates[SDL_SCANCODE_D] && !keystates[SDL_SCANCODE_S] || keystates[SDL_SCANCODE_A] && keystates[SDL_SCANCODE_D]) && (world->p1.chara_state == walk))
         {
             world->p1.chara_state = idle;
             world->p1.backwards = false;
@@ -375,7 +375,8 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
             
             if (world->p1.chara_state == idle || world->p1.chara_state == walk)
             {
-                world->p1.chara_state = crouch;
+                world->p1.chara_state = idle;
+                world->p1.permibility = true;
                 
             }
             //si le personnage est en saut on annule le saut en le faisant tomber
@@ -409,7 +410,7 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
                         world->p1.anim[flight].frame = 0;
                         world->p1.anim[flight_control].frame = 0;
                         world->p1.chara_state = flight;
-
+                        world->p1.permibility = false;
                         world->p1.double_jump = false;
                     }
                 }
@@ -514,7 +515,7 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
     //On refait pareil pour le joueur 2
     if (world->p2.chara_state != stun && !world->p2.attack_launched && !world->p2.guard)
     {
-        if ((!keystates[SDL_SCANCODE_LEFT] && !keystates[SDL_SCANCODE_RIGHT] && !keystates[SDL_SCANCODE_DOWN] || keystates[SDL_SCANCODE_LEFT] && keystates[SDL_SCANCODE_RIGHT]) && (world->p2.chara_state == walk || world->p2.chara_state == crouch))
+        if ((!keystates[SDL_SCANCODE_LEFT] && !keystates[SDL_SCANCODE_RIGHT] && !keystates[SDL_SCANCODE_DOWN] || keystates[SDL_SCANCODE_LEFT] && keystates[SDL_SCANCODE_RIGHT]) && (world->p2.chara_state == walk))
         {
             world->p2.chara_state = idle;
         }
@@ -572,7 +573,7 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
         {
             if (world->p2.chara_state == idle || world->p2.chara_state == walk)
             {
-                world->p2.chara_state = crouch;
+                world->p2.permibility;
                 if (keystates[SDL_SCANCODE_DOWN] != world->keystates_pre[SDL_SCANCODE_DOWN])
                 {
                     add_input_buffer(&world->p2, down, world->timestamp_w);
@@ -597,7 +598,7 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
                         world->p2.anim[flight].frame = 0;
                         world->p2.anim[flight_control].frame = 0;
                         world->p2.chara_state = flight;
-
+                        world->p2.permibility = false;  
                         world->p2.double_jump = false;
                     }
             }

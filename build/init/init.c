@@ -147,7 +147,7 @@ void init_perso(SDL_Renderer *renderer, sprite_perso *perso, int x, int y, int w
     perso->chara_state = idle;
     perso->backwards = false;
     perso->jump_origin = y;
-    
+    perso->permibility = false;
     perso->mirror = mirror;
     perso->life = MAX_LIFE;
     perso->attack_launched = false;
