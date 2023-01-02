@@ -2,7 +2,6 @@
 #define STRUCTURE_H
 
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
 #include <stdbool.h>
 #include "../constante.h"
 #include <SDL2/SDL_ttf.h>

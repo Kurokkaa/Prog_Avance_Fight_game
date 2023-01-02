@@ -2,7 +2,6 @@
 #define graphics_h
 
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
 #include <stdio.h>
 #include "../structure/structure.h"
 #include "../data/data.h"
