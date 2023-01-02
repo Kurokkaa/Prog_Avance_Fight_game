@@ -12,6 +12,7 @@
 #include "constante.h"
 
 
+
 int main(int argc, char *argv[]){
     SDL_Window* fenetre; // Déclaration de la fenêtre
     SDL_Renderer* renderer;// Déclaration du renderer

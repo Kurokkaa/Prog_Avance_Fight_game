@@ -14,11 +14,10 @@
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_mixer.h>
 #include "../init/init.h"
-#include "sys/stat.h"
+
 
 /*FONCTION POUR LES LOOTBOXES*/
 int generate_number (int a, int b);
-void init_lootbox(lootbox * lootbox, SDL_Renderer * renderer);
 void update_lootbox(jeu * world);
 void check_lootbox_pickup(sprite_perso * player, lootbox * lootbox, int player_number);
 void apply_bonus(lootbox * lootbox, sprite_perso *player);

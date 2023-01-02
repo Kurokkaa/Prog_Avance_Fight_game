@@ -5,15 +5,23 @@
 #include "../lootbox/lootbox.h"
 
 
-
+/**
+ * @brief lit le fichier de la carte afin de gérér collisions et l'affichage des plateformes
+ * 
+ * @param nom le nom du fichier
+ * @return char**
+ */
 char **read_file_map(char *nom)
 {
-    FILE *file = fopen(nom, "r");
-    char **map_struct = malloc(sizeof(char *) * 40);
+    //on ouvre le ficher en lecture binaire
+    FILE *file = fopen(nom, "rb");
+    //la map est divisé en 40 ligne de 18 pixels
+    char **map_struct = malloc(sizeof(char *) * LINES);
     for (int i = 0; i < 40; i++)
     {
-        map_struct[i] = malloc(sizeof(char) * 21);
-        fread(map_struct[i], 21, 1, file);
+        //chaque ligne à 21 collones dont 20 effectifs de 64 pixels
+        map_struct[i] = malloc(sizeof(char) * COLUMNS);
+        fread(map_struct[i], COLUMNS, 1, file);
     }
     if (map_struct == NULL)
     {
@@ -21,9 +29,15 @@ char **read_file_map(char *nom)
     }
     return map_struct;
 }
-
-SDL_Texture *load_image(char path[], SDL_Renderer *renderer)
+/**
+ * @brief charge l'image et crée la texture qui associé au renderer
+ * 
+ * @param path le nom du fichier
+ * @return la texture de l'image
+ */
+SDL_Texture *load_image(char* path, SDL_Renderer *renderer)
 {
+    
     SDL_Surface *tmp = NULL;
     SDL_Texture *texture = NULL;
     tmp = SDL_LoadBMP(path);
@@ -42,7 +56,12 @@ SDL_Texture *load_image(char path[], SDL_Renderer *renderer)
     }
     return texture;
 }
-
+/**
+ * @brief lit les coups dans le buffer et recherche si le combo est dedans
+ * 
+ * @param player le perso où le buffer est lu
+ * @return un combo à t-il été trouvé ?
+ */
 bool read_combo(sprite_perso *player, int val, jeu * world)
 {
     // 1er combo
@@ -50,53 +69,65 @@ bool read_combo(sprite_perso *player, int val, jeu * world)
     bool equal;
     int j, k;
     int depart;
+    // on essaye tous les points départ jusqu'a la position dans le buffer - le nombres de coups du combo testé 
     for (int i = 0; i <= player->pos_tab_combo - player->tab_combo[val].nb_coups && !found; i++)
     {
+        //on estime que tous les coups suivants sont égaux
         equal = true;
+        // on sauvegarde le point de départ de la lecture
         depart = i;
+        //variable qui va parcourir les inputs du combo souhaité
         k = 0;
+        //on regarde un nombre de coups égals à la taille du combo souhaité tant que les coups du buffer sont égaux
         for (j = i; j < i + player->tab_combo[val].nb_coups && equal; j++)
         {
+            //si l'input du buffer et celui du combo testé ne sont pas égaux
             if (player->tab_combo[val].input[k] != player->buffer[j].input)
             {
+                //on indique qu'il ne sont pas égaux pour arréter la lecture
                 equal = false;
             }
+            //on avance dans le combo
             k++;
         }
-
+        //si tous les coups, le combo a été trouvé 
         if (equal)
         {
-
+            //si le combo a été fait assez rapidement
             if (player->buffer[depart + player->tab_combo[val].nb_coups - 1].timestamp - player->buffer[depart].timestamp <= player->tab_combo[val].frame_between)
             {
+                //on indique que ça a été trouvé 
                 found = true;
             }
         }
     }
     if (found)
     {
-
+        //on vide le buffer
         for (int i = 0; i < player->pos_tab_combo; i++)
         {
             player->buffer[i].input = 0;
             player->buffer[i].timestamp = 0;
         }
+        //on repart au début
         player->pos_tab_combo = 0;
         if (player->special_bar >= player->tab_combo[val].required)
         {
             player->special_bar -= player->tab_combo[val].required;
+            //selon le combo trouvé, on applique un effet 
             switch (val)
             {
             case 0:
+                //on lance la boule feu en regardant ou se situe le joueur par rapport à l'autre
                 player->chara_state = fireball;
                 player->fireball.multiplicateur = player->mirror ? -1 : 1;
                 break;
-            case 1:
-
+            case 2:
+                //on lance la gravityball en regardant ou se situe le joueur par rapport à l'autre et s'il à déjà la moitié de l'ecran
                 player->chara_state = gravityball;
                 player->gravityball.multiplicateur = player->mirror || player->x > 630 ? -1 : 1;
                 break;
-            case 2:
+            case 1:
                 player->berserk = true;
                 Mix_PlayChannel(player->audiochan.chara_voice, world->music.berserk_scream, 0);
                 player->damage_bonus = true;
@@ -127,7 +158,12 @@ void checkJoystick(SDL_Joystick **joysticks)
     printf("joystick X :%d \n", SDL_GameControllerGetAxis(joysticks[0], 0));
     printf("joystick Y : %d \n", SDL_GameControllerGetAxis(joysticks[0], 1));
 }
-
+/**
+ * @brief lit les coups dans le buffer et recherche si le combo est dedans
+ * 
+ * @param player le perso où le buffer est lu
+ * @return un combo à t-il été trouvé ?
+ */
 void check_timer(jeu *world)
 {
     if (world->timer.start && !world->timer.pause && !world->timer.inf)
@@ -151,6 +187,9 @@ void save_counter(char *select)
 void read_counter(jeu *world)
 {
     char *File_name = "build/counter.bin";
+    if(!file_exists(File_name)){
+        save_counter("90");
+    }
     struct stat stat_file;
     FILE *file = fopen(File_name, "rb"); // ouverture en mode lecture
     stat(File_name, &stat_file);
@@ -367,7 +406,7 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
         }
         else
         {
-            if (equals(x, y + perso->h + HEIGHT_PER_FRAME, world->map.map_structure, ' ') && equals(x + perso->w, y + perso->h + HEIGHT_PER_FRAME, world->map.map_structure, ' '))
+            if (equals(x, y + perso->h + HEIGHT_PER_FRAME, world->map.map_structure, ' ') && equals(x + perso->w, y + perso->h + HEIGHT_PER_FRAME, world->map.map_structure, ' ') )
             {
                 perso->y += HEIGHT_PER_FRAME;
             }
@@ -1122,9 +1161,18 @@ void write_victory(int nb1, int nb2)
     fclose(file);
 }
 
+bool file_exists (char *filename) 
+{
+  struct stat   buffer;   
+  return (stat (filename, &buffer) == 0);
+}
+
 void save_victory(int player)
 {
     char *File_name = "build/victory.bin";
+    if(!file_exists(File_name)){
+        write_victory(0,0);
+    }
     struct stat stat_file;
     FILE *file = fopen(File_name, "rb"); // ouverture en mode lecture
     stat(File_name, &stat_file);

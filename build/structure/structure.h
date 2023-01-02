@@ -123,6 +123,7 @@ struct sprite_p{
     int life_guard;
     bool broken_guard;
     bool damage_bonus;
+    bool permibility;
     bool berserk;
     int bonus_timer;
     int special_bar;

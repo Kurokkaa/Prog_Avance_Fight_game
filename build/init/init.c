@@ -29,7 +29,6 @@ void init_timer(jeu *world)
     world->timer.startTime = SDL_GetTicks();
     world->timer.pause = false;
     world->timer.start = true;
-    read_counter(world);
     world->p1.chrono_guard.startTime = SDL_GetTicks();
     world->p1.chrono_guard.pause = false;
     world->p1.chrono_guard.start = true;
@@ -46,6 +45,7 @@ void init_timer(jeu *world)
     world->p1.gravityball.dmg_timer.start = true;
     world->p2.gravityball.dmg_timer.pause = false;
     world->p2.gravityball.dmg_timer.start = true;
+    read_counter(world);
 }
 
 /**
@@ -60,19 +60,19 @@ void init_map(jeu *world, SDL_Renderer *renderer)
     {
     case city_night:
         world->map.image_fond = load_image("build/ressources/map/city_night/city.bmp", renderer);
-        world->map.map_structure = read_file_map("build/ressources/map/city_night/city_night_structure");
+        world->map.map_structure = read_file_map("build/ressources/map/city_night/city_night_structure.bin");
         world->map.plateformes = load_image("build/ressources/map/city_night/plateforme.bmp", renderer);
         break;
 
     case forest:
         world->map.image_fond = load_image("build/ressources/map/forest/forest.bmp", renderer);
-        world->map.map_structure = read_file_map("build/ressources/map/forest/forest_structure");
+        world->map.map_structure = read_file_map("build/ressources/map/forest/forest_structure.bin");
         world->map.plateformes = load_image("build/ressources/map/forest/plateforme.bmp", renderer);
         break;
 
     case japan:
         world->map.image_fond = load_image("build/ressources/map/Japan/Japan.bmp", renderer);
-        world->map.map_structure = read_file_map("build/ressources/map/Japan/Japan_structure");
+        world->map.map_structure = read_file_map("build/ressources/map/Japan/Japan_structure.bin");
         world->map.plateformes = load_image("build/ressources/map/Japan/plateforme.bmp", renderer);
         break;
     }
@@ -147,6 +147,7 @@ void init_perso(SDL_Renderer *renderer, sprite_perso *perso, int x, int y, int w
     perso->chara_state = idle;
     perso->backwards = false;
     perso->jump_origin = y;
+    
     perso->mirror = mirror;
     perso->life = MAX_LIFE;
     perso->attack_launched = false;

@@ -14,13 +14,21 @@
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_mixer.h>
 #include "sys/stat.h"
+#include "../controller/controller.h"
+#include "../lootbox/lootbox.h"
 
 /*FONCTIONS DE LECTURES*/
 char** read_file_map(char* nom);
-SDL_Texture* load_image( char path[],SDL_Renderer *renderer);
+SDL_Texture* load_image( char* path,SDL_Renderer *renderer);
 bool read_combo(sprite_perso* player, int val, jeu * world);
 void checkJoystick(SDL_Joystick** joysticks);
 void read_counter(jeu *world);
+void save_victory(int player);
+bool file_exists (char* filename);
+
+/*FONCTIONS D'ECRITURE*/
+
+void write_victory(int nb1, int nb2);
 
 /*FONCTIONS MOUVEMENTS ET ACTIONS*/
 void update_data(jeu* world);

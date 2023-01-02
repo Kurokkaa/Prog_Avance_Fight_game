@@ -4,7 +4,7 @@
     #define SCREEN_WIDTH 1280
     #define SCREEN_HEIGHT 720
     #define LINES 40
-    #define COLUMNS 20
+    #define COLUMNS 21
     #define CELL_HEIGHT 18
     #define CELL_WIDTH 64
     #define CHARA_SPEED 6

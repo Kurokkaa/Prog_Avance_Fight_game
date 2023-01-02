@@ -31,5 +31,6 @@ void init(SDL_Window** window, SDL_Renderer** renderer, jeu* world);
 void init_state_animation(SDL_Renderer* renderer, sprite_perso* perso, enum character_state state, char* path, int nbFrame, int width);
 void init_chara_state(SDL_Renderer* renderer, sprite_perso* perso);
 void init_timer(jeu* world);
+void init_lootbox(lootbox * lootbox, SDL_Renderer * renderer);
 
 #endif
