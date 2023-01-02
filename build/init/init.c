@@ -297,13 +297,6 @@ void init(SDL_Window **window, SDL_Renderer **renderer, jeu *world)
 
     *renderer = SDL_CreateRenderer(*window, -1, SDL_RENDERER_ACCELERATED);
 
-    int imgFlags = IMG_INIT_PNG;
-    if (!(IMG_Init(imgFlags) & imgFlags))
-    {
-        printf("Erreur initialisation de SDL_Image: %s\n", IMG_GetError());
-        SDL_Quit();
-    }
-
     if (TTF_Init() == -1)
     {
         printf("erreur dans l'initialisation de TTF: %s", SDL_GetError());
