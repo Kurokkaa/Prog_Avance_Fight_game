@@ -8,6 +8,11 @@
         "sdl_ttf.h": "c",
         "stdio.h": "c",
         "data.h": "c",
-        "cmath": "c"
+        "cmath": "c",
+        "stat.h": "c",
+        "init.h": "c",
+        "controller.h": "c",
+        "graphics.h": "c",
+        "sdl_mixer.h": "c"
     }
 }

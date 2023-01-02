@@ -5,8 +5,10 @@
 
 #include <SDL2/SDL_image.h>
 #include "structure/structure.h"
+#include "init/init.h"
 #include "graphics/graphics.h"
 #include "data/data.h"
+#include "controller/controller.h"
 #include "constante.h"
 
 
