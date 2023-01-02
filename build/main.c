@@ -10,10 +10,12 @@
 #include "data/data.h"
 #include "controller/controller.h"
 #include "constante.h"
+#include "time.h"
 
 
 
 int main(int argc, char *argv[]){
+    srand(time(NULL));
     SDL_Window* fenetre; // Déclaration de la fenêtre
     SDL_Renderer* renderer;// Déclaration du renderer
     SDL_Event events; //évenement du jeu

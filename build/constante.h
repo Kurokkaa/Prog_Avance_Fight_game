@@ -14,7 +14,7 @@
     #define KNOCKBACK_SPEED 6
     #define BUFFER_SIZE 60
     #define NB_COMBOS 3
-    #define RANDOM_SPAWN_CHANCE 500
+    #define RANDOM_SPAWN_CHANCE 200
     #define MAX_LIFE 300
     #define MAX_SPECIAL 300
     #define DMG_DURATION 5
@@ -25,7 +25,8 @@
     #define NB_ANIM 22
     #define MAX_SIZE_COMBO 10
     #define ENDGAME_TIMER 3
-    #define BERSERK_DMG 5
+    #define BERSERK_DMG 3
+    #define SPECIAL_START 300
 
     enum game_state{combat, main_menu, pause, options, selection_perso, selection_map, endgame};
     enum character_state{idle, walk, jump, crouch, fall, backwards, flight, flight_control, fall_control, landing, knockback, lpunch , kickstate,hpunch,stun,fireball,gravityball, winner , looser };

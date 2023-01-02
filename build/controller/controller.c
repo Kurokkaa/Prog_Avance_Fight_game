@@ -407,8 +407,8 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
                     {
 
                         world->p1.jump_origin = world->p1.y;
-                        world->p1.anim[flight].frame = 0;
-                        world->p1.anim[flight_control].frame = 0;
+                        setFrame(world->p1.anim, flight, 0);
+                        setFrame(world->p1.anim, flight_control, 0);
                         world->p1.chara_state = flight;
                         world->p1.permibility = false;
                         world->p1.double_jump = false;
@@ -573,7 +573,7 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
         {
             if (world->p2.chara_state == idle || world->p2.chara_state == walk)
             {
-                world->p2.permibility;
+                world->p2.permibility = true;
                 if (keystates[SDL_SCANCODE_DOWN] != world->keystates_pre[SDL_SCANCODE_DOWN])
                 {
                     add_input_buffer(&world->p2, down, world->timestamp_w);
@@ -595,8 +595,8 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
                     {
 
                         world->p2.jump_origin = world->p2.y;
-                        world->p2.anim[flight].frame = 0;
-                        world->p2.anim[flight_control].frame = 0;
+                        setFrame(world->p2.anim, flight, 0);
+                        setFrame(world->p1.anim, flight_control, 0);
                         world->p2.chara_state = flight;
                         world->p2.permibility = false;  
                         world->p2.double_jump = false;

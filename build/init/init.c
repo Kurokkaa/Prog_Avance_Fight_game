@@ -1,4 +1,5 @@
 #include "init.h"
+#include "../liste/liste.h"
 
 /**
  * @brief Initialisation de la manette
@@ -162,7 +163,7 @@ void init_perso(SDL_Renderer *renderer, sprite_perso *perso, int x, int y, int w
     init_hits(perso);
     init_combos(perso);
     perso->pos_tab_combo = 0;
-    perso->special_bar = 300;
+    perso->special_bar = SPECIAL_START;
     perso->fireball.fireball = load_image("./build/ressources/Characters/Powers/fireball.bmp", renderer);
     perso->fireball.launched_fireball = false;
     perso->gravityball.launched_fireball = false;
@@ -198,7 +199,7 @@ void init_hits(sprite_perso *perso)
     perso->hits.light_punch->delay = 50;
     perso->hits.light_punch->launch = 0;
 
-    perso->hits.heavy_punch->dmg = 40;
+    perso->hits.heavy_punch->dmg = 20;
     perso->hits.heavy_punch->speed = 0;
     perso->hits.heavy_punch->range_x = 30;
     perso->hits.heavy_punch->range_y = 0;
@@ -208,7 +209,7 @@ void init_hits(sprite_perso *perso)
     perso->hits.heavy_punch->delay = 5;
     perso->hits.heavy_punch->launch = 0;
 
-    perso->hits.kick->dmg = 30;
+    perso->hits.kick->dmg = 15;
     perso->hits.kick->speed = 0;
     perso->hits.kick->range_x = 30;
     perso->hits.kick->range_y = 0;
@@ -330,72 +331,60 @@ void init(SDL_Window **window, SDL_Renderer **renderer, jeu *world)
     init_jeu(world, *renderer);
 }
 
-void init_state_animation(SDL_Renderer *renderer, sprite_perso *perso, enum character_state state, char *path, int nbFrame, int width)
-{
-    perso->anim[state].anim_text = load_image(path, renderer);
-    perso->anim[state].frame = 0;
-    perso->anim[state].nbFrame = nbFrame;
-    perso->anim[state].width = width;
-    perso->anim[state].counter = 0;
-}
-
 void init_chara_state(SDL_Renderer *renderer, sprite_perso *perso)
 {
     switch (perso->perso_choisi)
     {
     case 0:
-        init_state_animation(renderer, perso, idle, "build/ressources/Characters/Chara1/Idle.bmp", 15, 90);
-        init_state_animation(renderer, perso, walk, "build/ressources/Characters/Chara1/Walking.bmp", 15, 90);
-        init_state_animation(renderer, perso, jump, "build/ressources/Characters/Chara1/Jump.bmp", 10, 85);
-        init_state_animation(renderer, perso, crouch, "build/ressources/Characters/Chara1/Idle.bmp", 15, 85);
-        init_state_animation(renderer, perso, fall, "build/ressources/Characters/Chara1/Falling.bmp", 10, 95);
-        init_state_animation(renderer, perso, backwards, "build/ressources/Characters/Chara1/Walking.bmp", 15, 85);
-        init_state_animation(renderer, perso, flight, "build/ressources/Characters/Chara1/Jump.bmp", 10, 85);
-        init_state_animation(renderer, perso, flight_control, "build/ressources/Characters/Chara1/Jump.bmp", 10, 85);
-        init_state_animation(renderer, perso, fall_control, "build/ressources/Characters/Chara1/Falling.bmp", 10, 85);
-        init_state_animation(renderer, perso, landing, "build/ressources/Characters/Chara1/Landing.bmp", 5, 90);
-        init_state_animation(renderer, perso, knockback, "build/ressources/Characters/Chara1/KnockBack.bmp", 5, 85);
-        init_state_animation(renderer, perso, lpunch, "build/ressources/Characters/Chara1/LightPunch.bmp", 16, 85);
-        init_state_animation(renderer, perso, kickstate, "build/ressources/Characters/Chara1/Kick.bmp", 14, 110);
-        init_state_animation(renderer, perso, hpunch, "build/ressources/Characters/Chara1/HeavyPunch.bmp", 15, 85);
-        init_state_animation(renderer, perso, stun, "build/ressources/Characters/Chara1/Knocked.bmp", 5, 85);
+        perso->anim = createAnimList(renderer, perso, "build/ressources/Characters/Chara1/Idle.bmp",15, 90);
+        insertAnimLast(perso->anim, renderer, perso, "build/ressources/Characters/Chara1/Walking.bmp", 15, 90);
+        insertAnimLast(perso->anim, renderer, perso, "build/ressources/Characters/Chara1/Jump.bmp", 10, 85);
+        insertAnimLast(perso->anim, renderer, perso, "build/ressources/Characters/Chara1/Idle.bmp", 15, 85);
+        insertAnimLast(perso->anim, renderer, perso, "build/ressources/Characters/Chara1/Falling.bmp", 10, 95);
+        insertAnimLast(perso->anim, renderer, perso, "build/ressources/Characters/Chara1/Walking.bmp", 15, 85);
+        insertAnimLast(perso->anim, renderer, perso,  "build/ressources/Characters/Chara1/Jump.bmp", 10, 85);
+        insertAnimLast(perso->anim, renderer, perso,  "build/ressources/Characters/Chara1/Jump.bmp", 10, 85);
+        insertAnimLast(perso->anim, renderer, perso,  "build/ressources/Characters/Chara1/Falling.bmp", 10, 85);
+        insertAnimLast(perso->anim, renderer, perso,  "build/ressources/Characters/Chara1/Landing.bmp", 5, 90);
+        insertAnimLast(perso->anim, renderer, perso,  "build/ressources/Characters/Chara1/KnockBack.bmp", 5, 85);
+        insertAnimLast(perso->anim, renderer, perso,  "build/ressources/Characters/Chara1/LightPunch.bmp", 16, 85);
+        insertAnimLast(perso->anim, renderer, perso,  "build/ressources/Characters/Chara1/Kick.bmp", 14, 110);
+        insertAnimLast(perso->anim, renderer, perso,  "build/ressources/Characters/Chara1/HeavyPunch.bmp", 15, 85);
+        insertAnimLast(perso->anim, renderer, perso, "build/ressources/Characters/Chara1/Knocked.bmp", 5, 85);
 
-        init_state_animation(renderer, perso, fireball, "build/ressources/Characters/Chara1/Fireball.bmp", 30, 90);
-        init_state_animation(renderer, perso, gravityball, "build/ressources/Characters/Chara1/Fireball.bmp", 30, 90);
-        init_state_animation(renderer, perso, winner, "build/ressources/Characters/Chara1/Victory.bmp", 30, 100);
-        init_state_animation(renderer, perso, looser, "build/ressources/Characters/Chara1/Defeat.bmp", 28, 90);
-        init_state_animation(renderer, perso, 19, "build/ressources/Characters/Powers/Aura_Spritesheet.Bmp", 8, 190);
-        init_state_animation(renderer, perso, 20, "build/ressources/Characters/Powers/Transparent_Aura_Spritesheet.Bmp", 8, 190);
-        init_state_animation(renderer, perso, 21, "build/ressources/Characters/Powers/gravityBall.bmp", 4, 199);
-        perso->anim[19].aura = 0;
+        insertAnimLast(perso->anim, renderer, perso, "build/ressources/Characters/Chara1/Fireball.bmp", 30, 90);
+        insertAnimLast(perso->anim, renderer, perso, "build/ressources/Characters/Chara1/Fireball.bmp", 30, 90);
+        insertAnimLast(perso->anim, renderer, perso, "build/ressources/Characters/Chara1/Victory.bmp", 30, 100);
+        insertAnimLast(perso->anim, renderer, perso, "build/ressources/Characters/Chara1/Defeat.bmp", 28, 90);
+        insertAnimLast(perso->anim, renderer, perso, "build/ressources/Characters/Powers/Aura_Spritesheet.Bmp", 8, 190);
+        insertAnimLast(perso->anim, renderer, perso, "build/ressources/Characters/Powers/Transparent_Aura_Spritesheet.Bmp", 8, 190);
+        insertAnimLast(perso->anim, renderer, perso, "build/ressources/Characters/Powers/gravityBall.bmp", 4, 207);
         break;
 
     case 1:
-        init_state_animation(renderer, perso, idle, "build/ressources/Characters/Chara2/Idle.bmp", 15, 90);
-        init_state_animation(renderer, perso, walk, "build/ressources/Characters/Chara2/Walking.bmp", 15, 90);
-        init_state_animation(renderer, perso, jump, "build/ressources/Characters/Chara2/Jump.bmp", 10, 85);
-        init_state_animation(renderer, perso, crouch, "build/ressources/Characters/Chara2/Idle.bmp", 15, 85);
-        init_state_animation(renderer, perso, fall, "build/ressources/Characters/Chara2/Falling.bmp", 10, 90);
-        init_state_animation(renderer, perso, backwards, "build/ressources/Characters/Chara2/Walking.bmp", 15, 85);
-        init_state_animation(renderer, perso, flight, "build/ressources/Characters/Chara2/Jump.bmp", 10, 85);
-        init_state_animation(renderer, perso, flight_control, "build/ressources/Characters/Chara2/Jump.bmp", 10, 85);
-        init_state_animation(renderer, perso, fall_control, "build/ressources/Characters/Chara2/Falling.bmp", 10, 95);
-        init_state_animation(renderer, perso, landing, "build/ressources/Characters/Chara2/Landing.bmp", 5, 90);
-        init_state_animation(renderer, perso, knockback, "build/ressources/Characters/Chara2/KnockBack.bmp", 5, 85);
-        init_state_animation(renderer, perso, lpunch, "build/ressources/Characters/Chara2/LightPunch.bmp", 16, 85);
-        init_state_animation(renderer, perso, kickstate, "build/ressources/Characters/Chara2/Kick.bmp", 14, 110);
-        init_state_animation(renderer, perso, hpunch, "build/ressources/Characters/Chara2/HeavyPunch.bmp", 15, 85);
-        init_state_animation(renderer, perso, stun, "build/ressources/Characters/Chara2/Knocked.bmp", 5, 85);
+        perso->anim = createAnimList(renderer, perso, "build/ressources/Characters/Chara2/Idle.bmp",15, 90);
+        insertAnimLast(perso->anim, renderer, perso, "build/ressources/Characters/Chara2/Walking.bmp", 15, 90);
+        insertAnimLast(perso->anim, renderer, perso, "build/ressources/Characters/Chara2/Jump.bmp", 10, 85);
+        insertAnimLast(perso->anim, renderer, perso, "build/ressources/Characters/Chara2/Idle.bmp", 15, 85);
+        insertAnimLast(perso->anim, renderer, perso, "build/ressources/Characters/Chara2/Falling.bmp", 10, 95);
+        insertAnimLast(perso->anim, renderer, perso, "build/ressources/Characters/Chara2/Walking.bmp", 15, 85);
+        insertAnimLast(perso->anim, renderer, perso,  "build/ressources/Characters/Chara2/Jump.bmp", 10, 85);
+        insertAnimLast(perso->anim, renderer, perso,  "build/ressources/Characters/Chara2/Jump.bmp", 10, 85);
+        insertAnimLast(perso->anim, renderer, perso,  "build/ressources/Characters/Chara2/Falling.bmp", 10, 85);
+        insertAnimLast(perso->anim, renderer, perso,  "build/ressources/Characters/Chara2/Landing.bmp", 5, 90);
+        insertAnimLast(perso->anim, renderer, perso,  "build/ressources/Characters/Chara2/KnockBack.bmp", 5, 85);
+        insertAnimLast(perso->anim, renderer, perso,  "build/ressources/Characters/Chara2/LightPunch.bmp", 16, 85);
+        insertAnimLast(perso->anim, renderer, perso,  "build/ressources/Characters/Chara2/Kick.bmp", 14, 110);
+        insertAnimLast(perso->anim, renderer, perso,  "build/ressources/Characters/Chara2/HeavyPunch.bmp", 15, 85);
+        insertAnimLast(perso->anim, renderer, perso, "build/ressources/Characters/Chara2/Knocked.bmp", 5, 85);
 
-        init_state_animation(renderer, perso, fireball, "build/ressources/Characters/Chara2/Fireball.bmp", 30, 90);
-        init_state_animation(renderer, perso, gravityball, "build/ressources/Characters/Chara2/Fireball.bmp", 30, 90);
-        init_state_animation(renderer, perso, looser, "build/ressources/Characters/Chara2/Defeat.bmp", 28, 90);
-        init_state_animation(renderer, perso, winner, "build/ressources/Characters/Chara2/Victory.bmp", 30, 100);
-
-        init_state_animation(renderer, perso, 19, "build/ressources/Characters/Powers/Aura_Spritesheet.Bmp", 8, 190);
-        init_state_animation(renderer, perso, 20, "build/ressources/Characters/Powers/Transparent_Aura_Spritesheet.Bmp", 8, 190);
-       init_state_animation(renderer, perso, 21, "build/ressources/Characters/Powers/gravityBall.bmp", 4, 199);
-        perso->anim[19].aura = 0;
+        insertAnimLast(perso->anim, renderer, perso, "build/ressources/Characters/Chara2/Fireball.bmp", 30, 90);
+        insertAnimLast(perso->anim, renderer, perso, "build/ressources/Characters/Chara2/Fireball.bmp", 30, 90);
+        insertAnimLast(perso->anim, renderer, perso, "build/ressources/Characters/Chara2/Victory.bmp", 30, 100);
+        insertAnimLast(perso->anim, renderer, perso, "build/ressources/Characters/Chara2/Defeat.bmp", 28, 90);
+        insertAnimLast(perso->anim, renderer, perso, "build/ressources/Characters/Powers/Aura_Spritesheet.Bmp", 8, 190);
+        insertAnimLast(perso->anim, renderer, perso, "build/ressources/Characters/Powers/Transparent_Aura_Spritesheet.Bmp", 8, 190);
+        insertAnimLast(perso->anim, renderer, perso, "build/ressources/Characters/Powers/gravityBall.bmp", 4, 207);
         break;
     }
 }

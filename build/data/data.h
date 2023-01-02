@@ -16,6 +16,8 @@
 #include "sys/stat.h"
 #include "../controller/controller.h"
 #include "../lootbox/lootbox.h"
+#include "../movements/movements.h"
+#include "../hits/hits.h"
 
 /*FONCTIONS DE LECTURES*/
 char** read_file_map(char* nom);
@@ -25,6 +27,7 @@ void checkJoystick(SDL_Joystick** joysticks);
 void read_counter(jeu *world);
 void save_victory(int player);
 bool file_exists (char* filename);
+bool equals(int x, int y, char** map_point, char test);
 
 /*FONCTIONS D'ECRITURE*/
 
@@ -32,14 +35,6 @@ void write_victory(int nb1, int nb2);
 
 /*FONCTIONS MOUVEMENTS ET ACTIONS*/
 void update_data(jeu* world);
-void movements(jeu* world, sprite_perso* perso, sprite_perso* adversaire);
-bool equals(int x, int y, char** map_point, char test);
-void light_punch(sprite_perso* attacker, sprite_perso* receiver,jeu* world);
-void heavy_punch(sprite_perso *attacker, sprite_perso *receiver,jeu* world);
-void kick_hit(sprite_perso *attacker, sprite_perso *receiver,jeu* world);
-void change_directions(sprite_perso * p1, sprite_perso * p2);
-bool canMove(sprite_perso * perso, sprite_perso * adversaire);
-void sprites_collision(sprite_perso * p1, sprite_perso * p2, jeu * world);
 void add_input_buffer(sprite_perso* player, enum combos_inputs touche_appui, int timestamp);
 void compute_game(jeu *world);
 void endgame_data(jeu *world);

@@ -20,47 +20,48 @@ void apply_sprite(SDL_Renderer *renderer, SDL_Texture *texture, sprite_perso* sp
 }
 
 void render_aura(SDL_Renderer *renderer, sprite_perso* sprite, int numaura){
+    anim * aura = getAnimation(sprite->anim, numaura);
     SDL_Rect dst = {0, 0, 0, 0};
     SDL_Rect src = {0, 0, 0, 0};
 
     dst.x = sprite->x-sprite->w;
     dst.y = sprite->y;
-    dst.w = sprite->anim[numaura].width;
+    dst.w = aura->width;
     dst.h = 250;
 
     
     int width;
-    SDL_QueryTexture(sprite->anim[numaura].anim_text, NULL, NULL, &width, &src.h);
+    SDL_QueryTexture(aura->anim_text, NULL, NULL, &width, &src.h);
     src.h -=10;
-    src.x = sprite->anim[numaura].frame * sprite->anim[numaura].width;
+    src.x = aura->frame * aura->width;
     src.y = 0;
-    src.w = sprite->anim[numaura].width;
-    SDL_RenderCopy(renderer, sprite->anim[numaura].anim_text, &src, &dst);
+    src.w = aura->width;
+    SDL_RenderCopy(renderer, aura->anim_text, &src, &dst);
 }
 
 void play_animations(SDL_Renderer *renderer, sprite_perso* sprite, int chara_state){
+    anim * animation = getAnimation(sprite->anim, chara_state) ;
     SDL_Rect dst = {0, 0, 0, 0};
     SDL_Rect src = {0, 0, 0, 0};
     dst.x = sprite->x;
     dst.y = sprite->y;
-    dst.w = sprite->anim[chara_state].width;
+    dst.w = animation->width;
     dst.h = 250;
 
-    int width;
-    SDL_QueryTexture(sprite->anim[chara_state].anim_text, NULL, NULL, &width, &src.h);
-    src.h -=10;
-    src.x = 40+sprite->anim[chara_state].frame * 500;
+    SDL_QueryTexture(animation->anim_text, NULL, NULL, NULL, &src.h);
+    src.h -= 10;
+    src.x = 40 + animation->frame * 500;
     src.y = 0;
-    src.w = sprite->anim[chara_state].width;
- if(!sprite->mirror){
-    SDL_RenderCopy(renderer, sprite->anim[chara_state].anim_text, &src, &dst);
- }
- else{
-    SDL_RendererFlip flip = SDL_FLIP_VERTICAL;
+    src.w = animation->width;
+    if(!sprite->mirror){
+        SDL_RenderCopy(renderer, animation->anim_text, &src, &dst);
+    }
+    else{
+        SDL_RendererFlip flip = SDL_FLIP_VERTICAL;
 
-        SDL_Point center = {sprite->anim[chara_state].width / 2,250/2};
-        SDL_RenderCopyEx(renderer,  sprite->anim[chara_state].anim_text, &src, &dst,180, &center, flip);
- }
+            SDL_Point center = {animation->width/ 2, 250/2};
+            SDL_RenderCopyEx(renderer, animation->anim_text, &src, &dst,180, &center, flip);
+    }
 }
 
 
@@ -77,18 +78,18 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
                 apply_textures(world->menu_set.cadreVie, renderer, 0 , 0); //Cadres contenant les vies et spécials
                 display_dynamic_texture(renderer, world->map.map_structure, world->map.plateformes);
                 render_bonuses(renderer, &world->lootbox);
-                if(world->p1.anim[19].aura || world->p1.damage_bonus){
+                if(getAnimation(world->p1.anim, 19)->aura || world->p1.damage_bonus){
                     render_aura(renderer, &(world->p1),19);
                 }
-                if(world->p2.anim[19].aura || world->p2.damage_bonus){
+                if(getAnimation(world->p2.anim, 19)->aura || world->p2.damage_bonus){
                     render_aura(renderer, &(world->p2),19);
                 }
                 play_animations(renderer, &(world->p1), world->p1.chara_state);
                 play_animations(renderer, &(world->p2), world->p2.chara_state);
-                if(world->p1.anim[19].aura || world->p1.damage_bonus){
+                if(getAnimation(world->p1.anim, 19)->aura || world->p1.damage_bonus){
                     render_aura(renderer, &(world->p1),20);
                 }
-                if(world->p2.anim[19].aura || world->p2.damage_bonus){
+                if(getAnimation(world->p2.anim, 19)->aura  || world->p2.damage_bonus){
                     render_aura(renderer, &(world->p2),20);
                 }
                 display_life(renderer, world);
@@ -210,20 +211,21 @@ void display_fireball(SDL_Renderer* renderer,throwable projectile){
 }
 
 void display_gravityball(SDL_Renderer* renderer,sprite_perso perso){
+    anim * animation = getAnimation(perso.anim, 21);
     if(perso.gravityball.launched_fireball){
         SDL_Rect dst = {0, 0, 0, 0};
         SDL_Rect src = {0, 0, 0, 0};
         dst.x = perso.gravityball.x;
         dst.y = perso.gravityball.y;
-        dst.w = perso.anim[21].width;
+        dst.w = animation->width;
         dst.h = 250;
 
-        SDL_QueryTexture(perso.anim[21].anim_text, NULL, NULL, &src.w, &src.h);
-        src.x = perso.anim[21].frame * 207;
+        SDL_QueryTexture(animation->anim_text, NULL, NULL, NULL, &src.h);
+        src.x = animation->frame * animation->width;
         src.y = 0;
         src.w = 207;
     
-        SDL_RenderCopy(renderer, perso.anim[21].anim_text, &src, &dst);
+        SDL_RenderCopy(renderer, animation->anim_text, &src, &dst);
     }
 }
 

@@ -5,15 +5,14 @@
  */
 
 /**
- * @brief Génère un nombre aléatoire entre la borne a et b (inclus)
+ * @brief Génère un nombre aléatoire entre la borne a et b (exclus)
  * 
  * @param a borne minimum
- * @param b borne maximum (inclus)
+ * @param b borne maximum (exclus)
  * @return int compris entre a et b
  */
 int generate_number(int a, int b)
 {
-    srand(time(NULL));
     return rand() % (b - a) + a;
 }
 
@@ -100,7 +99,7 @@ void apply_bonus(lootbox *lootbox, sprite_perso *player)
         player->life += x;
     }
 
-    if (!player->damage_bonus && lootbox->bonus == damage_bonus && !player->anim[19].aura) //Bonus dommage
+    if (!player->damage_bonus && lootbox->bonus == damage_bonus && !getAnimation(player->anim, 19)->aura) //Bonus dommage
     {
         player->damage_bonus = true;
         player->dmg_bonus_timer.start = true;
@@ -155,5 +154,15 @@ void lootbox_loop(jeu *world)
             apply_bonus(&world->lootbox, &world->p2);
             world->lootbox.active = false;
         }
+    }
+}
+
+void check_bonus(sprite_perso *perso)
+{
+    if (perso->damage_bonus && !perso->dmg_bonus_timer.pause && (SDL_GetTicks() - perso->dmg_bonus_timer.startTime) / 1000 >= DMG_DURATION)
+    {
+        perso->damage_bonus = false;
+        perso->dmg_bonus_timer.startTime = SDL_GetTicks();
+        perso->berserk = false;
     }
 }

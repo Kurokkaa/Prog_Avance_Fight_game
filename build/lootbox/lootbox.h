@@ -22,5 +22,6 @@ void update_lootbox(jeu * world);
 void check_lootbox_pickup(sprite_perso * player, lootbox * lootbox, int player_number);
 void apply_bonus(lootbox * lootbox, sprite_perso *player);
 void lootbox_loop(jeu *world);
+void check_bonus(sprite_perso *perso);
 
 #endif

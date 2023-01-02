@@ -39,6 +39,12 @@ struct animation_s{
 };
 typedef struct animation_s anim;
 
+struct list_anim_t{
+    anim animation;
+    struct element * next;
+};
+typedef struct list_anim_t list_anim;
+
 struct hit_set_s
 {
     hit *light_punch;
@@ -114,7 +120,7 @@ struct sprite_p{
     bool double_jump;
     int life;
     hit_set hits;
-    anim* anim;
+    list_anim * anim;
     inputs *buffer;
     int pos_tab_combo;
     combo* tab_combo;

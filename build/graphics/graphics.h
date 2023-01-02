@@ -7,6 +7,7 @@
 #include "../structure/structure.h"
 #include "../data/data.h"
 #include "../constante.h"
+#include "../liste/liste.h"
 #include <SDL2/SDL_ttf.h>
 
 

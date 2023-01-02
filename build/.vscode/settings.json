@@ -13,6 +13,8 @@
         "init.h": "c",
         "controller.h": "c",
         "graphics.h": "c",
-        "sdl_mixer.h": "c"
+        "sdl_mixer.h": "c",
+        "stdlib.h": "c",
+        "movements.h": "c"
     }
 }
