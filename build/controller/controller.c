@@ -218,6 +218,7 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
 
                     init_lootbox(&world->lootbox, renderer);
                     world->menu_set.index_menu = 0;
+                    world->in_game = true;
                 }
                 else if (world->state == options)
                 {

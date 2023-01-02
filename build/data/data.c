@@ -206,8 +206,7 @@ void read_counter(jeu *world)
     }
     else{
         world->timer.inf = false;
-    }
-    
+    }  
 }
 
 /**
@@ -335,58 +334,47 @@ void TTF_free_police(jeu* world){
 
 void free_music(jeu *world)
 {
+    if(world->in_game){
+        Mix_FreeChunk(world->music.game_music);
+        Mix_FreeChunk(world->music.aura);
+        Mix_FreeChunk(world->music.berserk_scream);
+        Mix_FreeChunk(world->music.fireball_sound);
+        Mix_FreeChunk(world->music.fireball_explosion);
+        Mix_FreeChunk(world->music.gravityball_sound);
+        Mix_FreeChunk(world->music.grunt);
+        Mix_FreeChunk(world->music.heavy_punch);
+        Mix_FreeChunk(world->music.hit_guard);
+        Mix_FreeChunk(world->music.kick);
+        Mix_FreeChunk(world->music.kick_air);
+        Mix_FreeChunk(world->music.light_punch);
+        Mix_FreeChunk(world->music.punch_air);
+        Mix_FreeChunk(world->music.win_laugh);
+    }
     Mix_FreeChunk(world->music.menu);
-    Mix_FreeChunk(world->music.game_music);
-    Mix_FreeChunk(world->music.aura);
-    Mix_FreeChunk(world->music.berserk_scream);
-    Mix_FreeChunk(world->music.fireball_sound);
-    Mix_FreeChunk(world->music.fireball_explosion);
-    Mix_FreeChunk(world->music.gravityball_sound);
-    Mix_FreeChunk(world->music.grunt);
-    Mix_FreeChunk(world->music.heavy_punch);
-    Mix_FreeChunk(world->music.hit_guard);
-    Mix_FreeChunk(world->music.kick);
-    Mix_FreeChunk(world->music.kick_air);
-    Mix_FreeChunk(world->music.light_punch);
     Mix_FreeChunk(world->music.menu_selector);
-    Mix_FreeChunk(world->music.punch_air);
-    Mix_FreeChunk(world->music.win_laugh);
 }
 
 
 void quit_game(jeu *world, SDL_Window **fenetre, SDL_Renderer **renderer)
 {
-    free_hits(world);
-    TTF_free_police(world);
+    if(world->in_game){
+        free_hits(world);
+        TTF_free_police(world);
+        free_map_structure(world->map.map_structure);
+    }
+    
     free_menu(world);
     destroy_textures(world);
-    free_map_structure(world->map.map_structure);
     free_music(world);
-    close_Joystick(world->joysticks);
     TTF_Quit();
     Mix_CloseAudio();
-
     IMG_Quit();
     SDL_DestroyWindow(*fenetre);
     SDL_DestroyRenderer(*renderer);
     SDL_Quit();
 }
 
-void close_Joystick(jeu *world)
-{
-    int nbJoystick = SDL_NumJoysticks();
-    if (nbJoystick > 0)
-    {
-        for (int i = 0; i < nbJoystick; i++)
-        {
-            SDL_GameControllerClose(world->joysticks[i]);
-        }
-        free(world->joysticks);
-    }
-}
-
 void free_menu(jeu* world){
-    SDL_DestroyTexture(world->menu_set.cadreVie);
     SDL_DestroyTexture(world->menu_set.menu);
     SDL_DestroyTexture(world->menu_set.selection_maps_menu);
     SDL_DestroyTexture(world->menu_set.options_menu);
@@ -415,11 +403,11 @@ void destroy_map(jeu *world)
 
 void destroy_textures(jeu *world)
 {
-    SDL_DestroyTexture(world->menu_set.menu_fond);
     destroy_anim(&world->p1);
     destroy_anim(&world->p2);
     SDL_DestroyTexture(world->map.image_fond);
     SDL_DestroyTexture(world->map.plateformes);
+    SDL_DestroyTexture(world->menu_set.cadreVie);
     for (int i = 0; i < special_bonus; i++)
     {
         SDL_DestroyTexture(world->lootbox.texture[i]);
@@ -711,7 +699,6 @@ void endgame_data(jeu *world)
 
     if (world->p1.chara_state == winner)
     {
-        printf("TEST\n");
         setFrame(world->p1.anim, winner, getAnimation(world->p1.anim, winner)->frame + 1);
 
         if (getAnimation(world->p1.anim, winner)->frame == getAnimation(world->p1.anim, winner)->nbFrame)

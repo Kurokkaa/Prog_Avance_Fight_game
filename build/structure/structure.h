@@ -215,6 +215,7 @@ struct world_s{
     lootbox lootbox;
     Sound music;
     bool game_over;
+    bool in_game;
     int gravityball_audio_chan;
 };
 typedef struct world_s jeu;
