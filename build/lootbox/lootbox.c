@@ -19,16 +19,16 @@ int generate_number(int a, int b)
 /**
  * @brief Reset et active une lootbox
  * 
- * @param lootbox à reset et activer
+ * @param lootbox lootbox à reset et activer
  */
 void reset_activate_lootbox(lootbox *lootbox)
 {
-    lootbox->active = true;
-    lootbox->falling = true;
-    lootbox->x = generate_number(65, 950);
-    lootbox->y = 0 - lootbox->h;
-    lootbox->collided = 0;
-    lootbox->bonus = generate_number(health_bonus, special_bonus + 1);
+    lootbox->active = true; // on active la lootbox 
+    lootbox->falling = true; //on active la chute de la lootbox
+    lootbox->x = generate_number(65, 950); // la lootbox doit tomber dans les zones accessibles au joueur
+    lootbox->y = 0 - lootbox->h; //placement y de la lootbox
+    lootbox->collided = 0; //initalisation non collisionné
+    lootbox->bonus = generate_number(health_bonus, special_bonus + 1); // tirage aléatoire du bonus
 }
 
 /**
@@ -38,16 +38,16 @@ void reset_activate_lootbox(lootbox *lootbox)
  */
 void update_lootbox(jeu *world)
 {
-    if (world->lootbox.falling)
+    if (world->lootbox.falling) //Si lootbox en état de chute
     {
-        if ((equals(world->lootbox.x, world->lootbox.y + world->lootbox.h + world->lootbox.fallspeed, world->map.map_structure, ' ') || (equals(world->lootbox.x + world->lootbox.w, world->lootbox.y + world->lootbox.h + world->lootbox.fallspeed, world->map.map_structure, ' ') || world->lootbox.y < CELL_HEIGHT + 20) && world->lootbox.y < 667))
+        if ((equals(world->lootbox.x, world->lootbox.y + world->lootbox.h + world->lootbox.fallspeed, world->map.map_structure, ' ') || (equals(world->lootbox.x + world->lootbox.w, world->lootbox.y + world->lootbox.h + world->lootbox.fallspeed, world->map.map_structure, ' ') || world->lootbox.y < CELL_HEIGHT + 20) && world->lootbox.y < 667)) //on test si la lootbox tombe sur une plateforme ou au point le plus bas de la map
         {
 
-            world->lootbox.y += world->lootbox.fallspeed;
+            world->lootbox.y += world->lootbox.fallspeed; //vitesse de chute de la lootbox
         }
-        else
+        else //si la lootbox touche une plateforme ou limite, elle ne tombe plus
         {
-            world->lootbox.falling = false;
+            world->lootbox.falling = false; 
         }
     }
 }
@@ -56,27 +56,27 @@ void update_lootbox(jeu *world)
  * @brief Test si un joueur a ramassé une lootbox
  * 
  * @param player un sprite d'un joueur
- * @param lootbox une lootbox
+ * @param lootbox une structure lootbox
  * @param player_number le numéro du joueur, permet d'attribuer un bonus
  */
 void check_lootbox_pickup(sprite_perso *player, lootbox *lootbox, int player_number)
 {
-    if (lootbox->active)
+    if (lootbox->active) //si lootbox active
     {
         int tete = player->y;
         int pieds = player->y + player->h;
 
-        if (lootbox->y >= tete && lootbox->y <= pieds)
+        if (lootbox->y >= tete && lootbox->y <= pieds) //test de collision entre joueur et lootbox en y
         {
-            if (player->x + player->w >= lootbox->x && player->x <= lootbox->x + lootbox->w)
+            if (player->x + player->w >= lootbox->x && player->x <= lootbox->x + lootbox->w) //test de collision entre joueur et lootbox en x
             {
-                if (lootbox->collided != 0)
+                if (lootbox->collided != 0) //si lootbox est touché par un autre joueur, elle passe au numéro du joueur. Si les deux la touche, elle passe à 3 pour appliquer le bonus aux deux
                 {
                     lootbox->collided = 3;
                 }
                 else
                 {
-                    lootbox->collided = player_number;
+                    lootbox->collided = player_number; //donne le bonus au joueur qui attrape la lootbox
                 }
             }
         }
@@ -86,7 +86,7 @@ void check_lootbox_pickup(sprite_perso *player, lootbox *lootbox, int player_num
 /**
  * @brief Applique le bonus de la lootbox
  * 
- * @param lootbox 
+ * @param lootbox une structure lootbox
  * @param player sprite du joueur
  */
 void apply_bonus(lootbox *lootbox, sprite_perso *player)
@@ -101,9 +101,9 @@ void apply_bonus(lootbox *lootbox, sprite_perso *player)
 
     if (!player->damage_bonus && lootbox->bonus == damage_bonus && !getAnimation(player->anim, 19)->aura) //Bonus dommage
     {
-        player->damage_bonus = true;
-        player->dmg_bonus_timer.start = true;
-        player->dmg_bonus_timer.startTime = SDL_GetTicks();
+        player->damage_bonus = true; //activation du bonus dommage
+        player->dmg_bonus_timer.start = true; //on lance le compteur 
+        player->dmg_bonus_timer.startTime = SDL_GetTicks(); //on définit sa valeur de référence
         player->dmg_bonus_timer.pause = false;
     }
 
@@ -122,16 +122,16 @@ void lootbox_loop(jeu *world)
 {
     if (world->lootbox.active == 0) // On ne fait pas apparaitre de lootbox s'il y en a déjà une
     { 
-        int n = generate_number(0, RANDOM_SPAWN_CHANCE);
+        int n = generate_number(0, RANDOM_SPAWN_CHANCE); //tirage aléatoire en fonction de la constante RANDOM_SPAWN_CHANCE
 
-        if (n == 1)
-        {                                            // Si la fonction renvoie 1, alors on créé une lootbox
-            reset_activate_lootbox(&world->lootbox); // place la lootbox de manière semi-aléatoire sur l'axe x
+        if (n == 1)// Si la fonction renvoie 1, alors on créé une lootbox
+        {
+            reset_activate_lootbox(&world->lootbox); // reset et réactive une lootbox à un endroit et avec un bonus aléatoire
         }
     }
 
-    if (world->lootbox.active == 1)
-    {                                                         // Cas où une lootbox est active
+    if (world->lootbox.active == 1) // Cas où une lootbox est active
+    { 
         update_lootbox(world);                                // mouvement de la lootbox
         check_lootbox_pickup(&world->p1, &world->lootbox, 1); // vérifie si le joueur 1 a ramassé la lootbox
         check_lootbox_pickup(&world->p2, &world->lootbox, 2); // vérifie si le joueur 2 a ramassé la lootbox
@@ -157,12 +157,17 @@ void lootbox_loop(jeu *world)
     }
 }
 
+/**
+ * @brief Vérifie si le temps du bonus de damage est expiré
+ * 
+ * @param perso le perso dont on teste la durée du bonus
+ */
 void check_bonus(sprite_perso *perso)
 {
-    if (perso->damage_bonus && !perso->dmg_bonus_timer.pause && (SDL_GetTicks() - perso->dmg_bonus_timer.startTime) / 1000 >= DMG_DURATION)
+    if (perso->damage_bonus && !perso->dmg_bonus_timer.pause && (SDL_GetTicks() - perso->dmg_bonus_timer.startTime) / 1000 >= DMG_DURATION) //vérifie si le joueur a encore du temps pour son bonus, si on rentre dans la condition, on le désactive
     {
-        perso->damage_bonus = false;
+        perso->damage_bonus = false; //désactivation du dommage
         perso->dmg_bonus_timer.startTime = SDL_GetTicks();
-        perso->berserk = false;
+        perso->berserk = false; //désactivation du berserk si nécessaire
     }
 }

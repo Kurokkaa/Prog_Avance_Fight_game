@@ -144,31 +144,15 @@ bool read_combo(sprite_perso *player, int val, jeu * world)
     return found;
 }
 
-void checkJoystick(SDL_Joystick **joysticks)
-{
-    SDL_GameControllerUpdate(); // Mise à jour de l'état des controller
-    int i;
-    for (int j = 0; j < SDL_NumJoysticks(); j++)
-    {
-        for (i = 0; i < 20; i++)
-        {
-            if (SDL_GameControllerGetButton(joysticks[j], i))
-            {
-                printf("bouton %d presse", i);
-            }
-        }
-    }
-    printf("joystick X :%d \n", SDL_GameControllerGetAxis(joysticks[0], 0));
-    printf("joystick Y : %d \n", SDL_GameControllerGetAxis(joysticks[0], 1));
-}
+
 /**
- * @brief lit les coups dans le buffer et recherche si le combo est dedans
+ * @brief décremente le timer du jeu
  * 
- * @param player le perso où le buffer est lu
- * @return un combo à t-il été trouvé ?
+ * @param world le jeu 
  */
 void check_timer(jeu *world)
 {
+    //si le timer n'est pas en pause et que le compteur est comptée
     if (world->timer.start && !world->timer.pause && !world->timer.inf)
     {
 
@@ -180,16 +164,29 @@ void check_timer(jeu *world)
     }
 }
 
+/**
+ * @brief sauvegarde le compteur choisi 
+ * 
+ * @param select la sélection
+
+ */
 void save_counter(char *select)
 {
+    /*ecriture du compteur dans le fichier*/
     FILE *file = fopen("build/counter.bin", "wb");
     fwrite(select, strlen(select), 1, file);
     fclose(file);
 }
 
+/**
+ * @brief lit le compteur choisi dans un fichier et l'applique à la partie
+ * 
+ * @param world le monde
+ */
 void read_counter(jeu *world)
 {
     char *File_name = "build/counter.bin";
+    //si le fichier n'existe pas on le crée avec une valeur par défaut
     if(!file_exists(File_name)){
         save_counter("90");
     }
@@ -201,6 +198,7 @@ void read_counter(jeu *world)
     fread(text_file, 1, sz, file);
     text_file[sz] = '\0';
     world->timer.timer = atoi(text_file);
+    //si le nombre est 999 on le considère comme infini
     if(world->timer.timer == 999){
         world->timer.inf = true;
     }
@@ -212,10 +210,18 @@ void read_counter(jeu *world)
 /**
  * FONCTIONS MOUVEMENTS + COUPS
  */
+
+/**
+ * @brief reset la frame de toutes les animation excepté celle actuel
+ * 
+ * @param perso le personnage
+ * @param state l'etat actuel 
+ * 
+ */
 void reset_state(sprite_perso *perso, enum character_state state)
 {
     for (int i = 0; i <= gravityball; i++)
-    {
+    {   //on ne reset le state où le perso est actuellement
         if (i != state)
         {
             setFrame(perso->anim, i, 0);
@@ -223,12 +229,20 @@ void reset_state(sprite_perso *perso, enum character_state state)
     }
 }
 
+/**
+ * @brief gère l'animation de l'aura
+ * 
+ * @param player le perso où le buffer est lu
+ * 
+ */
 void manage_aura(sprite_perso *perso, jeu * world)
 {
     anim * animation = getAnimation(perso->anim, 19);
     anim * animation2 = getAnimation(perso->anim, 20);
+    //vitesse de l'animation
     if (animation->counter >=5)
     {
+        //si l'aura est activé mais pas le bonus de dégats on veut la finir
         if (animation->aura && !perso->damage_bonus)
         {
             if (animation->frame != animation->nbFrame)
@@ -244,7 +258,7 @@ void manage_aura(sprite_perso *perso, jeu * world)
                 Mix_Pause(perso->audiochan.aura);
             }
         }
-
+        // si le bonus de dégat et activé mais pas l'animation, on la lance
         if (!animation->aura && perso->damage_bonus)
         {
             animation->frame++;
@@ -255,7 +269,7 @@ void manage_aura(sprite_perso *perso, jeu * world)
                 Mix_PlayChannel(perso->audiochan.aura, world->music.aura, 0);
             }
         }
-
+        // si les deux sont activé on la faire rebouclé
         if (perso->damage_bonus && animation->aura)
         {
             if (animation->frame == 4)
@@ -277,6 +291,15 @@ void manage_aura(sprite_perso *perso, jeu * world)
     }
 }
 
+/**
+ * @brief test sur quelle case du quadrillage 
+ * 
+ * @param x la coordonnée en x
+ * @param y la coordonnée en y
+ * @param map_point le quadrillage 
+ * @param test le caractère à tester
+ * @return un combo à t-il été trouvé ?
+ */
 bool equals(int x, int y, char **map_point, char test)
 {
     int height_factor, width_factor;
@@ -285,9 +308,15 @@ bool equals(int x, int y, char **map_point, char test)
     return (map_point[y / height_factor][x / width_factor] == test);
 }
 
+/**
+ * @brief ajout d'un input dans le buffer
+ * 
+ * @param player le perso où se trouve 
+ * @return un combo à t-il été trouvé ?
+ */
 // fonction d'ajout de l'input dans le buffer
 void add_input_buffer(sprite_perso *player, enum combos_inputs touche_appui, int timestamp)
-{
+{   //si le buffer est déjà plein, on décale le buffer pour accepter la nouvelle valeur
     if (player->pos_tab_combo == BUFFER_SIZE)
     {
         for (int i = 0; i < BUFFER_SIZE; i++)
@@ -296,6 +325,7 @@ void add_input_buffer(sprite_perso *player, enum combos_inputs touche_appui, int
         }
         player->pos_tab_combo = BUFFER_SIZE - 1;
     }
+    //et on inscrit l'input à la dernière position
     player->buffer[player->pos_tab_combo].input = touche_appui;
     player->buffer[player->pos_tab_combo++].timestamp = timestamp;
 }
@@ -327,11 +357,20 @@ void free_hits(jeu* world)
     free(world->keystates_pre);
 }
 
+/**
+ * @brief libère les fonts
+ * 
+ * @param world le monde
+ */
 void TTF_free_police(jeu* world){
     free(world->font.police_compteur);
     free(world->font.police_victoire);
 }
-
+/**
+ * @brief libère les musiques
+ * 
+ * @param world le monde
+ */
 void free_music(jeu *world)
 {
     if(world->in_game){
@@ -353,18 +392,22 @@ void free_music(jeu *world)
     Mix_FreeChunk(world->music.menu);
     Mix_FreeChunk(world->music.menu_selector);
 }
-
-
+/**
+ * @brief libération de la mémoire
+ * @param fenetre la SDL_windows
+ * @param renderer le renderer
+ * @param world le monde
+ */
 void quit_game(jeu *world, SDL_Window **fenetre, SDL_Renderer **renderer)
 {
     if(world->in_game){
         free_hits(world);
         TTF_free_police(world);
         free_map_structure(world->map.map_structure);
+        destroy_textures(world);
     }
     
     free_menu(world);
-    destroy_textures(world);
     free_music(world);
     TTF_Quit();
     Mix_CloseAudio();
@@ -373,12 +416,22 @@ void quit_game(jeu *world, SDL_Window **fenetre, SDL_Renderer **renderer)
     SDL_DestroyRenderer(*renderer);
     SDL_Quit();
 }
-
+/**
+ * @brief libère les textures des menus
+ * 
+ * @param world le monde
+ */
 void free_menu(jeu* world){
     SDL_DestroyTexture(world->menu_set.menu);
     SDL_DestroyTexture(world->menu_set.selection_maps_menu);
     SDL_DestroyTexture(world->menu_set.options_menu);
 }
+
+/**
+ * @brief libère le quadrillage de la map
+ * 
+ * @param world le monde
+ */
 
 void free_map_structure(char **map_structure)
 {
@@ -388,19 +441,31 @@ void free_map_structure(char **map_structure)
     }
     free(map_structure);
 }
-
+/**
+ * @brief libère toutes les animations
+ * 
+ * @param world le monde
+ */
 void destroy_anim(sprite_perso *perso)
 {
     freeList(perso->anim);
 }
-
+/**
+ * @brief libère les miniatures de la séléction de la map
+ * 
+ * @param world le monde
+ */
 void destroy_map(jeu *world)
 {
     for(int i = 0 ; i<NB_MAPS ; i++){
         SDL_DestroyTexture(world->menu_set.tab_map[i]);
     }
 }
-
+/**
+ * @brief libère les textures de la partie
+ * 
+ * @param world le monde
+ */
 void destroy_textures(jeu *world)
 {
     destroy_anim(&world->p1);
@@ -414,38 +479,56 @@ void destroy_textures(jeu *world)
     }
     destroy_map(world);
 }
-
+/**
+ * @brief met en pause le chronomètre 
+ * 
+ * @param world le monde
+ */
 void unpause(compteur *chrono)
 {
     if (chrono->start)
     {
+        //on souhaite recupérer la même différence à la reprise pour calculer le temps écoulé
         chrono->startTime = SDL_GetTicks() - chrono->pauseTime;
         chrono->pause = false;
     }
 }
-
+/**
+ * @brief remet en route le chronomètre
+ * 
+ * @param world le monde
+ */
 void pauseChrono(compteur *chrono)
 {
     if (chrono->start)
     {
         chrono->pause = true;
+        // on remet le même temps qui c'est écoulé avant la pause
         chrono->pauseTime = SDL_GetTicks() - chrono->startTime;
     }
 }
-
+/**
+ * @brief régenère la garde du perso 
+ * 
+ * @param perso le personnage
+ */
 void regenerate_shield(sprite_perso *perso)
-{
-    if (!perso->chrono_guard.pause && !perso->broken_guard && (SDL_GetTicks() - perso->chrono_guard.startTime) / 1000 >= 1 && perso->life_guard < 100 && !perso->guard)
+
+{  
+    //si le chrono n'est pas en pause,qu'il c'est écoulé une seconde, qu'elle n'est pas à fond et qu'il n'est pas en garde
+    if (!perso->chrono_guard.pause && !perso->broken_guard && (SDL_GetTicks() - perso->chrono_guard.startTime) / 1000 >= 1 && perso->life_guard < MAX_GUARD && !perso->guard)
     {
+        //on augmente la garde
         perso->life_guard += 10;
-        if (perso->special_bar > 300)
-        {
-            perso->special_bar = 300;
-        }
+        //on réinitialise le chronomètre
         perso->chrono_guard.startTime = SDL_GetTicks();
     }
 }
-
+/**
+ * @brief régenère la jauge de spécial 
+ * 
+ * @param perso le personnage
+ */
 void increase_special(sprite_perso *perso)
 {
     if (!perso->chrono_special.pause && (SDL_GetTicks() - perso->chrono_special.startTime) / 1000 >= 0.5 && perso->special_bar < 300)
@@ -458,7 +541,11 @@ void increase_special(sprite_perso *perso)
         perso->chrono_special.startTime = SDL_GetTicks();
     }
 }
-
+/**
+ * @brief détermine le nombre de chiffre d'un nombre
+ * 
+ * @param n la valeur 
+ */
 int numDigits(int n)
 {
     int r = 1;
@@ -471,22 +558,36 @@ int numDigits(int n)
     }
     return r;
 }
-
+/**
+ * @brief on écrit le nouveaux score
+ * 
+ * @param nb1 le nombre de victoire du joueur 1
+ * @param nb2 le nombre de victoire du joueur 2
+ */
 void write_victory(int nb1, int nb2)
 {
     char new_score[8 + numDigits(nb1) + numDigits(nb2)];
     FILE *file = fopen("build/victory.bin", "wb");
-    sprintf(new_score, "p1:%d\np2:%dn", nb1, nb2);
+    sprintf(new_score, "p1:%d\np2:%d\n", nb1, nb2);
     fwrite(new_score, 7 + numDigits(nb1) + numDigits(nb2), 1, file);
     fclose(file);
 }
-
+/**
+ * @brief vérifie si un fichier existe
+ * 
+ * @param bool le fichier existe il ?
+ */
 bool file_exists (char *filename) 
 {
   struct stat   buffer;   
   return (stat (filename, &buffer) == 0);
 }
 
+/**
+ * @brief sauvegarde les victoires 
+ * 
+ * @param player le personnage
+ */
 void save_victory(int player)
 {
     char *File_name = "build/victory.bin";
@@ -508,24 +609,27 @@ void save_victory(int player)
     int i;
     for (i = 0; i < sz; i++)
     {
-
+        //si un caractère de fin de ligne est prèsent on à changé de 
         if (text_file[i] == '\n')
         {
             line++;
         }
+        //si c'est un :
         if (text_file[i] == ':')
         {
             size = 0;
-
+            //on détermine la taille du conteneur du score
             while (text_file[i + size + 1] != '\n')
             {
                 size++;
             }
+            // on passe au caractère d'après
             i += 1;
             int index = 0;
             char nombre[size + 1];
             int pos = 0;
             nombre[size] = '\0';
+            // on recopie tous dans le conteneur du score
             while (text_file[i + index] != '\n' && index < size)
             {
 
@@ -533,7 +637,7 @@ void save_victory(int player)
 
                 index++;
             }
-
+            //selon la ligne, on met dans le bon variable
             if (line == 1)
             {
                 nb1 = atoi(nombre);
@@ -554,9 +658,14 @@ void save_victory(int player)
         nb2 += 1;
     }
     fclose(file);
+    //on ecrit le nouveau
     write_victory(nb1, nb2);
 }
-
+/**
+ * @brief vérifie les limites des stats
+ * 
+ * @param perso le personnage
+ */
 void check_stats(sprite_perso *perso)
 {
     if (perso->life > MAX_LIFE)
@@ -577,7 +686,11 @@ void check_stats(sprite_perso *perso)
         perso->stun_time = BROKEN_GUARD_STUN;
     }
 }
-
+/**
+ * @brief gère la fin de partie 
+ * 
+ * @param world le monde
+ */
 void compute_game(jeu *world)
 {
     if (!world->game_over)
@@ -586,7 +699,7 @@ void compute_game(jeu *world)
         {
             world->timer.startTime = SDL_GetTicks();
             world->timer.timer = ENDGAME_TIMER;
-
+            //P1 à gagné
             if (world->p1.life > world->p2.life)
             {
                 save_victory(1);
@@ -597,6 +710,7 @@ void compute_game(jeu *world)
                 world->p2.chara_state = looser;
                 world->p2.y += 40;
             }
+            //P2 à gagné
             if (world->p1.life < world->p2.life)
             {
                 save_victory(2);
@@ -610,7 +724,7 @@ void compute_game(jeu *world)
         }
         else
         {
-
+            //le timer est à 0 et P1 à gagné
             if (world->p1.life <= 0)
             {
                 world->timer.startTime = SDL_GetTicks();
@@ -623,7 +737,7 @@ void compute_game(jeu *world)
                 world->p2.chara_state = winner;
                 world->p1.y += 40;
             }
-
+            //le timer est à 0 et P2 à gagné
             if (world->p2.life <= 0)
             {
                 world->timer.startTime = SDL_GetTicks();

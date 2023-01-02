@@ -1,35 +1,24 @@
 
 #include "graphics.h"
 
-
-
-void apply_sprite(SDL_Renderer *renderer, SDL_Texture *texture, sprite_perso* sprite){
-    SDL_Rect dst = {0, 0, 0, 0};
-    
-    SDL_QueryTexture(texture, NULL, NULL, &dst.w, &dst.h);
-    dst.x = sprite->x; dst.y = sprite->y;
-    if(!sprite->mirror){
-        SDL_RenderCopy(renderer, texture, NULL, &dst);
-        }
-    else{
-        SDL_RendererFlip flip = SDL_FLIP_VERTICAL;
-        SDL_Point center = {sprite->w/2,sprite->h/2};
-        SDL_RenderCopyEx(renderer, texture, NULL, &dst,180, &center, flip);
-    }
-    
-}
-
+/**
+ * @brief Applique une Texture lorsque l'aura est activé
+ *  
+ * @param renderer Le moteur de rendu
+ * @param sprite Image du personnage
+ * @param numaura Numéro de l'aura affiché
+ */
 void render_aura(SDL_Renderer *renderer, sprite_perso* sprite, int numaura){
+    //Configure l'animation de l'aura
     anim * aura = getAnimation(sprite->anim, numaura);
     SDL_Rect dst = {0, 0, 0, 0};
     SDL_Rect src = {0, 0, 0, 0};
-
     dst.x = sprite->x-sprite->w;
     dst.y = sprite->y;
     dst.w = aura->width;
     dst.h = 250;
 
-    
+    //Gère l'affichage de l'aura
     int width;
     SDL_QueryTexture(aura->anim_text, NULL, NULL, &width, &src.h);
     src.h -=10;
@@ -39,7 +28,15 @@ void render_aura(SDL_Renderer *renderer, sprite_perso* sprite, int numaura){
     SDL_RenderCopy(renderer, aura->anim_text, &src, &dst);
 }
 
+/**
+ * @brief Joue l'animation du personnage
+ *  
+ * @param renderer Le moteur de rendu
+ * @param sprite Image du personnage
+ * @param chara_state Etat du personnage 
+ */
 void play_animations(SDL_Renderer *renderer, sprite_perso* sprite, int chara_state){
+    //Configure l'animation du personnage
     anim * animation = getAnimation(sprite->anim, chara_state) ;
     SDL_Rect dst = {0, 0, 0, 0};
     SDL_Rect src = {0, 0, 0, 0};
@@ -48,11 +45,14 @@ void play_animations(SDL_Renderer *renderer, sprite_perso* sprite, int chara_sta
     dst.w = animation->width;
     dst.h = 250;
 
+    //Affiche le personnage
     SDL_QueryTexture(animation->anim_text, NULL, NULL, NULL, &src.h);
     src.h -= 10;
     src.x = 40 + animation->frame * 500;
     src.y = 0;
     src.w = animation->width;
+
+    //si le personnage est à droite de l'autre alors on inverse le sens du sprite
     if(!sprite->mirror){
         SDL_RenderCopy(renderer, animation->anim_text, &src, &dst);
     }
@@ -64,26 +64,36 @@ void play_animations(SDL_Renderer *renderer, sprite_perso* sprite, int chara_sta
     }
 }
 
-
-
+/**
+ * @brief Mets à jour les images du jeu
+ *  
+ * @param renderer Le moteur de rendu
+ * @param world Les données du monde
+ */
 void refresh_graphics(SDL_Renderer *renderer, jeu *world){
+    //efface l'ancienne image
     SDL_RenderClear(renderer);
     SDL_SetRenderDrawBlendMode(renderer,SDL_BLENDMODE_NONE);
     SDL_Rect rect;
+    //selon l'état du jeu
     switch(world->state){
+        //En partie
         case combat:
+            //Si c'est en pause pendant combat
             case pause:
             display_map(renderer,world);
             if(world->state == combat){
                 apply_textures(world->menu_set.cadreVie, renderer, 0 , 0); //Cadres contenant les vies et spécials
                 display_dynamic_texture(renderer, world->map.map_structure, world->map.plateformes);
-                render_bonuses(renderer, &world->lootbox);
+                render_bonuses(renderer, &world->lootbox);  //les bonus
+                //si le personnage à un bonus de puissance on mets l'aura
                 if(getAnimation(world->p1.anim, 19)->aura || world->p1.damage_bonus){
                     render_aura(renderer, &(world->p1),19);
                 }
                 if(getAnimation(world->p2.anim, 19)->aura || world->p2.damage_bonus){
                     render_aura(renderer, &(world->p2),19);
                 }
+                //animations des états des personnages
                 play_animations(renderer, &(world->p1), world->p1.chara_state);
                 play_animations(renderer, &(world->p2), world->p2.chara_state);
                 if(getAnimation(world->p1.anim, 19)->aura || world->p1.damage_bonus){
@@ -92,13 +102,16 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
                 if(getAnimation(world->p2.anim, 19)->aura  || world->p2.damage_bonus){
                     render_aura(renderer, &(world->p2),20);
                 }
+                //HUD
                 display_life(renderer, world);
+                display_timer(world,renderer);
+                //Les sorts 
                 display_fireball(renderer,world->p1.fireball);
                 display_fireball(renderer,world->p2.fireball);
                 display_gravityball(renderer,world->p1);
                 display_gravityball(renderer,world->p2);
-                display_timer(world,renderer);
                 display_special(renderer,world);
+                //la garde 
                 if(world->p1.guard){
                     display_guard(renderer,world->p1);
                 }
@@ -106,13 +119,14 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
                     display_guard(renderer,world->p2);
                 }
             }
+            //si le monde est en pause
             if(world->state == pause){
                 //blend mode pour gérer la transparence
                 SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
                 //Couleur noire avec une opacité de 50%
                 SDL_SetRenderDrawColor(renderer, 0, 0, 0, 150);
                 SDL_RenderFillRect(renderer,NULL);
-                 SDL_Color color = {180,180,180,0};
+                SDL_Color color = {180,180,180,0};
                 SDL_Surface* surface_compteur = TTF_RenderText_Solid(world->font.police_compteur, "RESUME", color);
                 SDL_Texture* texture_compteur = SDL_CreateTextureFromSurface(renderer,surface_compteur);
                 apply_textures(texture_compteur,renderer,580, 300);
@@ -129,12 +143,14 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
             }
             break;
 
+        //si la partie est finie   
         case endgame:
             display_map(renderer,world);
             play_animations(renderer, &(world->p1), world->p1.chara_state);
             play_animations(renderer, &(world->p2), world->p2.chara_state);
             SDL_Color color = {150,151,162,0};
             char* WhoWin;
+            //Affichage du message de victoire pour le gagnant
             if(world->p1.chara_state == winner){
                 WhoWin = "LE JOUEUR 1 GAGNE";
             }
@@ -146,10 +162,10 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
             apply_textures(texture_victoire,renderer,235, 200);
             free(surface_victoire);
             break;
-
+        //Quand on est dans le menu
         case main_menu:
+            //le rectangle de selection du menu
             apply_textures(world->menu_set.menu_fond, renderer, 0, 0);
-            
             rect.x = 140;
             rect.y = 250 + 150 * world->menu_set.index_menu ;
             rect.h = 150 ;
@@ -158,11 +174,13 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
             SDL_RenderDrawRect(renderer, &rect);
             break;
 
+        //selection de la carte pour jouer (les miniatures)
         case selection_map:
             apply_textures(world->menu_set.menu_fond, renderer, 0, 0);
             apply_textures(world->menu_set.tab_map[world->menu_set.index_menu],renderer,240, 135);
             break;
 
+        //selection du du temps de la partie
         case options:
             apply_textures(world->menu_set.menu_fond,renderer,0,0);
         
@@ -173,10 +191,15 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
             SDL_SetRenderDrawColor(renderer, 255, 255 , 0, 1);
             SDL_RenderDrawRect(renderer, &rect);
         }
-        //apply_texture(world->p1.texture_perso, renderer, world->p1.x , world->p1.y);
         SDL_RenderPresent(renderer);
 }
 
+/**
+ * @brief Affiche le timer 
+ *  
+ * @param renderer Le moteur de rendu
+ * @param world Les données du monde
+ */
 void display_timer(jeu* world,SDL_Renderer* renderer){
             char* timer = malloc(sizeof(char)*4);
             if(world->timer.inf){
@@ -204,12 +227,24 @@ void display_timer(jeu* world,SDL_Renderer* renderer){
             free(timer);
 }
 
+/**
+ * @brief Affiche la boule de feu
+ *  
+ * @param renderer Le moteur de rendu
+ * @param throwable Structure des attaques à distance
+ */
 void display_fireball(SDL_Renderer* renderer,throwable projectile){
    if(projectile.launched_fireball){
         apply_textures(projectile.fireball,renderer,projectile.x,projectile.y);
     }
 }
 
+/**
+ * @brief Affiche le trou noir
+ *  
+ * @param renderer Le moteur de rendu
+ * @param world Les données du monde
+ */
 void display_gravityball(SDL_Renderer* renderer,sprite_perso perso){
     anim * animation = getAnimation(perso.anim, 21);
     if(perso.gravityball.launched_fireball){
@@ -229,9 +264,15 @@ void display_gravityball(SDL_Renderer* renderer,sprite_perso perso){
     }
 }
 
+/**
+ * @brief retourne le niveau de la barre de spécial
+ *  
+ * @param perso Structure de tout ce qui est relatif aux personnages
+ */
 char* barlvl(sprite_perso perso){
-     char* lvl;
-     if(perso.special_bar>=0){
+    char* lvl;
+    //si il y a la bar chargé 0 fois
+    if(perso.special_bar>=0){
         lvl = "0";
     }
     if(perso.special_bar>=100){
@@ -246,10 +287,17 @@ char* barlvl(sprite_perso perso){
     return lvl;
 }
 
+/**
+ * @brief affichage de la barre de spécial
+ *  
+ * @param renderer Le moteur de rendu
+ * @param world Les données du monde
+ */
 void display_special(SDL_Renderer* renderer, jeu* world){
     char* lvlP1 = barlvl(world->p1);
     char* lvlP2 = barlvl(world->p2);
     
+    //la barre de spécial
     SDL_Rect rect;
     SDL_Rect rect_fond;
     rect.x = 500 ;
@@ -261,6 +309,7 @@ void display_special(SDL_Renderer* renderer, jeu* world){
     rect_fond.y = 30;
     rect_fond.w = -500;
 
+    //le niveau de la barre de spécial
     if(world->p1.special_bar < 300){
         rect.w = (world->p1.special_bar % 100) * -5;
     }
@@ -274,15 +323,13 @@ void display_special(SDL_Renderer* renderer, jeu* world){
     SDL_Surface* lvl2 = TTF_RenderText_Solid(world->font.police_compteur,lvlP2 , color);
     SDL_Texture* texture_lvl2 = SDL_CreateTextureFromSurface(renderer,lvl2);
     apply_textures(texture_lvl2,renderer,735, 25);
-    
-    //free(surface_compteur);
+
+    //barre de spécial du 2nd joueur
     SDL_Rect rect2;
     SDL_Rect rect_fond2;
     rect2.x = SCREEN_WIDTH - 500 ;
     rect2.y = 30;
     rect2.h = 20;
-    
-    
     rect_fond2.x = SCREEN_WIDTH - 500;
     rect_fond2.h = 20;
     rect_fond2.y = 30;
@@ -302,8 +349,16 @@ void display_special(SDL_Renderer* renderer, jeu* world){
     SDL_SetRenderDrawColor(renderer, 26, 4, 229, 0);
     SDL_RenderFillRect(renderer, &rect);
     SDL_RenderFillRect(renderer, &rect2);
+    SDL_FreeSurface(lvl1);
+    SDL_FreeSurface(lvl2);
 }
 
+/**
+ * @brief Affiche la bulle verte de la garde
+ *  
+ * @param renderer Le moteur de rendu
+ * @param perso Les données des personnages
+ */
 void display_guard(SDL_Renderer* renderer,sprite_perso perso){
    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
     if(perso.life_guard >0){
@@ -318,6 +373,12 @@ void display_guard(SDL_Renderer* renderer,sprite_perso perso){
     disque(perso.x+perso.w - 20 ,perso.y+perso.h/2,perso.life_guard*0.75,renderer);
 }
 
+/**
+ * @brief Affiche la vie 
+ *  
+ * @param renderer Le moteur de rendu
+ * @param world Les données du monde
+ */
 void display_life(SDL_Renderer* renderer, jeu* world){
     /*VIE JOUEUR 1*/
     SDL_Rect rect;
@@ -369,6 +430,14 @@ void display_life(SDL_Renderer* renderer, jeu* world){
     SDL_RenderFillRect(renderer, &rect2);
 }
 
+/**
+ * @brief Applique une texture
+ *  
+ * @param renderer Le moteur de rendu
+ * @param world Les données du monde
+ * @param x abcisse
+ * @param y ordonné
+ */
 void apply_textures(SDL_Texture * texture, SDL_Renderer *renderer, int x , int y){
     SDL_Rect dst = {0, 0, 0, 0};
 
@@ -379,11 +448,17 @@ void apply_textures(SDL_Texture * texture, SDL_Renderer *renderer, int x , int y
     SDL_RenderCopy(renderer, texture, NULL, &dst);
 }
 
+/**
+ * @brief Affiche la map
+ *  
+ * @param renderer Le moteur de rendu
+ * @param world Les données du monde
+ */
 void display_map(SDL_Renderer* renderer,jeu* world){
     switch(world->choosed_map){
+        //différentes maps
         case city_night:
             apply_textures(world->map.image_fond,renderer,0,0);
-            //read_structure(world->map.map_russia.map_structure);
         break;
 
         case forest:
@@ -396,6 +471,13 @@ void display_map(SDL_Renderer* renderer,jeu* world){
     }
 }
 
+/**
+ * @brief Affiche les plateformes selon la position sur le quadrillage
+ *  
+ * @param renderer Le moteur de rendu
+ * @param map_struct Structure de la carte
+ * @param texture texture de la plateforme
+ */
 void display_dynamic_texture(SDL_Renderer* renderer, char** map_struct, SDL_Texture* texture){
     if(texture == NULL){
         printf("Probleme de la texture des plateformes");
@@ -408,6 +490,7 @@ void display_dynamic_texture(SDL_Renderer* renderer, char** map_struct, SDL_Text
     width_factor = CELL_WIDTH;
     height_factor = CELL_HEIGHT;
 
+    //parcours de la structure de la map
     for(int i = 0; i<40 ; i++){
         for(int j = 0 ; j<20 ; j++){
             
@@ -415,40 +498,57 @@ void display_dynamic_texture(SDL_Renderer* renderer, char** map_struct, SDL_Text
                 apply_textures(texture, renderer, j * width_factor, i * height_factor);
             }
         }
-       
     }
 }
 
+/**
+ * @brief Affiche la texture pour chaque bonus
+ *  
+ * @param renderer Le moteur de rendu
+ * @param lootbox La lootbox à afficher
+ */
 void render_bonuses(SDL_Renderer * renderer, lootbox * lootbox){
     if(lootbox->active){
         apply_textures(lootbox->texture[lootbox->bonus],renderer,lootbox->x,lootbox->y);
     }
 }
 
+/**
+ * @brief Affiche un disque
+ *  
+ * @param cx L'abcisse
+ * @param cy L'ordonnée
+ * @param rayon le rayon du disque
+ * @param renderer Le moteur de rendu
+ */
 void disque(int cx,int cy,int rayon,SDL_Renderer* renderer){
    int d, y, x;
- 
-  d = 3 - (2 * rayon);
-  x = 0;
-  y = rayon;
- 
-  while (y >= x) {
+   d = 3 - (2 * rayon);
+   x = 0;
+   y = rayon;
+   while (y >= x) {
     ligneHorizontale(cx - x, cy - y, 2 * x + 1,renderer);
     ligneHorizontale(cx - x, cy + y, 2 * x + 1,renderer);
     ligneHorizontale(cx - y, cy - x, 2 * y + 1,renderer);
     ligneHorizontale(cx - y, cy + x, 2 * y + 1,renderer);
- 
     if (d < 0)
       d = d + (4 * x) + 6;
     else {
-      d = d + 4 * (x - y) + 10;
-      y--;
-    }
- 
+        d = d + 4 * (x - y) + 10;
+        y--;
+        }
     x++;
   }
     }
 
+/**
+ * @brief Affiche une ligne horizontale
+ *  
+ * @param x abcisse 
+ * @param y ordonnée
+ * @param w taille
+ * @param renderer Le moteur de rendu
+ */
 void ligneHorizontale(int x, int y, int w, SDL_Renderer* renderer)
 {
   SDL_Rect r;

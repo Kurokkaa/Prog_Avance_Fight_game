@@ -1,11 +1,22 @@
 #include "hits.h"
 
+/**
+ * @brief gere les animations des coups, et leur lancement
+ *  
+ * @param character_state etat du personnage
+ * @param counter vitesse de l'animation
+ * @param attacker qui attaque
+ * @param receiver qui se fait attaquer
+ * @param world Le monde
+ */
 void hits_anim(int character_state, int counter, sprite_perso * attacker, sprite_perso * receiver, jeu * world){
+    //si il bloque ou non
     if (getAnimation(attacker->anim, character_state)->counter == counter)
     {
         setFrame(attacker->anim, character_state, getAnimation(attacker->anim, character_state)->frame + 1);
         if (getAnimation(attacker->anim, character_state)->frame == attacker->hits.light_punch->effective_frame)
         {
+            //selon le type de coups
             switch (character_state)
             {
             case lpunch:
@@ -35,6 +46,13 @@ void hits_anim(int character_state, int counter, sprite_perso * attacker, sprite
     }
 }
 
+/**
+ * @brief gère les hitboxs des coups de poings leger, le son 
+ *  
+ * @param attacker celui qui donne le coup
+ * @param receiver celui qui reçoit les coups
+ * @param world Le monde
+ */
 void light_punch(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
 {
 
@@ -108,6 +126,13 @@ void light_punch(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
     }
 }
 
+/**
+ * @brief gère les coups de poings lourds (hitbox/son...)
+ *  
+ * @param attacker celui qui donne le coup
+ * @param receiver celui qui reçoit les coups
+ * @param world Le monde
+ */
 void heavy_punch(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
 {
     if (!attacker->mirror)
@@ -179,9 +204,15 @@ void heavy_punch(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
     }
 }
 
+/**
+ * @brief gère les coups de pieds (son etc..)
+ *  
+ * @param attacker celui qui donne le coup
+ * @param receiver celui qui reçoit les coups
+ * @param world Le monde
+ */
 void kick_hit(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
 {
-
     if (!attacker->mirror)
     {
         if ((attacker->x + attacker->w + attacker->hits.kick->range_x >= receiver->x) && (attacker->y + attacker->h / 2 >= receiver->y && attacker->y + attacker->h / 2 <= receiver->y + receiver->h))
@@ -248,6 +279,13 @@ void kick_hit(sprite_perso *attacker, sprite_perso *receiver, jeu *world)
     }
 }
 
+/**
+ * @brief gère les boules de feux 
+ *  
+ * @param attacker celui qui donne le coup
+ * @param receiver celui qui reçoit les coups
+ * @param world Le monde
+ */
 void check_fireball(sprite_perso *attacker, sprite_perso *receiver, jeu * world)
 {
     if (attacker->fireball.x >= receiver->x && attacker->fireball.x <= receiver->x + receiver->w && attacker->fireball.launched_fireball && attacker->fireball.y >= receiver->y && attacker->fireball.y <= receiver->y + receiver->h)
@@ -277,6 +315,13 @@ void check_fireball(sprite_perso *attacker, sprite_perso *receiver, jeu * world)
     }
 }
 
+/**
+ * @brief gère les trous noirs
+ *  
+ * @param attacker celui qui donne le coup
+ * @param receiver celui qui reçoit les coups
+ * @param world Le monde
+ */
 void check_gravityball(sprite_perso *attacker, sprite_perso *receiver, jeu * world)
 {
     if ((attacker->gravityball.launched_fireball && !attacker->gravityball.ending))
@@ -348,6 +393,11 @@ void check_gravityball(sprite_perso *attacker, sprite_perso *receiver, jeu * wor
     
 }
 
+/**
+ * @brief gère le déplacement de la boule de feu
+ *  
+ * @param perso données relative aux personnages
+ */
 void move_fireball(sprite_perso *perso)
 {
     if (perso->fireball.launched_fireball)
@@ -361,6 +411,11 @@ void move_fireball(sprite_perso *perso)
     }
 }
 
+/**
+ * @brief gère le déplacement du trou noir
+ *  
+ * @param perso gère les données relatives aux personnages
+ */
 void move_gravityball(sprite_perso *perso)
 {
     if (perso->gravityball.launched_fireball)

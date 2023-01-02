@@ -1,19 +1,41 @@
 #include "liste.h"
 
+/**
+ * @brief Test si la liste est vide
+ * 
+ * @param liste liste à tester
+ * @return true si list est vide
+ * @return false si liste n'est pas vide
+ */
 bool isEmpty(list_anim * liste){
     return (liste == NULL)? 1 : 0;
 }
 
+/**
+ * @brief Libère la liste
+ * 
+ * @param liste liste à libérer
+ */
 void freeList( list_anim * liste){
-    if(isEmpty(liste->next)){
-        SDL_DestroyTexture(liste->animation.anim_text);
-        free(liste);
+    if(isEmpty(liste->next)){ //SI la liste n'est pas vide
+        SDL_DestroyTexture(liste->animation.anim_text); //on détruit la texture
+        free(liste); //on free la liste
     }
     else{
         freeList(liste->next);
     }
 }
 
+/**
+ * @brief Crée une liste d'animations
+ * 
+ * @param renderer moteur de rendu 
+ * @param perso perso qui a les animations
+ * @param path chemin des textures
+ * @param nbFrame nombres de frames de l'animation
+ * @param width largeur de l'animation
+ * @return list_anim une liste d'animation créé
+ */
 list_anim * createAnimList(SDL_Renderer *renderer, sprite_perso *perso, char *path, int nbFrame, int width){
     //Alloc mémoire
     list_anim * list = (list_anim*)malloc(sizeof(list_anim));
@@ -36,7 +58,6 @@ list_anim * createAnimList(SDL_Renderer *renderer, sprite_perso *perso, char *pa
     list->next = NULL;
     return list;
 }
-
 
 int insertAnimLast(list_anim * list, SDL_Renderer *renderer, sprite_perso *perso, char *path, int nbFrame, int width){
     //Alloc mémoire
