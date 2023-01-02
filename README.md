@@ -1,6 +1,6 @@
 # Prog_Avance_Fight_game
 A stickfighter game
-
+Binome : STACCIONI John, CHAPUSOT Alexis, ANDRE Jeffrey
 Jeu de combat,
 Touches : ZQSD pours les déplacements du J1, 
 G: coup de poings leger
