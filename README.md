@@ -5,7 +5,7 @@ Binome : STACCIONI John, CHAPUSOT Alexis, ANDRE Jeffrey
 
 Jeu de combat,
 
-Touches : ZQSD pours les déplacements du J1, 
+Touches : ZQSD pours les déplacements du J1, \n
 G: coup de poings leger
 Y : coup de poings lourd
 H : garde
