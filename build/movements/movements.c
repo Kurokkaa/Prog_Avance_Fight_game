@@ -404,6 +404,7 @@ bool canMove(sprite_perso *perso, sprite_perso *adversaire)
             }
         }
     }
+    free(yAxis);
     return canMove;
 }
 

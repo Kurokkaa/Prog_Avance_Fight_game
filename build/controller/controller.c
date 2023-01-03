@@ -202,7 +202,7 @@ void handle_menu_inputs(SDL_Event *event, jeu *world, SDL_Renderer *renderer)
                         init_perso(renderer, &world->p1, 65, 465, 55, 230, CHARA_SPEED, false, 0);
                         init_perso(renderer, &world->p2, 950, 465, 55, 230, CHARA_SPEED, true, 1);
                     }
-                    init_controller(world);
+                    
                     init_timer(world); //On initialise tous les chronomètre
                     world->game_over = false; // variable de fin de combat
                     world->state = combat;

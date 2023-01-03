@@ -28,7 +28,9 @@ char **read_file_map(char *nom)
     {
         printf("Erreur de chargement de structure");
     }
+    fclose(file);
     return map_struct;
+
 }
 
 /**
@@ -204,7 +206,8 @@ void read_counter(jeu *world)
     }
     else{
         world->timer.inf = false;
-    }  
+    }
+    fclose(file);  
 }
 
 /**
@@ -598,7 +601,8 @@ void save_victory(int player)
     FILE *file = fopen(File_name, "rb"); // ouverture en mode lecture
     stat(File_name, &stat_file);
     int sz = stat_file.st_size;
-    char text_file[sz + 1];
+    char* text_file=malloc(sizeof(char)*sz+1);
+    
     fread(text_file, 1, sz, file);
     text_file[sz] = '\0';
 
@@ -626,7 +630,7 @@ void save_victory(int player)
             // on passe au caractère d'après
             i += 1;
             int index = 0;
-            char nombre[size + 1];
+            char* nombre[size+1];
             int pos = 0;
             nombre[size] = '\0';
             // on recopie tous dans le conteneur du score
@@ -660,6 +664,8 @@ void save_victory(int player)
     fclose(file);
     //on ecrit le nouveau
     write_victory(nb1, nb2);
+    free(text_file);
+    
 }
 /**
  * @brief vérifie les limites des stats

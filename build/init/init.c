@@ -1,24 +1,6 @@
 #include "init.h"
 #include "../liste/liste.h"
 
-/**
- * @brief Initialisation de la manette
- * 
- * @param world les données du monde du jeu
- */
-void init_controller(jeu *world)
-{
-    int nbJoystick = SDL_NumJoysticks();
-    printf("il y a %d controller\n", nbJoystick);
-    if (nbJoystick > 0)
-    {
-        world->joysticks = malloc(sizeof(SDL_GameController *) * nbJoystick);
-        for (int i = 0; i < nbJoystick; i++)
-        {
-            world->joysticks[i] = SDL_GameControllerOpen(i);
-        }
-    }
-}
 
 /**
  * @brief Initialisation du timer

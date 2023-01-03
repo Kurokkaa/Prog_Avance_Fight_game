@@ -140,6 +140,10 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
                 rect.w = 950; 
                 SDL_SetRenderDrawColor(renderer, 255, 255 , 0, 255);
                 SDL_RenderDrawRect(renderer, &rect);
+                SDL_FreeSurface(surface_compteur);
+                SDL_FreeSurface(quit_surface);
+                SDL_DestroyTexture(texture_compteur);
+                SDL_DestroyTexture(quit_texture);
             }
             break;
 
@@ -161,6 +165,7 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
             SDL_Texture* texture_victoire = SDL_CreateTextureFromSurface(renderer,surface_victoire);
             apply_textures(texture_victoire,renderer,235, 200);
             free(surface_victoire);
+            SDL_DestroyTexture(texture_victoire);
             break;
         //Quand on est dans le menu
         case main_menu:
@@ -351,6 +356,8 @@ void display_special(SDL_Renderer* renderer, jeu* world){
     SDL_RenderFillRect(renderer, &rect2);
     SDL_FreeSurface(lvl1);
     SDL_FreeSurface(lvl2);
+    SDL_DestroyTexture(texture_lvl1);
+    SDL_DestroyTexture(texture_lvl2);
 }
 
 /**
