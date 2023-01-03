@@ -171,6 +171,10 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
             {
                 perso->x -= perso->speed;
             }
+            else
+            {
+                perso->chara_state = idle;
+            }
         }
 
         else //si perso mirror
@@ -178,6 +182,10 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
             if (!equals(perso->x + perso->speed, perso->y + perso->h, world->map.map_structure, '0')) //on teste sa limite droite, s'il peut bouger, on le bouge
             {
                 perso->x += perso->speed;
+            }
+            else
+            {
+                perso->chara_state = idle;
             }
         }
 
@@ -447,6 +455,7 @@ void sprites_collision(sprite_perso *p1, sprite_perso *p2, jeu *world)
                     {
                         p1->chara_state = knockback;
                     }
+
                     else
                     {
                         p1->chara_state = idle;
