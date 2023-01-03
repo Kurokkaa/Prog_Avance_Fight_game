@@ -228,9 +228,7 @@ void movements(jeu *world, sprite_perso *perso, sprite_perso *adversaire)
                 perso->chara_state = landing; //sinon il atterit
                 perso->permibility = false;
             }
-            if((equals(x, y + perso->h, world->map.map_structure, ' ') && equals(x + perso->w, y + perso->h + HEIGHT_PER_FRAME, world->map.map_structure, ' '))){
-                perso->permibility = false;
-            }
+            
         }
     }
 
