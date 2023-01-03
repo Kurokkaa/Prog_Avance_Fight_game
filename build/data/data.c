@@ -414,7 +414,6 @@ void quit_game(jeu *world, SDL_Window **fenetre, SDL_Renderer **renderer)
     free_music(world);
     TTF_Quit();
     Mix_CloseAudio();
-    IMG_Quit();
     SDL_DestroyWindow(*fenetre);
     SDL_DestroyRenderer(*renderer);
     SDL_Quit();
