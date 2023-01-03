@@ -10,15 +10,15 @@ G: coup de poings leger
 Y : coup de poings lourd  
 H : garde  
 J: coup de pied 
-Les flèches pour le J2 et 4895 :
-4: coup de poings leger
-8 : coup de poings lourd
-5 : garde
-9: coup de pied
+Les flèches pour le J2 et 4895 :  
+4: coup de poings leger  
+8 : coup de poings lourd  
+5 : garde  
+9: coup de pied  
 
-COMBOS 1: droite, gauche, coup de poingss 
-COMBOS 2: droite, gauche, coup de poings lourds
-COMBOS 3: droite, gauche, coup de pieds
+COMBOS 1: droite, gauche, coup de poings  
+COMBOS 2: droite, gauche, coup de poings lourds  
+COMBOS 3: droite, gauche, coup de pieds  
 
 Earth rumble: 
 https://www.youtube.com/watch?v=NfcAGablk-I&ab_channel=A.Graf
