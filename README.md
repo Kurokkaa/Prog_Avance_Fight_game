@@ -10,7 +10,7 @@ G : coup de poings leger
 Y : coup de poings lourd  
 H : garde  
 J : coup de pied  
-Les flèches pour le J2 et 4895 :  
+Les flèches pour le J2:
 4 : coup de poings leger  
 8 : coup de poings lourd  
 5 : garde  
