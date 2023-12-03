@@ -51,6 +51,7 @@ struct hit_set_s
     hit *kick;
     hit *special_attack;
     hit *special_attack2;
+    hit *special_defense;
 };
 typedef struct hit_set_s hit_set;
 
@@ -138,6 +139,7 @@ struct sprite_p{
     throwable fireball;
     throwable gravityball;
     audiochannel audiochan;
+    throwable grows_back;
 };
 typedef struct sprite_p sprite_perso;
 
