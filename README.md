@@ -5,12 +5,14 @@ Trinôme : STACCIONI John, CHAPUSOT Alexis, ANDRE Jeffrey
 
 Jeu de combat,
 
-Touches : ZQSD pours les déplacements du J1:  
+Touches : 
+ZQSD pours les déplacements du J1:  
 G : coup de poings leger  
 Y : coup de poings lourd  
 H : garde  
 J : coup de pied  
-Les flèches pour le J2:
+
+Les flèches pour les deplacements du J2:
 4 : coup de poings leger  
 8 : coup de poings lourd  
 5 : garde  
