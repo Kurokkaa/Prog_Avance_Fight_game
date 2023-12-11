@@ -196,6 +196,7 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
             SDL_SetRenderDrawColor(renderer, 255, 255 , 0, 1);
             SDL_RenderDrawRect(renderer, &rect);
         }
+        
         SDL_RenderPresent(renderer);
 }
 

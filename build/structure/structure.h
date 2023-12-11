@@ -206,6 +206,7 @@ struct world_s{
     bool terminer; /*!< Champ indiquant si l'on est à la fin du jeu */
     sprite_perso p1;
     sprite_perso p2;
+    bool mode_1_player;
     set_map map;
     SDL_GameController **joysticks;
     menu menu_set;

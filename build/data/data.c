@@ -4,6 +4,8 @@
 #include "../controller/controller.h"
 #include "../lootbox/lootbox.h"
 #include "../liste/liste.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 
 /**
@@ -309,6 +311,49 @@ bool equals(int x, int y, char **map_point, char test)
     height_factor = CELL_HEIGHT;
     width_factor = CELL_WIDTH;
     return (map_point[y / height_factor][x / width_factor] == test);
+}
+
+/**
+ * @brief Ia du p2 si il y a 1 seul joueur
+ * 
+ * @param world les données du monde
+ * @param P1 le joueur 1
+ * @param p2 le bot
+ */
+void decision_ia(jeu* world, sprite_perso *p1, sprite_perso *p2){
+    if(p2->x - p1->x && p2->y >= p1->y){
+        int min = 1;
+        int max = 4;
+        int random_number = min + rand() % (max - min + 1);
+        printf("test");
+        switch(random_number){
+            case 1:
+                add_input_buffer(&world->p2, light_p, world->timestamp_w);
+                world->p2.chara_state = lpunch;
+                //l'attaque est considéré comme lancée
+                world->p2.attack_launched = true;
+            case 2:
+                add_input_buffer(&world->p2, heavy_p, world->timestamp_w);
+                world->p2.chara_state = hpunch;
+                //l'attaque est considéré comme lancée
+                world->p2.attack_launched = true;
+            case 3:
+                world->p2.guard = true;
+                world->p2.chara_state = idle;
+            case 4:
+                add_input_buffer(&world->p2, kick, world->timestamp_w);
+                world->p2.attack_launched = true;
+                world->p2.chara_state = kick;
+            default:
+                if(p2->x > p1->x){
+                    add_input_buffer(&world->p2, left, world->timestamp_w);
+                }
+                if(p2->x < p1->x){
+                    add_input_buffer(&world->p2, right, world->timestamp_w);
+                }
+
+        }
+    }
 }
 
 /**
@@ -770,6 +815,9 @@ void update_data(jeu *world)
     regenerate_shield(&world->p2);
     increase_special(&world->p1);
     increase_special(&world->p2);
+    if(IA == 1){
+        decision_ia(&world,&world->p1,&world->p2);
+    }
     move_fireball(&world->p1);
     move_fireball(&world->p2);
     move_gravityball(&world->p1);

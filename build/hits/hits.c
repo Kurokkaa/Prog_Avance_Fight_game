@@ -449,39 +449,3 @@ void move_gravityball(sprite_perso *perso)
         perso->gravityball.y = perso->y;
     }
 }
-
-/**
- * @brief gère la cancel combo
- * 
- * @param attacker celui qui donne le coup
- * @param receiver celui qui reçoit les coups
- * @param world Le monde
-*/
-void check_grows_back(sprite_perso *attacker, sprite_perso *receiver, jeu *world){
-    if(!attacker->mirror){
-        if((attacker->x + CELL_HEIGHT + GROWSBACK_HITBOX >= receiver->x) && (attacker->x + CELL_HEIGHT + GROWSBACK_HITBOX <= receiver->x + CELL_HEIGHT)){
-            for(int i; i< GROWSBACK_KNOCKBACK; i++){
-                if(receiver->x >= SCREEN_WIDTH){
-                    i = SCREEN_WIDTH - 2;
-                    receiver->x = SCREEN_WIDTH;
-                }
-                else{
-                    receiver->x++;
-                }
-        }
-    }
-    else{
-        if((attacker->x - GROWSBACK_HITBOX <= receiver->x + CELL_HEIGHT) && (attacker->x - GROWSBACK_HITBOX >= receiver->x)){
-            for(int i; i< GROWSBACK_KNOCKBACK; i++){
-                if(receiver->x <= 0){
-                    i = GROWSBACK_KNOCKBACK - 2;
-                    receiver->x =0;
-                }
-                else{
-                    receiver->x--;
-                }
-            }
-        }
-    }
-}
-}

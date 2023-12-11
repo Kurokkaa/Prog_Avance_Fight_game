@@ -541,7 +541,10 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
             }
             if (keystates[SDL_SCANCODE_LEFT] != world->keystates_pre[SDL_SCANCODE_LEFT])
             {
-                add_input_buffer(&world->p2, left, world->timestamp_w);
+                if(IA != 1){
+                    add_input_buffer(&world->p2, left, world->timestamp_w);
+                }
+                
             }
         }
 
@@ -566,7 +569,9 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
             }
             if (keystates[SDL_SCANCODE_RIGHT] != world->keystates_pre[SDL_SCANCODE_RIGHT])
             {
-                add_input_buffer(&world->p2, right, world->timestamp_w);
+                if(IA != 1){
+                    add_input_buffer(&world->p2, right, world->timestamp_w);
+                }
             }
         }
 
@@ -577,7 +582,9 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
                 world->p2.permibility = true;
                 if (keystates[SDL_SCANCODE_DOWN] != world->keystates_pre[SDL_SCANCODE_DOWN])
                 {
-                    add_input_buffer(&world->p2, down, world->timestamp_w);
+                    if(IA != true){
+                        add_input_buffer(&world->p2, down, world->timestamp_w);
+                    }
                 }
             }
         }
@@ -605,7 +612,9 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
             }
             if (keystates[SDL_SCANCODE_UP] != world->keystates_pre[SDL_SCANCODE_UP])
             {
-                add_input_buffer(&world->p2, up, world->timestamp_w);
+                if(IA != 1){
+                    add_input_buffer(&world->p2, up, world->timestamp_w);
+                }
             }
         }
 
@@ -617,16 +626,19 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
 
                 if (world->p2.chara_state == idle || world->p2.chara_state == walk)
                 {
-                    add_input_buffer(&world->p2, light_p, world->timestamp_w);
-                    for (int i = 0; i < NB_COMBOS && !combop2; i++)
-                    {
-                        combop2 = read_combo(&world->p2, i, world);
+                    if(IA != 1){
+                        add_input_buffer(&world->p2, light_p, world->timestamp_w);
+                        for (int i = 0; i < NB_COMBOS && !combop2; i++)
+                        {
+                            combop2 = read_combo(&world->p2, i, world);
+                        }
+                        if (!combop2)
+                        {
+                            world->p2.chara_state = lpunch;
+                            world->p2.attack_launched = true;
+                        }
                     }
-                    if (!combop2)
-                    {
-                        world->p2.chara_state = lpunch;
-                        world->p2.attack_launched = true;
-                    }
+
                 }
             }
         }
@@ -639,6 +651,7 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
 
                 if (world->p2.chara_state == idle || world->p2.chara_state == walk)
                 {
+                    if(IA!=1){
                     add_input_buffer(&world->p2, heavy_p, world->timestamp_w);
                     for (int i = 0; i < NB_COMBOS && !combop2; i++)
                     {
@@ -648,6 +661,7 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
                     {
                         world->p2.chara_state = hpunch;
                         world->p2.attack_launched = true;
+                    }
                     }
                 }
             }
@@ -661,6 +675,7 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
 
                 if (world->p2.chara_state == idle || world->p2.chara_state == walk)
                 {
+                    if(IA != 1){
                     add_input_buffer(&world->p2, kick, world->timestamp_w);
                     for (int i = 0; i < NB_COMBOS && !combop2; i++)
                     {
@@ -671,19 +686,24 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
                         world->p2.chara_state = kickstate;
                         world->p2.attack_launched = true;
                     }
+                    }
                 }
             }
         }
 
         if (keystates[SDL_SCANCODE_KP_5] && !world->p2.broken_guard && (world->p2.chara_state == idle || world->p2.chara_state == walk))
         {
-            world->p2.guard = true;
-            world->p2.chara_state = idle;
+            if(IA!=1){
+                world->p2.guard = true;
+                world->p2.chara_state = idle;
+            }
         }
     }
     if (!keystates[SDL_SCANCODE_KP_5] && (world->p2.chara_state == idle || world->p2.chara_state == walk))
     {
-        world->p2.guard = false;
+        if(IA!=1){
+            world->p2.guard = false;
+        }
     }
     // On stocke l'état de toutes les touches du clavier pour éviter les appuyés prolongés
     for (int i = 0; i < 123; i++)

@@ -29,8 +29,9 @@
     #define SPECIAL_START 0
     #define GROWSBACK_HITBOX 40
     #define GROWSBACK_KNOCKBACK 200
+    #define IA 0
 
-    enum game_state{combat, main_menu, pause, options, selection_perso, selection_map, endgame};
+    enum game_state{combat, main_menu, pause, options, selection_perso, selection_map, endgame, selection_IA};
     enum character_state{idle, walk, jump, crouch, fall, backwards, flight, flight_control, fall_control, landing, knockback, lpunch , kickstate,hpunch,stun,fireball,gravityball, winner , looser };
     enum game_map{city_night, forest, japan};
     enum combos_inputs{up, down, left, right, kick, light_p, heavy_p, special};
