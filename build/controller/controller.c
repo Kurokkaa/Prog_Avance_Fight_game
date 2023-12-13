@@ -337,7 +337,6 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
             if (world->p1.chara_state == fall)
             {
                 world->p1.chara_state = fall_control;
-              
             }
             //on ajoute l'input gauche au buffer si la touche n'a pas été appuyé sur la frame d'avant
             if (keystates[SDL_SCANCODE_A] != world->keystates_pre[SDL_SCANCODE_A])
@@ -518,27 +517,32 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
     {
         if ((!keystates[SDL_SCANCODE_LEFT] && !keystates[SDL_SCANCODE_RIGHT] && !keystates[SDL_SCANCODE_DOWN] || keystates[SDL_SCANCODE_LEFT] && keystates[SDL_SCANCODE_RIGHT]) && (world->p2.chara_state == walk))
         {
-            world->p2.chara_state = idle;
+            if(IA != 1){
+                world->p2.chara_state = idle;
+            }
         }
         if (keystates[SDL_SCANCODE_LEFT] && !keystates[SDL_SCANCODE_RIGHT])
         {
             // world->p1.speed = -CHARA_SPEED;
-            
+            if(IA!=1)
+            {
                 world->p2.backwards = true;
             
-            if (world->p2.chara_state == idle)
+                if (world->p2.chara_state == idle)
             {
-                world->p2.chara_state = walk;
+                    world->p2.chara_state = walk;
                             
             }
-            if (world->p2.chara_state == flight)
+                if (world->p2.chara_state == flight)
             {
-                world->p2.chara_state = flight_control;
+                    world->p2.chara_state = flight_control;
             }
             if (world->p2.chara_state == fall)
             {
-                world->p2.chara_state = fall_control;
+                    world->p2.chara_state = fall_control;
+                }
             }
+
             if (keystates[SDL_SCANCODE_LEFT] != world->keystates_pre[SDL_SCANCODE_LEFT])
             {
                 if(IA != 1){
@@ -550,7 +554,8 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
 
         if (!keystates[SDL_SCANCODE_LEFT] && keystates[SDL_SCANCODE_RIGHT])
         {
-             world->p2.backwards = false;
+            if(IA != 1){
+                world->p2.backwards = false;
            
             if (world->p2.chara_state == idle)
             {
@@ -567,6 +572,9 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
                 world->p2.chara_state = fall_control;
                 
             }
+            
+            }
+
             if (keystates[SDL_SCANCODE_RIGHT] != world->keystates_pre[SDL_SCANCODE_RIGHT])
             {
                 if(IA != 1){
@@ -582,7 +590,7 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
                 world->p2.permibility = true;
                 if (keystates[SDL_SCANCODE_DOWN] != world->keystates_pre[SDL_SCANCODE_DOWN])
                 {
-                    if(IA != true){
+                    if(IA == 0){
                         add_input_buffer(&world->p2, down, world->timestamp_w);
                     }
                 }
@@ -709,5 +717,8 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
     for (int i = 0; i < 123; i++)
     {
         world->keystates_pre[i] = keystates[i];
+    }
+    if(IA == 1 && (world->timestamp_w %100) == 0){
+        decision_ia(&world,&world->p1,&world->p2);
     }
 }

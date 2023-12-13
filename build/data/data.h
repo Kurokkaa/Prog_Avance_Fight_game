@@ -33,6 +33,7 @@ void update_data(jeu* world);
 void add_input_buffer(sprite_perso* player, enum combos_inputs touche_appui, int timestamp);
 void compute_game(jeu *world);
 void endgame_data(jeu *world);
+void decision_ia(jeu* world, sprite_perso *p1, sprite_perso *p2);
 
 
 /*FONCTIONS FREE ESPACE ALLOUE*/
