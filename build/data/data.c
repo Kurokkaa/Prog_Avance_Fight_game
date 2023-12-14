@@ -313,16 +313,6 @@ bool equals(int x, int y, char **map_point, char test)
     return (map_point[y / height_factor][x / width_factor] == test);
 }
 
-/**
- * @brief Ia du p2 si il y a 1 seul joueur
- * 
- * @param world les données du monde
- * @param P1 le joueur 1
- * @param p2 le bot
- */
-void decision_ia(jeu* world, sprite_perso *p1, sprite_perso *p2){
-    
-}
 
 /**
  * @brief ajout d'un input dans le buffer

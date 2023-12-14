@@ -548,7 +548,6 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
                 if(IA != 1){
                     add_input_buffer(&world->p2, left, world->timestamp_w);
                 }
-                
             }
         }
 
@@ -557,22 +556,19 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
             if(IA != 1){
                 world->p2.backwards = false;
            
-            if (world->p2.chara_state == idle)
-            {
-                world->p2.chara_state = walk;
+                if (world->p2.chara_state == idle)
+                {
+                    world->p2.chara_state = walk;
                 
-            }
-            if (world->p2.chara_state == flight)
-            {
-                world->p2.chara_state = flight_control;
-                
-            }
-            if (world->p2.chara_state == fall)
-            {
+                }
+                if (world->p2.chara_state == flight)
+                {
+                    world->p2.chara_state = flight_control;
+                }
+                if (world->p2.chara_state == fall)
+                {
                 world->p2.chara_state = fall_control;
-                
-            }
-            
+                }
             }
 
             if (keystates[SDL_SCANCODE_RIGHT] != world->keystates_pre[SDL_SCANCODE_RIGHT])
@@ -713,12 +709,100 @@ void gameplay_inputs(SDL_Event *event, jeu *world)
             world->p2.guard = false;
         }
     }
+    //Les actions de l'ia
+    if(IA!=0)
+    {
+        if(world->p1.x+150 < world->p2.x && (world->p2.chara_state == idle || world->p2.chara_state == walk) && !world->p2.guard)
+        {
+            world->p2.backwards = true;
+            if (world->p2.chara_state == idle)
+            {
+                world->p2.chara_state = walk;
+            
+            }
+            if (world->p2.chara_state == flight)
+            {
+                world->p2.chara_state = flight_control;
+            }
+            if (world->p2.chara_state == fall)
+            {
+                world->p2.chara_state = fall_control;
+            }
+            add_input_buffer(&world->p1, left, world->timestamp_w);
+            }
+       else if(world->p1.x > world->p2.x+150 && (world->p2.chara_state == idle || world->p2.chara_state == walk) && !world->p2.guard)
+        {
+            world->p2.backwards = false;
+            if (world->p2.chara_state == idle)
+            {
+                world->p2.chara_state = walk;
+            
+            }
+            if (world->p2.chara_state == flight)
+            {
+                world->p2.chara_state = flight_control;
+            }
+            if (world->p2.chara_state == fall)
+            {
+                world->p2.chara_state = fall_control;
+            }
+            add_input_buffer(&world->p1, right, world->timestamp_w);
+        }
+        else{
+            if(world->p2.x+100 >= world->p1.x && world->p2.x <= world->p1.x && world->p1.mirror || world->p2.x-100 <= world->p1.x && world->p2.x >= world->p1.x && !world->p1.mirror)
+            {
+                int random_value = (rand() % 5) + 1;
+                switch (random_value)
+                {
+                case 1:
+                if(world->p2.chara_state == idle || world->p2.chara_state == walk && !world->p2.guard)
+                {
+                    add_input_buffer(&world->p2, light_p, world->timestamp_w);
+                    world->p2.chara_state = lpunch;
+                    world->p2.attack_launched = true;
+                }
+                    break;
+                case 2:
+                    if(world->p2.chara_state == idle || world->p2.chara_state == walk && !world->p2.guard)
+                    {
+                        add_input_buffer(&world->p2, heavy_p, world->timestamp_w);
+                        world->p2.chara_state = hpunch;
+                        world->p2.attack_launched = true;
+                    }
+                    break;
+                case 3:
+                    if(world->p2.chara_state == idle || world->p2.chara_state == walk && !world->p2.guard)
+                    {
+                        add_input_buffer(&world->p2, kick, world->timestamp_w);
+                        world->p2.chara_state = kickstate;
+                        world->p2.attack_launched = true;
+                    }
+                        break;
+                case 4:
+                    if(world->p2.chara_state == idle || world->p2.chara_state == walk)
+                    {
+                        world->p2.guard = true;
+                        world->p2.chara_state = idle;
+                    }
+                    break;
+                case 5:
+                    if(world->p2.chara_state == idle || world->p2.chara_state == walk)
+                    {
+                        world->p2.guard = false;
+                    }
+                    break;
+                default:
+
+                    break;
+                }
+            }
+        }
+    }
+                    
+    
     // On stocke l'état de toutes les touches du clavier pour éviter les appuyés prolongés
     for (int i = 0; i < 123; i++)
     {
         world->keystates_pre[i] = keystates[i];
-    }
-    if(IA == 1 && (world->timestamp_w %100) == 0){
-        decision_ia(&world,&world->p1,&world->p2);
     }
 }
