@@ -1,5 +1,5 @@
 # Prog_Avance_Fight_game
-A stickfighter game
+A Stickfighter_Game
 
 Trinôme : STACCIONI John, CHAPUSOT Alexis, ANDRE Jeffrey 
 
