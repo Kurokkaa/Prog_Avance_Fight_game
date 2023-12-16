@@ -48,7 +48,7 @@ Ressources :
 Link of the git repository : Github : https://github.com/Kurokkaa/Prog_Avance_Fight_game.git
 
 To compile on Linux you will need to go with a terminal in the repository "Prog_Avance_Fight_game",
-enter this command in this order :
+enter the following commands :
             -> "cmake build"
             -> "make"
             -> "./main" (to open the game)
