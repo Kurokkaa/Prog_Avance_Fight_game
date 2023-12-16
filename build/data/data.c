@@ -172,7 +172,6 @@ void check_timer(jeu *world)
  * @brief sauvegarde le compteur choisi 
  * 
  * @param select la sélection
-
  */
 void save_counter(char *select)
 {
@@ -180,6 +179,17 @@ void save_counter(char *select)
     FILE *file = fopen("build/counter.bin", "wb");
     fwrite(select, strlen(select), 1, file);
     fclose(file);
+}
+
+/**
+ * @brief sauvegarde si on veut activer l'ia
+ * 
+ * @param world les données du monde
+ * @param ia un entier qui sert de booleen
+ */
+void set_IA(jeu *world, int ia)
+{
+    world->ia = ia;
 }
 
 /**

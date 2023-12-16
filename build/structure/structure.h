@@ -219,6 +219,7 @@ struct world_s{
     bool game_over;
     bool in_game;
     int gravityball_audio_chan;
+    int ia;
 };
 typedef struct world_s jeu;
 

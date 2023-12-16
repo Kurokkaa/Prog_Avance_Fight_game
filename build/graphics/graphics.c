@@ -188,11 +188,28 @@ void refresh_graphics(SDL_Renderer *renderer, jeu *world){
         //selection du du temps de la partie
         case options:
             apply_textures(world->menu_set.menu_fond,renderer,0,0);
-        
             rect.x = 60 + 300 * world->menu_set.index_menu;
             rect.y = 250;
-            rect.h = 300 ;
+            rect.h = 230 ;
             rect.w = 290; 
+            if(world->menu_set.index_menu >=4)
+            {
+                if(world->menu_set.index_menu ==4)
+                {
+                rect.x = 70 + 300 * (world->menu_set.index_menu - 3);
+                rect.y = 470;
+                rect.h = 230 ;
+                rect.w = 450;
+                }
+                if(world->menu_set.index_menu ==5)
+                {
+                rect.x = 250 + 300 * (world->menu_set.index_menu - 3);
+                rect.y = 470;
+                rect.h = 230 ;
+                rect.w = 300;
+                }
+            }
+            
             SDL_SetRenderDrawColor(renderer, 255, 255 , 0, 1);
             SDL_RenderDrawRect(renderer, &rect);
         }

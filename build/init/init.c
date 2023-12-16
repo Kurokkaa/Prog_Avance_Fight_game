@@ -115,6 +115,7 @@ void init_jeu(jeu *world, SDL_Renderer *renderer)
     world->gravityball_audio_chan = 8;
     world->game_over = false;
     world->in_game = false;
+    set_IA(&world, 0);
     world->keystates_pre = malloc(sizeof(int)*123);
 }
 

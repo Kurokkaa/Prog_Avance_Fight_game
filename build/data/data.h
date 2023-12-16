@@ -33,7 +33,6 @@ void update_data(jeu* world);
 void add_input_buffer(sprite_perso* player, enum combos_inputs touche_appui, int timestamp);
 void compute_game(jeu *world);
 void endgame_data(jeu *world);
-void decision_ia(jeu* world, sprite_perso *p1, sprite_perso *p2);
 
 
 /*FONCTIONS FREE ESPACE ALLOUE*/
@@ -42,6 +41,10 @@ void close_Joystick(jeu* world);
 void free_map_structure(char** map_structure);
 void destroy_textures(jeu* world);
 void free_menu(jeu* world);
+
+/*MENU SETTER*/
+void save_counter(char *select);
+void set_IA(jeu *world, int ia);
 
 /*FONCTION CHRONOMETRE*/
 void unpause(compteur* chrono);
