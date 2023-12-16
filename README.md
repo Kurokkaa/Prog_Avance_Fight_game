@@ -1,42 +1,55 @@
 # Prog_Avance_Fight_game
 A stickfighter game
 
-Trinôme : STACCIONI John, CHAPUSOT Alexis, ANDRE Jeffrey
+Trinôme : STACCIONI John, CHAPUSOT Alexis, ANDRE Jeffrey 
 
-Jeu de combat,
+A fighting game,
 
-Touches : 
-ZQSD pours les déplacements du J1:  
-G : coup de poings leger  
-Y : coup de poings lourd  
-H : garde  
-J : coup de pied  
+Inputs player 1:
+  -> Movements :
+      - Z : Up
+      - Q : Left
+      - S : Down
+      - D : Right
+  -> Hits :
+      - G : Light_Punch
+      - Y : Heavy_Punch
+      - J : Kick
+      - H : Guard
 
-Les flèches pour les deplacements du J2:
-4 : coup de poings leger  
-8 : coup de poings lourd  
-5 : garde  
-9: coup de pied  
+Inputs player 2:
+  -> Movements :
+      - Up Key : Up
+      - Left Key : Left
+      - Down Key : Down
+      - Right Key : Right
+  -> Hits :
+      - Numpad_4 : Light_Punch
+      - Numpad_8 : Heavy_Punch
+      - Numpad_9 : Kick
+      - Numpad_5 : Guard
 
-COMBOS 1: droite, gauche, coup de poings  
-COMBOS 2: droite, gauche, coup de poings lourds  
-COMBOS 3: droite, gauche, coup de pieds  
+There are 3 combos that you can use :
+  -> 1st one using 1 bar to send a projectile : Right -> Left -> Light_Punch
+  -> 2nd one using 2 bars to be in fury mod : Right -> Left -> Heavy_Punch
+  -> The last one using 2 bars to send a black hole : Right -> Left -> Kick
 
-Earth rumble: 
-https://www.youtube.com/watch?v=NfcAGablk-I&ab_channel=A.Graf
+A bot has been add, you can activate him in Options.
 
-Cinematic Deep Bass Rumble:
-https://www.youtube.com/watch?v=-rvPVbwk0XU&ab_channel=SoundLibrary
+Ressources :
+  - Earth rumble: https://www.youtube.com/watch?v=NfcAGablk-I&ab_channel=A.Graf
 
-Villain Laugh:
-https://www.youtube.com/watch?v=gfNXPJbz4hM&ab_channel=JustSubscribeKhabyLame
+  - Cinematic Deep Bass Rumble : https://www.youtube.com/watch?v=-rvPVbwk0XU&ab_channel=SoundLibrary
 
-Cinematic Punch, kick sound effects :
-https://www.youtube.com/watch?v=NZvCnpYdHqE&ab_channel=ClassicSounds
+  - Villain Laugh : https://www.youtube.com/watch?v=gfNXPJbz4hM&ab_channel=JustSubscribeKhabyLame
 
-Github : https://github.com/Kurokkaa/Prog_Avance_Fight_game.git
+  - Cinematic Punch, kick sound effects : https://www.youtube.com/watch?v=NZvCnpYdHqE&ab_channel=ClassicSounds
 
-Compilation : 
-cmake build -->
-make -->
-./main
+Link of the git repository : Github : https://github.com/Kurokkaa/Prog_Avance_Fight_game.git
+
+To compile on Linux you will need to go with a terminal in the repository "Prog_Avance_Fight_game",
+enter this command in this order :
+            -> "cmake build"
+            -> "make"
+            -> "./main" (to open the game)
+
