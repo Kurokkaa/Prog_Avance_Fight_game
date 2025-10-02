@@ -53,3 +53,7 @@ enter the following commands :
             -> "make"
             -> "./main" (to open the game)
 
+# Dependencies 
+SDL2_images, sdl2_ttf, 
+
+
