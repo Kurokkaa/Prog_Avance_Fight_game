@@ -54,6 +54,6 @@ enter the following commands :
             -> "./main" (to open the game)
 
 # Dependencies 
-SDL2_images, sdl2_ttf, 
+sdl2_images, sdl2_ttf, sdl2_mixer, 
 
 
